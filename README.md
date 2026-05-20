@@ -22,6 +22,7 @@ graph LR
     A -.->|submodule| KA[knowledge-atoms]
     A -.->|submodule| EA[event-atoms]
     A -.->|submodule| PLA[plugin-atoms]
+    A -.->|submodule| TA[theme-atoms]
     classDef umbrella fill:#1f3a5f,color:#fff,stroke:#fff,stroke-width:2px
 ```
 
@@ -38,6 +39,7 @@ graph LR
 | [`knowledge-atoms`](./knowledge-atoms) | Bootstrap | Knowledge graph primitives — entities, relationships, provenance |
 | [`event-atoms`](./event-atoms) | Bootstrap | Event primitives — types, schemas, channels, delivery semantics |
 | [`plugin-atoms`](./plugin-atoms) | Bootstrap | Plugin interface standards — contracts, capabilities, lifecycle hooks |
+| [`theme-atoms`](./theme-atoms) | Bootstrap | Theme primitives — prompt segments, separators, glyph sets, role bindings, syntax schemes |
 
 ## Clone with submodules
 

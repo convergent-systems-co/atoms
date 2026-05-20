@@ -31,3 +31,6 @@
 [submodule "plugin-atoms"]
 	path = plugin-atoms
 	url = https://github.com/convergent-systems-co/plugin-atoms.git
+[submodule "theme-atoms"]
+	path = theme-atoms
+	url = https://github.com/convergent-systems-co/theme-atoms.git

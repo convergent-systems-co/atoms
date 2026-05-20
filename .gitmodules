@@ -1,0 +1,33 @@
+[submodule "brand-atoms"]
+	path = brand-atoms
+	url = https://github.com/convergent-systems-co/brand-atoms.git
+[submodule "service-atoms"]
+	path = service-atoms
+	url = https://github.com/convergent-systems-co/service-atoms.git
+[submodule "prompt-atoms"]
+	path = prompt-atoms
+	url = https://github.com/convergent-systems-co/prompt-atoms.git
+[submodule "policy-atoms"]
+	path = policy-atoms
+	url = https://github.com/convergent-systems-co/policy-atoms.git
+[submodule "identity-atoms"]
+	path = identity-atoms
+	url = https://github.com/convergent-systems-co/identity-atoms.git
+[submodule "compliance-atoms"]
+	path = compliance-atoms
+	url = https://github.com/convergent-systems-co/compliance-atoms.git
+[submodule "workflow-atoms"]
+	path = workflow-atoms
+	url = https://github.com/convergent-systems-co/workflow-atoms.git
+[submodule "agent-atoms"]
+	path = agent-atoms
+	url = https://github.com/convergent-systems-co/agent-atoms.git
+[submodule "knowledge-atoms"]
+	path = knowledge-atoms
+	url = https://github.com/convergent-systems-co/knowledge-atoms.git
+[submodule "event-atoms"]
+	path = event-atoms
+	url = https://github.com/convergent-systems-co/event-atoms.git
+[submodule "plugin-atoms"]
+	path = plugin-atoms
+	url = https://github.com/convergent-systems-co/plugin-atoms.git

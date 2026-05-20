@@ -34,3 +34,6 @@
 [submodule "theme-atoms"]
 	path = theme-atoms
 	url = https://github.com/convergent-systems-co/theme-atoms.git
+[submodule "persona-atoms"]
+	path = persona-atoms
+	url = https://github.com/convergent-systems-co/persona-atoms.git

@@ -23,6 +23,7 @@ graph LR
     A -.->|submodule| EA[event-atoms]
     A -.->|submodule| PLA[plugin-atoms]
     A -.->|submodule| TA[theme-atoms]
+    A -.->|submodule| PER[persona-atoms]
     classDef umbrella fill:#1f3a5f,color:#fff,stroke:#fff,stroke-width:2px
 ```
 
@@ -40,6 +41,7 @@ graph LR
 | [`event-atoms`](./event-atoms) | Bootstrap | Event primitives — types, schemas, channels, delivery semantics |
 | [`plugin-atoms`](./plugin-atoms) | Bootstrap | Plugin interface standards — contracts, capabilities, lifecycle hooks |
 | [`theme-atoms`](./theme-atoms) | Bootstrap | Theme primitives — prompt segments, separators, glyph sets, role bindings, syntax schemes |
+| [`persona-atoms`](./persona-atoms) | Bootstrap | AI agent/LLM persona primitives — voice profiles, role definitions, behavioural constraints, knowledge boundaries, tone parameters |
 
 ## Clone with submodules
 

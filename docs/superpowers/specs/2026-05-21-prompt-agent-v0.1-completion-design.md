@@ -460,7 +460,7 @@ Before `astro build`, copy `../atoms/`, `../prompts/` or `../agents/`, `../rules
 - **Project names**: `prompt-atoms` and `agent-atoms` (one Pages project per catalog).
 - **Custom domains**: `prompt-atoms.com`, `agent-atoms.com`. Attached via `wrangler pages deployment` or the Cloudflare dashboard (out-of-band one-time setup).
 - **Deploy trigger**: GitHub Actions workflow on push to `main`; runs `pnpm install && pnpm build && wrangler pages deploy dist`.
-- **Secret**: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` as repo or org-level GH Actions secrets. Per `Code.md §5` (release-publishing secret consolidation), prefer **org-level** secret if Cloudflare credentials are reused across `convergent-systems-co` repos; per-repo only if scoping requires it. *Open question for the user: are these already configured at the org level for theme-atoms / brand-atoms?*
+- **Secret**: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` — already configured at the **org level** for `convergent-systems-co` (confirmed; used by `theme-atoms` and `brand-atoms` deploys). Both `prompt-atoms` and `agent-atoms` repos inherit the secrets via org membership; no per-repo configuration needed. Matches `Code.md §5` (release-publishing secret consolidation).
 - **Preview deploys**: on PRs (default Wrangler behavior).
 
 ### Accessibility & performance (Code.md §10.1 / §10.2)
@@ -568,11 +568,10 @@ Each gate is independent per `Common.md §2.3` (no blanket prior approvals).
 
 1. Before `git push` of the `feat/v0.1-completion` branch on `prompt-atoms` (the push itself is the first external action — the branch becomes visible on `github.com`).
 2. Before `gh pr create` on `prompt-atoms`.
-3. Before adding the CF Pages GitHub Actions secrets if they aren't already at org level (involves writing credentials into GitHub repo settings).
-4. Before `git push` of the `feat/v0.1-completion` branch on `agent-atoms`.
-5. Before `gh pr create` on `agent-atoms`.
-6. Before `git push` of the umbrella bump commit on `atoms/`.
-7. Before each Cloudflare Pages production deploy if triggered manually (vs auto-on-merge).
+3. Before `git push` of the `feat/v0.1-completion` branch on `agent-atoms`.
+4. Before `gh pr create` on `agent-atoms`.
+5. Before `git push` of the umbrella bump commit on `atoms/`.
+6. Before each Cloudflare Pages production deploy if triggered manually (vs auto-on-merge).
 
 All local commits inside the feature branches are autonomous (`Common.md §2.1`); only the boundary-crossing operations (push, PR open, CF deploy, secret writes) require approval.
 

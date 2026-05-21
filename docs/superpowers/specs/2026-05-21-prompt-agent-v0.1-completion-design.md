@@ -23,6 +23,9 @@ Bring `prompt-atoms` and `agent-atoms` to a fully-shipped v0.1 — every artifac
 - [ ] `scripts/build-exports.py` present and runnable
 - [ ] `exports/catalog.json` present and current with the tree
 - [ ] `scripts/validate.py` exits 0 for atoms + compositions + rules
+- [ ] `web/` Astro app builds; landing + browser + atom-detail + composition-detail pages live
+- [ ] `web/public/_headers` serves `/atoms/**/*.json`, `/prompts/*.json`, `/rules/**/*.json`, `/exports/catalog.json`, `/schemas/*.json` with correct content-types and cache rules
+- [ ] Cloudflare Pages deploy of `web/dist/` on `prompt-atoms.com`
 - [ ] One PR opened against `convergent-systems-co/prompt-atoms`
 
 **agent-atoms** (analogous)
@@ -30,6 +33,9 @@ Bring `prompt-atoms` and `agent-atoms` to a fully-shipped v0.1 — every artifac
 - [ ] `atoms/` ≥ 48 files (10 persona, 20 tool-definition, 8 capability-declaration, 5 role-boundary, 5 isolation-constraint — 5 added for parity beyond what GOALS.md numerates)
 - [ ] `agents/` ≥ 2 compositions
 - [ ] `schemas/composition-v1.json` + `rules/` + `exports/catalog.json`
+- [ ] `web/` Astro app builds; landing + browser + atom-detail + agent-detail pages live
+- [ ] `web/public/_headers` serves `/atoms/**/*.json`, `/agents/*.json`, `/rules/**/*.json`, `/exports/catalog.json`, `/schemas/*.json`
+- [ ] Cloudflare Pages deploy of `web/dist/` on `agent-atoms.com`
 - [ ] One PR opened against `convergent-systems-co/agent-atoms`
 
 **atoms (umbrella)**
@@ -43,11 +49,11 @@ Bring `prompt-atoms` and `agent-atoms` to a fully-shipped v0.1 — every artifac
 - No cross-catalog `see_also` references — each catalog stays standalone for this pass.
 - No `xaips` proposals filed. The v0.1 `XAIP: prompt composition schema` checkbox stays unchecked; we author the schema directly. After-the-fact XAIP filing is v0.2 work.
 - No signed exports. `exports/catalog.json` ships unsigned; signing is v0.2.
-- No site deploys to `prompt-atoms.com` / `agent-atoms.com` / `xdao.co`. Neither catalog has a `web/` directory.
+- No `xdao.co` updates this pass. `xdao` is a separate repo; listing the catalogs there is a follow-up task against `convergent-systems-co/xdao`.
 
 ### Open questions flagged, not resolved
 
-- Domain deploy story for `prompt-atoms.com` and `agent-atoms.com` (referenced in `ATOMS.yml`). Not gating v0.1.
+- DNS / Cloudflare Pages project naming. Assumed: project names `prompt-atoms` and `agent-atoms`, custom domains `prompt-atoms.com` and `agent-atoms.com`. Requires user to attach domains in the Cloudflare dashboard or `wrangler` CLI — out of band for the PR itself.
 
 ---
 
@@ -81,11 +87,36 @@ prompt-atoms/
 ├── scripts/
 │   ├── validate.py                                 ~ (extended for new schemas)
 │   └── build-exports.py                            +
-└── exports/
-    └── catalog.json                                + (build output)
+├── exports/
+│   └── catalog.json                                + (build output)
+└── web/                                            + (Astro + Wrangler, mirrors theme-atoms)
+    ├── astro.config.mjs                            +
+    ├── package.json                                +
+    ├── pnpm-lock.yaml                              +
+    ├── tsconfig.json                               +
+    ├── public/
+    │   ├── _headers                                + (content-types + cache for raw artifacts)
+    │   ├── atoms/         (copied from ../atoms/)  + (prebuild step)
+    │   ├── prompts/       (copied from ../prompts/) + (prebuild step)
+    │   ├── rules/         (copied from ../rules/)  + (prebuild step)
+    │   ├── schemas/       (copied from ../schemas/) + (prebuild step)
+    │   └── exports/       (copied from ../exports/) + (prebuild step)
+    ├── scripts/
+    │   └── copy-catalog.mjs                        + (prebuild copy)
+    └── src/
+        ├── layouts/Base.astro                      +
+        ├── components/                             + (AtomCard, CompositionCard, RefBadge, …)
+        └── pages/
+            ├── index.astro                         + (landing — what / why / how)
+            ├── how-to-use.astro                    +
+            ├── install.astro                       +
+            ├── atoms/index.astro                   + (browser, filter by type)
+            ├── atoms/[type]/[id].astro             + (dynamic atom detail)
+            ├── prompts/index.astro                 + (composition list)  [agent-atoms: agents/index.astro]
+            └── prompts/[id].astro                  + (composition detail, ref-resolved)  [agent-atoms: agents/[id].astro]
 ```
 
-`agent-atoms/` mirrors the shape; type names and counts change per Section 4.
+`agent-atoms/` mirrors the shape; type names and counts change per Section 4; `prompts/` paths in `web/src/pages/` become `agents/`.
 
 ### Two-PR flow
 
@@ -112,6 +143,12 @@ PR → review → merge   PR → review → merge   (single bump commit, direct 
 9.  feat(prompts|agents): seed compositions
 10. chore(exports): initial catalog.json
 11. test(validate): extend validator for compositions + rules
+12. feat(web): Astro scaffold (config, package.json, layouts, components)
+13. feat(web): landing + how-to-use + install pages
+14. feat(web): atom browser + dynamic atom detail page
+15. feat(web): composition browser + dynamic composition detail page
+16. feat(web): _headers for raw artifact serving
+17. ci(deploy): Cloudflare Pages deploy workflow (GH Actions, on main)
 ```
 
 Each commit body explains the *why*: for atoms, "needed by composition X" or "fills v0.1 type-count target"; for schemas, the design decisions on which fields are required.
@@ -367,6 +404,71 @@ rules/isolation-rule/network-write-requires-allowlist.json
 
 ---
 
+## 4b. Web app & deploy (per catalog)
+
+Both catalogs ship an Astro + Wrangler `web/` app that mirrors `theme-atoms/web/` in shape and toolchain. No design pass for layout — copy the theme-atoms structure and adapt content. v0.1 prioritizes correctness and machine-readability over visual polish; styling can be refined in v0.2.
+
+### Toolchain (matches theme-atoms exactly)
+
+| Tool         | Version      | Purpose                                |
+|--------------|--------------|----------------------------------------|
+| Astro        | `^6.1.10`    | Static site generator                  |
+| React        | `^19.0.0`    | Interactive components (browser/filter)|
+| Wrangler     | `^4.0.0`     | Cloudflare Pages deploy                |
+| pnpm         | latest stable| Package manager (lockfile committed)   |
+
+### Page set (per catalog)
+
+- `index.astro` — landing: catalog purpose, civilization-grade properties, link to atoms-tools, link to GitHub.
+- `how-to-use.astro` — installation, composition resolution walkthrough, vendor selection.
+- `install.astro` — `git clone --recurse-submodules` (umbrella), `git submodule update --init prompt-atoms` (single), `curl https://<catalog>.com/exports/catalog.json` (machine consumer).
+- `atoms/index.astro` — list every atom, filterable by type and vendor.
+- `atoms/[type]/[id].astro` — individual atom detail (rendered content, schema, see_also resolution).
+- `prompts/index.astro` (prompt-atoms) **or** `agents/index.astro` (agent-atoms) — composition list.
+- `prompts/[id].astro` **or** `agents/[id].astro` — composition detail with resolved refs as clickable links.
+
+### Prebuild copy (`scripts/copy-catalog.mjs`)
+
+Before `astro build`, copy `../atoms/`, `../prompts/` or `../agents/`, `../rules/`, `../schemas/`, `../exports/` into `web/public/`. Same pattern as `theme-atoms/web/scripts/copy-catalog.mjs`. This is how the static site serves the raw JSON files at predictable URLs.
+
+### `public/_headers`
+
+```
+/atoms/*.json
+  Content-Type: application/json; charset=utf-8
+  Cache-Control: public, max-age=300, must-revalidate
+
+/prompts/*.json                      # agent-atoms: /agents/*.json
+  Content-Type: application/json; charset=utf-8
+  Cache-Control: public, max-age=300, must-revalidate
+
+/rules/*.json
+  Content-Type: application/json; charset=utf-8
+  Cache-Control: public, max-age=300, must-revalidate
+
+/exports/catalog.json
+  Content-Type: application/json; charset=utf-8
+  Cache-Control: public, max-age=60, must-revalidate
+
+/schemas/*.json
+  Content-Type: application/schema+json; charset=utf-8
+  Cache-Control: public, max-age=3600, must-revalidate
+```
+
+### Cloudflare Pages deploy
+
+- **Project names**: `prompt-atoms` and `agent-atoms` (one Pages project per catalog).
+- **Custom domains**: `prompt-atoms.com`, `agent-atoms.com`. Attached via `wrangler pages deployment` or the Cloudflare dashboard (out-of-band one-time setup).
+- **Deploy trigger**: GitHub Actions workflow on push to `main`; runs `pnpm install && pnpm build && wrangler pages deploy dist`.
+- **Secret**: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` as repo or org-level GH Actions secrets. Per `Code.md §5` (release-publishing secret consolidation), prefer **org-level** secret if Cloudflare credentials are reused across `convergent-systems-co` repos; per-repo only if scoping requires it. *Open question for the user: are these already configured at the org level for theme-atoms / brand-atoms?*
+- **Preview deploys**: on PRs (default Wrangler behavior).
+
+### Accessibility & performance (Code.md §10.1 / §10.2)
+
+Inherited from theme-atoms's setup. v0.1 target: WCAG 2.1 AA on the landing and detail pages, Core Web Vitals within Code.md §10.2 thresholds on a static page with no large images. Atom-browser interactivity (React filter) is the one place performance budget needs explicit attention; defer interactivity to client islands and keep initial render server-static.
+
+---
+
 ## 5. Schemas & tooling
 
 ### `schemas/composition-v1.json` (per catalog)
@@ -466,11 +568,13 @@ Each gate is independent per `Common.md §2.3` (no blanket prior approvals).
 
 1. Before `git push` of the `feat/v0.1-completion` branch on `prompt-atoms` (the push itself is the first external action — the branch becomes visible on `github.com`).
 2. Before `gh pr create` on `prompt-atoms`.
-3. Before `git push` of the `feat/v0.1-completion` branch on `agent-atoms`.
-4. Before `gh pr create` on `agent-atoms`.
-5. Before `git push` of the umbrella bump commit on `atoms/`.
+3. Before adding the CF Pages GitHub Actions secrets if they aren't already at org level (involves writing credentials into GitHub repo settings).
+4. Before `git push` of the `feat/v0.1-completion` branch on `agent-atoms`.
+5. Before `gh pr create` on `agent-atoms`.
+6. Before `git push` of the umbrella bump commit on `atoms/`.
+7. Before each Cloudflare Pages production deploy if triggered manually (vs auto-on-merge).
 
-All local commits inside the feature branches are autonomous (`Common.md §2.1`); only the boundary-crossing operations (push, PR open) require approval.
+All local commits inside the feature branches are autonomous (`Common.md §2.1`); only the boundary-crossing operations (push, PR open, CF deploy, secret writes) require approval.
 
 ---
 
@@ -481,7 +585,8 @@ All local commits inside the feature branches are autonomous (`Common.md §2.1`)
 - **`xaips` proposals** — schemas authored directly; after-the-fact XAIP filing is v0.2 work.
 - **Signed exports** — no signing infra in either repo. Unsigned `exports/catalog.json` ships; signing in v0.2.
 - **Cross-catalog `see_also`** — schema regex restricts to the same catalog. Widening to a `prompt-atoms://`/`agent-atoms://` cross-prefix scheme is v0.2.
-- **Site deploys to `prompt-atoms.com` / `agent-atoms.com` / `xdao.co`** — no `web/` app exists in either catalog; out of scope.
+- **`xdao.co` updates** — listing the catalogs on the federation portal is a separate PR against `convergent-systems-co/xdao`.
+- **Visual polish on the web/ apps** — v0.1 ships functional pages with theme-atoms's existing styling. Design refinement, branding, and any catalog-specific visual identity are v0.2.
 - **`persona/peer-programmer`**, Claude-specific XML tool-tag template, redundant citation constraints — see §3 exclusions.
 
 ---
@@ -495,6 +600,9 @@ All local commits inside the feature branches are autonomous (`Common.md §2.1`)
 | Composition ref resolution is more complex than expected (semver matching) | v0.1 ships with exact-match only (`"version": "1.0.0"`). SemVer constraint matching (`"^1.0.0"`) is v0.2. |
 | Cross-repo coordination (one PR per child + umbrella bump) is error-prone | Strict ordering in §6: prompt-atoms PR merges first, then agent-atoms, then umbrella bump. Each step is an explicit approval gate. |
 | Tool ecosystem changes (e.g., `gh` CLI auth) break PR creation | Existing `~/.ai/Common.md §4.7` per-repo credential helper convention applies; verify with `gh auth status --hostname github.com` before each push. |
+| Astro 6 / React 19 toolchain churn during this work | Pin to exact versions of theme-atoms's working setup; commit `pnpm-lock.yaml`; verify `pnpm build` succeeds locally before each web/ commit. |
+| CF Pages deploy fails on first push (missing secrets, missing domain attachment) | First deploy targets a `*.pages.dev` URL (always works); custom domain attachment is a separate manual step in the CF dashboard, out of the PR's critical path. PR can merge with the catalog reachable on `prompt-atoms.pages.dev` even if `prompt-atoms.com` isn't attached yet. |
+| Web/ app and catalog data drift (atom added but copy script doesn't run) | `web/scripts/copy-catalog.mjs` runs as `prebuild` (matches theme-atoms). Build fails if files are missing. CI builds the web app on PR; mismatch is caught before merge. |
 
 ---
 
@@ -503,5 +611,8 @@ All local commits inside the feature branches are autonomous (`Common.md §2.1`)
 - `jsonschema` Python package (already used by `validate.py` in both catalogs).
 - `gh` CLI for PR creation (already used per existing PR history).
 - `git` submodule discipline in the umbrella repo (already in use).
+- `pnpm` + Node.js 20+ for the `web/` Astro app (matches theme-atoms requirements).
+- Cloudflare account with Pages enabled and `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` available (org or per-repo GH Actions secrets).
+- Custom domains `prompt-atoms.com` and `agent-atoms.com` either already registered or in-flight registration; DNS pointing at Cloudflare is a separate manual step.
 
-No new external dependencies introduced.
+No new code-level external dependencies introduced; web/ deps mirror theme-atoms exactly.

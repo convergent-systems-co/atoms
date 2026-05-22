@@ -2,6 +2,8 @@
 # Required token scopes:
 #   - Account → Cloudflare Pages → Edit
 #   - Zone → DNS → Edit (for the convergent-systems.co zone)
+# Module sourced from convergent-systems-co/core-infra (private repo) —
+# CI fetches it via CORE_INFRA_READ_TOKEN; see .github/workflows/tf-plan.yml.
 provider "cloudflare" {}
 
 module "pages_project" {

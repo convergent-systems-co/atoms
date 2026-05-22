@@ -1,0 +1,25 @@
+spec_version = "1.0.0"
+canonical_name = "atoms.convergent-systems.co/catalogs/service-atoms"
+version = "0.1.0"
+atom_type = "atoms.convergent-systems.co/catalogs"
+authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
+created_at = "2026-05-22T03:40:32.832Z"
+
+[signatures]
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "CQGw9XCLyIEqvWFOOACLFck7xcdFUyVPdyFCrnGR8MoLe19sFbMPQNluft5pu0LJ6fUpMjVb8wpGcPUXpfmvDw=="
+
+[body]
+atom_types = ["identity", "protocol", "schema", "policy", "endpoint-pattern"]
+canonical_domain = "service-atoms.com"
+catalog_name = "service-atoms"
+catalog_version = "0.1.0"
+composition_dir = "services"
+composition_type = "services"
+federation = "xdao.co"
+github_url = "https://github.com/convergent-systems-co/service-atoms"
+implements_spec = "atoms-spec/v1"
+license = "Apache-2.0"
+pages_url = "https://service-atoms.pages.dev"
+purpose = "Replaces DNS for services inside the ecosystem while remaining decentralized at the implementation layer — identity, protocol, schema, policy, and endpoint primitives composed into typed services."
+rule_types = ["version-compatibility", "auth-required", "schema-evolution"]
+runtime_consumers = ["universal-bus", "aish"]

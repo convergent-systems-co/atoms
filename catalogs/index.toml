@@ -1,0 +1,109 @@
+spec_version = "1.0.0"
+canonical_name = "atoms.convergent-systems.co/catalogs/index"
+version = "1.0.0"
+atom_type = "atoms.convergent-systems.co/class-index"
+authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
+created_at = "2026-05-22T03:40:32.832Z"
+
+[signatures]
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "fbM5vYFH/m+u6QUhVvKrt13o2BNGgV0uvK9g0d9NNgJWYLz6R0/oTDzZ08sjkSxf01XVKMXA84y6zarriXvnDA=="
+
+[body]
+class = "catalogs"
+total = 16
+
+[[body.catalogs]]
+canonical_domain = "agent-atoms.com"
+name = "agent-atoms"
+url = "/catalogs/agent-atoms.toml"
+version = "0.1.0"
+
+[[body.catalogs]]
+canonical_domain = "brand-atoms.com"
+name = "brand-atoms"
+url = "/catalogs/brand-atoms.toml"
+version = "0.1.0"
+
+[[body.catalogs]]
+canonical_domain = "channel-atoms.com"
+name = "channel-atoms"
+url = "/catalogs/channel-atoms.toml"
+version = "0.1.0"
+
+[[body.catalogs]]
+canonical_domain = "compliance-atoms.com"
+name = "compliance-atoms"
+url = "/catalogs/compliance-atoms.toml"
+version = "0.1.0"
+
+[[body.catalogs]]
+canonical_domain = "event-atoms.com"
+name = "event-atoms"
+url = "/catalogs/event-atoms.toml"
+version = "0.1.0"
+
+[[body.catalogs]]
+canonical_domain = "identity-atoms.com"
+name = "identity-atoms"
+url = "/catalogs/identity-atoms.toml"
+version = "0.1.0"
+
+[[body.catalogs]]
+canonical_domain = "knowledge-atoms.com"
+name = "knowledge-atoms"
+url = "/catalogs/knowledge-atoms.toml"
+version = "0.1.0"
+
+[[body.catalogs]]
+canonical_domain = "model-atoms.com"
+name = "model-atoms"
+url = "/catalogs/model-atoms.toml"
+version = "0.1.0"
+
+[[body.catalogs]]
+canonical_domain = "persona-atoms.com"
+name = "persona-atoms"
+url = "/catalogs/persona-atoms.toml"
+version = "0.1.0"
+
+[[body.catalogs]]
+canonical_domain = "plugin-atoms.com"
+name = "plugin-atoms"
+url = "/catalogs/plugin-atoms.toml"
+version = "0.1.0"
+
+[[body.catalogs]]
+canonical_domain = "policy-atoms.com"
+name = "policy-atoms"
+url = "/catalogs/policy-atoms.toml"
+version = "0.1.0"
+
+[[body.catalogs]]
+canonical_domain = "profile-atoms.com"
+name = "profile-atoms"
+url = "/catalogs/profile-atoms.toml"
+version = "0.1.0"
+
+[[body.catalogs]]
+canonical_domain = "prompt-atoms.com"
+name = "prompt-atoms"
+url = "/catalogs/prompt-atoms.toml"
+version = "0.1.0"
+
+[[body.catalogs]]
+canonical_domain = "service-atoms.com"
+name = "service-atoms"
+url = "/catalogs/service-atoms.toml"
+version = "0.1.0"
+
+[[body.catalogs]]
+canonical_domain = "theme-atoms.com"
+name = "theme-atoms"
+url = "/catalogs/theme-atoms.toml"
+version = "0.1.0"
+
+[[body.catalogs]]
+canonical_domain = "workflow-atoms.com"
+name = "workflow-atoms"
+url = "/catalogs/workflow-atoms.toml"
+version = "0.1.0"

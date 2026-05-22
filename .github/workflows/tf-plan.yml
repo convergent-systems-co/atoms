@@ -18,6 +18,8 @@ jobs:
       - uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: "1.7.5"
+      - name: configure git credentials
+        run: git config --global url."https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf "https://github.com/"
       - name: fmt
         run: terraform fmt -recursive -check infra/
       - name: init

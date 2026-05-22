@@ -18,6 +18,16 @@ jobs:
       - uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: "1.7.5"
+      - name: Configure git credentials for core-infra (private) module fetch
+        env:
+          CORE_INFRA_READ_TOKEN: ${{ secrets.CORE_INFRA_READ_TOKEN }}
+        run: |
+          # Map https://github.com → token-authenticated form just for the
+          # convergent-systems-co/core-infra fetch. The token is org-scoped
+          # to Contents:Read on core-infra only.
+          git config --global \
+            "url.https://x-access-token:${CORE_INFRA_READ_TOKEN}@github.com/convergent-systems-co/core-infra.insteadOf" \
+            "https://github.com/convergent-systems-co/core-infra"
       - name: fmt
         run: terraform fmt -recursive -check infra/
       - name: init

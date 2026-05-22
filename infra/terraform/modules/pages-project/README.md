@@ -1,41 +1,32 @@
-# infra/cloudflare/pages-project
+# pages-project module
 
-Terraform module that creates the Cloudflare Pages project hosting `atoms.convergent-systems.co` — the umbrella catalog directory site.
+Cloudflare Pages module that hosts the umbrella catalog directory site (and any sibling per-env Pages project). Direct-upload — deployments arrive via `wrangler pages deploy` in `.github/workflows/deploy.yml`, no Git-source binding.
 
-## What this creates
+## What it creates
 
-A single `cloudflare_pages_project` named `atoms-umbrella` (the default project name; the custom domain `atoms.convergent-systems.co` is attached out-of-band in the Cloudflare dashboard). Deployments arrive via `wrangler pages deploy` from `.github/workflows/deploy.yml` — no Git-source binding.
+| Resource | When | What |
+|---|---|---|
+| `cloudflare_pages_project.this` | always | The Pages project (default URL: `https://<project_name>.pages.dev`). |
+| `cloudflare_pages_domain.custom` | when `var.custom_domain != ""` | Attaches the custom hostname to the Pages project. |
+| `cloudflare_dns_record.pages_cname` | when `var.custom_domain != ""` and `var.zone_id != ""` | Proxied CNAME pointing the custom domain at `<project_name>.pages.dev`. |
 
-## Prerequisites
+The two optional resources are gated on `custom_domain` + `zone_id`; leaving them empty produces a Pages-only deploy (subdomain `*.pages.dev`).
 
-- OpenTofu or Terraform `>= 1.6.0`.
-- AWS-compatible credentials for the `cs-tfstate` R2 backend (from `~/.env/convergent-systems.co/.env` via `eval "$(cat …)"`).
-- `CLOUDFLARE_API_TOKEN` exported with `Cloudflare Pages — Edit` scope.
-- convergent-systems-co Cloudflare account ID (FIFO var `CLOUDFLARE_ACCOUNT_ID`).
+## Inputs
 
-## Apply
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `cloudflare_account_id` | yes | — | Cloudflare account ID. |
+| `project_name` | no | `atoms-umbrella` | Pages project name. |
+| `production_branch` | no | `main` | Branch that triggers prod deploys. |
+| `custom_domain` | no | `""` | Custom hostname to attach (e.g., `atoms.convergent-systems.co`). |
+| `zone_id` | no | `""` | Cloudflare zone ID hosting the custom domain. |
 
-```bash
-cd infra/cloudflare/pages-project
-set -a
-eval "$(cat ~/.env/convergent-systems.co/.env)"
-set +a
-export CLOUDFLARE_API_TOKEN="$CLOUDFLARE_ACCOUNT_TOKEN"
-export TF_VAR_cloudflare_account_id="$CLOUDFLARE_ACCOUNT_ID"
+## Required token scopes
 
-tofu init
-tofu plan
-tofu apply -auto-approve
-```
-
-After apply, the project is reachable at `https://atoms-umbrella.pages.dev`. Attach the custom domain `atoms.convergent-systems.co` in the Cloudflare dashboard (Pages → atoms-umbrella → Custom domains) — DNS lives in the `convergent-systems.com` zone managed by the same account, so Cloudflare auto-creates the CNAME.
+- **Account → Cloudflare Pages → Edit** (always)
+- **Zone → DNS → Edit** on the relevant zone (only when `custom_domain` is set)
 
 ## State
 
-```
-s3://cs-tfstate/state-bucket/convergent-systems-co/atoms/pages-project.tfstate
-```
-
-## Destroy
-
-Don't destroy this — it serves the central ecosystem directory.
+State lives in the env composition's backend config — not here. See `infra/terraform/envs/<env>/backend.tf`.

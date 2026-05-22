@@ -117,7 +117,8 @@ load helpers
   run "$SCRIPT" --template "$tmpl" --target "$tgt" --catalog channel-atoms --site single
   [ "$status" -eq 0 ]
   grep -q "name: channel-atoms" "$tgt/ARCHITECTURE.md"
-  ! grep -q "{{PROJECT_NAME}}" "$tgt/ARCHITECTURE.md"
+  run grep -q "{{PROJECT_NAME}}" "$tgt/ARCHITECTURE.md"
+  [ "$status" -ne 0 ]
 }
 
 @test "substitutes site URL placeholder" {
@@ -130,4 +131,33 @@ load helpers
   run "$SCRIPT" --template "$tmpl" --target "$tgt" --catalog channel-atoms --site single
   [ "$status" -eq 0 ]
   grep -q "site: https://channel-atoms.com" "$tgt/ARCHITECTURE.md"
+}
+
+@test "Makefile single-site: drops SITE variable and cd web/\$(SITE) becomes cd web" {
+  local tmpl tgt
+  tmpl=$(make_temp_dir); tgt=$(make_temp_dir)
+  make_fixture_template "$tmpl"
+  make_fixture_catalog_bandB "$tgt"
+
+  run "$SCRIPT" --template "$tmpl" --target "$tgt" --catalog test-atoms --site single
+  [ "$status" -eq 0 ]
+
+  run grep -q "SITE ?= site" "$tgt/Makefile"
+  [ "$status" -ne 0 ]
+  run grep -q 'cd web/$(SITE)' "$tgt/Makefile"
+  [ "$status" -ne 0 ]
+  grep -q "cd web &&" "$tgt/Makefile"
+}
+
+@test "ci.yml single-site: path web/site becomes web" {
+  local tmpl tgt
+  tmpl=$(make_temp_dir); tgt=$(make_temp_dir)
+  make_fixture_template "$tmpl"
+  make_fixture_catalog_bandB "$tgt"
+
+  run "$SCRIPT" --template "$tmpl" --target "$tgt" --catalog test-atoms --site single
+  [ "$status" -eq 0 ]
+  run grep -q "web/site" "$tgt/.github/workflows/ci.yml"
+  [ "$status" -ne 0 ]
+  grep -q "cd web " "$tgt/.github/workflows/ci.yml"
 }

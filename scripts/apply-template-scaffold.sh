@@ -80,6 +80,12 @@ main() {
 
   substitute_tokens "$target" "$catalog" "$dry_run"
 
+  # shellcheck source=lib/scaffold-transform.sh
+  source "$(dirname "$0")/lib/scaffold-transform.sh"
+
+  transform_makefile_single_site "$target" "$dry_run"
+  transform_workflows_single_site "$target" "$dry_run"
+
   echo "[scaffold] template=$template target=$target catalog=$catalog site=$site dry_run=$dry_run"
 }
 

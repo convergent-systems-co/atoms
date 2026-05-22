@@ -5,7 +5,7 @@
 provider "cloudflare" {}
 
 module "pages_project" {
-  source = "../../modules/pages-project"
+  source = "git::https://github.com/convergent-systems-co/core-infra.git//terraform/cloudflare/pages-project?ref=v0.1.0"
 
   cloudflare_account_id = var.cloudflare_account_id
   project_name          = "atoms-umbrella"

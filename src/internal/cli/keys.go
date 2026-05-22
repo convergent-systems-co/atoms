@@ -21,12 +21,12 @@ the root signing key's fingerprint, role, status, and public material.`,
 				return fmt.Errorf("fetch /keys/root.toml: %w", err)
 			}
 			out := cmd.OutOrStdout()
-			fmt.Fprintln(out, "Root key (atoms.convergent-systems.co):")
-			fmt.Fprintf(out, "  fingerprint:        %s\n", root.Body.Fingerprint)
-			fmt.Fprintf(out, "  role:               %s\n", root.Body.Role)
-			fmt.Fprintf(out, "  status:             %s\n", root.Body.Status)
-			fmt.Fprintf(out, "  authority:          %s\n", root.Body.Authority)
-			fmt.Fprintf(out, "  public_key_base64:  %s\n", root.Body.PublicKeyBase64)
+			_, _ = fmt.Fprintln(out, "Root key (atoms.convergent-systems.co):")
+			_, _ = fmt.Fprintf(out, "  fingerprint:        %s\n", root.Body.Fingerprint)
+			_, _ = fmt.Fprintf(out, "  role:               %s\n", root.Body.Role)
+			_, _ = fmt.Fprintf(out, "  status:             %s\n", root.Body.Status)
+			_, _ = fmt.Fprintf(out, "  authority:          %s\n", root.Body.Authority)
+			_, _ = fmt.Fprintf(out, "  public_key_base64:  %s\n", root.Body.PublicKeyBase64)
 			return nil
 		},
 	}

@@ -21,7 +21,7 @@ key — use ` + "`atoms verify`" + ` to check.`,
 			if err != nil {
 				return fmt.Errorf("fetch /spec/atom-spec.toml: %w", err)
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "%s\n", spec.Body.Markdown)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "%s\n", spec.Body.Markdown)
 			return nil
 		},
 	}

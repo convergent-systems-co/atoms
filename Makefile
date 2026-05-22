@@ -29,9 +29,9 @@ lint: ## Run golangci-lint across workspace modules
 		fi; \
 	done
 
-fmt: ## Run gofmt + terraform fmt
+fmt: ## Run gofmt + tofu fmt
 	gofmt -s -w .
-	terraform fmt -recursive infra/
+	tofu fmt -recursive infra/
 
 tidy: ## go work sync + go mod tidy per workspace module
 	$(GO) work sync
@@ -52,16 +52,16 @@ web-build: ## Build the Astro umbrella site
 	cd web && pnpm install --frozen-lockfile && pnpm build
 
 tf-init: ## Init the selected TF env (ENV=dev|prod)
-	cd infra/terraform/envs/$(ENV) && terraform init
+	cd infra/terraform/envs/$(ENV) && tofu init
 
 tf-plan: ## Plan against the selected TF env (ENV=dev|prod)
-	cd infra/terraform/envs/$(ENV) && terraform plan
+	cd infra/terraform/envs/$(ENV) && tofu plan
 
 tf-apply: ## Apply the selected TF env (ENV=dev|prod)
-	cd infra/terraform/envs/$(ENV) && terraform apply
+	cd infra/terraform/envs/$(ENV) && tofu apply
 
 tf-fmt: ## Format TF files
-	terraform fmt -recursive infra/
+	tofu fmt -recursive infra/
 
 clean: ## Remove build artifacts
 	rm -rf dist/ web/dist/

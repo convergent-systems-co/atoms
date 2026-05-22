@@ -4,7 +4,7 @@ variable "cloudflare_account_id" {
 }
 
 variable "project_name" {
-  description = "Cloudflare Pages project name. Default URL: https://<project_name>.pages.dev. Custom domain atoms.convergent-systems.com attached out-of-band."
+  description = "Cloudflare Pages project name. Default URL: https://<project_name>.pages.dev. Custom domain atoms.convergent-systems.co attached out-of-band."
   type        = string
   default     = "atoms-umbrella"
 }

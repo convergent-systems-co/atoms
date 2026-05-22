@@ -1,0 +1,78 @@
+---
+import Base from "../../layouts/Base.astro";
+const SPEC_VERSION = "1.0.0";
+---
+<Base
+  title="The Atom Spec"
+  description={`The Atom Spec v${SPEC_VERSION} — constitutional design for the *-atoms ecosystem.`}
+>
+  <h1>The Atom Spec</h1>
+  <p>
+    <strong>Status:</strong> v{SPEC_VERSION} — Constitutional design for the
+    <code>*-atoms</code> ecosystem.
+  </p>
+  <p>
+    The Spec defines what every atom and every catalog MUST be: universal
+    identity, URL convention, signing, versioning, references, trust, and
+    governance. Every catalog in the ecosystem conforms to it.
+  </p>
+
+  <h2>Canonical artifacts</h2>
+  <table>
+    <thead>
+      <tr><th>Form</th><th>Latest</th><th>Pinned</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Markdown</td>
+        <td><a href="/spec/atom-spec.md"><code>/spec/atom-spec.md</code></a></td>
+        <td><a href={`/spec/atom-spec@${SPEC_VERSION}.md`}><code>{`/spec/atom-spec@${SPEC_VERSION}.md`}</code></a></td>
+      </tr>
+      <tr>
+        <td>Canonical TOML atom</td>
+        <td><a href="/spec/atom-spec.toml"><code>/spec/atom-spec.toml</code></a></td>
+        <td><a href={`/spec/atom-spec@${SPEC_VERSION}.toml`}><code>{`/spec/atom-spec@${SPEC_VERSION}.toml`}</code></a></td>
+      </tr>
+      <tr>
+        <td>Version index</td>
+        <td colspan="2"><a href="/spec/index.toml"><code>/spec/index.toml</code></a></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Bootstrap status</h2>
+  <p>
+    Per Part IX §40, Spec v{SPEC_VERSION} is the bootstrap version — hand-authored
+    and signed by the <code>atoms.convergent-systems.co</code> root key. The
+    root key has not been minted yet, so the published TOML carries
+    <code>authored_by = "ed25519:bootstrap-pending"</code> and an empty
+    <code>[signatures]</code> table. When the root key is generated, the Spec
+    atom will be re-emitted under the same canonical URLs with valid
+    signatures, and the catalog registry entries will be re-signed at the
+    same time.
+  </p>
+
+  <h2>Reading the Spec</h2>
+  <p>
+    The full Spec is the markdown above. For a quick mental model:
+  </p>
+  <ul>
+    <li><strong>Part I.</strong> An atom is a typed, signed, versioned, TOML artifact.</li>
+    <li><strong>Part II.</strong> A catalog groups atoms into classes under a canonical domain.</li>
+    <li><strong>Part III.</strong> References resolve via <code>&lt;catalog-id&gt;/&lt;class&gt;/&lt;slug&gt;@&lt;version&gt;</code>.</li>
+    <li><strong>Part IV.</strong> Every atom is Ed25519-signed; trust is configurable.</li>
+    <li><strong>Part V.</strong> SemVer for versions; immutable once published; deprecation windows for breaking changes.</li>
+    <li><strong>Part VI.</strong> Converters transform canonical TOML into consumer formats (W3C tokens, CSS, Tailwind, Rego, …).</li>
+    <li><strong>Part VII.</strong> <code>atoms.convergent-systems.co</code> hosts the Spec, catalog registry, trust roots, and converter registry.</li>
+    <li><strong>Part VIII.</strong> Builders validate, resolve, and sign atoms before publication.</li>
+    <li><strong>Part IX.</strong> Self-reference: the Spec is its own first instance.</li>
+    <li><strong>Part X.</strong> Spec evolves via a formal amendment process.</li>
+    <li><strong>Part XI.</strong> Open questions (localization, archival, federation, …).</li>
+  </ul>
+</Base>
+
+<style>
+  table { border-collapse: collapse; margin: 1rem 0; width: 100%; }
+  th, td { text-align: left; border: 1px solid var(--border); padding: 0.5rem 0.75rem; }
+  th { background: var(--card); }
+</style>

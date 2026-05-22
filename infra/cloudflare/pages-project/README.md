@@ -1,10 +1,10 @@
 # infra/cloudflare/pages-project
 
-Terraform module that creates the Cloudflare Pages project hosting `atoms.convergent-systems.com` — the umbrella catalog directory site.
+Terraform module that creates the Cloudflare Pages project hosting `atoms.convergent-systems.co` — the umbrella catalog directory site.
 
 ## What this creates
 
-A single `cloudflare_pages_project` named `atoms-umbrella` (the default project name; the custom domain `atoms.convergent-systems.com` is attached out-of-band in the Cloudflare dashboard). Deployments arrive via `wrangler pages deploy` from `.github/workflows/deploy.yml` — no Git-source binding.
+A single `cloudflare_pages_project` named `atoms-umbrella` (the default project name; the custom domain `atoms.convergent-systems.co` is attached out-of-band in the Cloudflare dashboard). Deployments arrive via `wrangler pages deploy` from `.github/workflows/deploy.yml` — no Git-source binding.
 
 ## Prerequisites
 
@@ -28,7 +28,7 @@ tofu plan
 tofu apply -auto-approve
 ```
 
-After apply, the project is reachable at `https://atoms-umbrella.pages.dev`. Attach the custom domain `atoms.convergent-systems.com` in the Cloudflare dashboard (Pages → atoms-umbrella → Custom domains) — DNS lives in the `convergent-systems.com` zone managed by the same account, so Cloudflare auto-creates the CNAME.
+After apply, the project is reachable at `https://atoms-umbrella.pages.dev`. Attach the custom domain `atoms.convergent-systems.co` in the Cloudflare dashboard (Pages → atoms-umbrella → Custom domains) — DNS lives in the `convergent-systems.com` zone managed by the same account, so Cloudflare auto-creates the CNAME.
 
 ## State
 

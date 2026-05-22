@@ -1,0 +1,74 @@
+---
+import Base from "../../layouts/Base.astro";
+import { readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+
+const HERE = dirname(fileURLToPath(import.meta.url));
+const DIR_PATH = join(HERE, "../../../public/directory.json");
+const directoryRaw = await readFile(DIR_PATH, "utf-8");
+const directory = JSON.parse(directoryRaw);
+const catalogs = (directory.catalogs ?? []).slice().sort((a, b) => a.name.localeCompare(b.name));
+---
+<Base
+  title="Catalog registry"
+  description="Spec-conformant registry entries for every catalog in the ecosystem."
+>
+  <h1>Catalog registry</h1>
+  <p>
+    Per <a href="/spec/">Spec</a> §32, every recognized catalog has a
+    registry entry at <code>/catalogs/&lt;catalog-id&gt;.toml</code>. Entries are
+    generated at build time from each submodule's <code>ATOMS.yml</code> and
+    pin the catalog's canonical domain, declared atom types, and federation
+    metadata.
+  </p>
+
+  <h2>Index endpoint</h2>
+  <p>Programmatic discovery of all catalogs:</p>
+  <pre><code>curl https://atoms.convergent-systems.co/catalogs/index.toml</code></pre>
+
+  <h2>Catalogs ({catalogs.length})</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Catalog</th>
+        <th>Version</th>
+        <th>Domain</th>
+        <th>Status</th>
+        <th>Registry entry</th>
+      </tr>
+    </thead>
+    <tbody>
+      {catalogs.map((c) => (
+        <tr>
+          <td><strong>{c.name}</strong></td>
+          <td><code>{c.version ?? "—"}</code></td>
+          <td><code>{c.domain ?? `${c.name}.com`}</code></td>
+          <td>
+            <span class={c.status === "live" ? "status status-live" : "status status-bootstrap"}>
+              {c.status ?? "bootstrap"}
+            </span>
+          </td>
+          <td><a href={`/catalogs/${c.name}.toml`}><code>{`/catalogs/${c.name}.toml`}</code></a></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+
+  <h2>Bootstrap status</h2>
+  <p>
+    Entries currently carry <code>authored_by = "ed25519:bootstrap-pending"</code>
+    and an empty <code>[signatures]</code> table. They are signed in a
+    follow-up slice once the <code>atoms.convergent-systems.co</code> root
+    key is generated.
+  </p>
+</Base>
+
+<style>
+  table { border-collapse: collapse; margin: 1rem 0; width: 100%; }
+  th, td { text-align: left; border: 1px solid var(--border); padding: 0.5rem 0.75rem; }
+  th { background: var(--card); }
+  .status { font-size: 0.85em; padding: 0.125rem 0.5rem; border-radius: 0.25rem; }
+  .status-live { background: #e6f4ea; color: var(--live); }
+  .status-bootstrap { background: #fff5e0; color: var(--bootstrap); }
+</style>

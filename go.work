@@ -1,0 +1,7 @@
+go 1.22
+
+use (
+	./src/cmd/atoms
+	./src/internal
+	./src/pkg
+)

@@ -1,105 +1,111 @@
 # atoms
 
-> Umbrella super-project for every `*-Atoms` catalog in the [Convergent Systems](https://xdao.co) ecosystem.
+> Umbrella catalog-of-catalogs for every `*-atoms` catalog in the [Convergent Systems](https://xdao.co) ecosystem. Live at [**atoms.convergent-systems.co**](https://atoms.convergent-systems.co).
 
-`atoms` is not a monorepo. Each catalog remains its own independent repository — donatable, transferable, federatable, with its own release cycle and contributor community. `atoms` is a thin umbrella that pins a known-good revision of every catalog as a git submodule, so a single clone gives you the whole ecosystem in one tree.
+`atoms` hosts the canonical [Atom Spec](./spec/atom-spec.md), the catalog registry, the trust-root key registry, and an aggregated directory of every recognized catalog. It is itself a catalog conforming to the Spec (Part VII §31 — the catalog of catalogs).
 
-> Architectural principle (from `aish/ARCHITECTURE.md`): *"each `*-Atoms` catalog is its own repository. Not a monorepo."* Submodules preserve that — catalogs stay decentralized; this repo just provides an umbrella view.
+It is not a monorepo. Each catalog stays its own repository — donatable, transferable, federatable, with its own release cycle. `atoms` pins each via git submodule under `src/<catalog>-atoms/`, so a single clone with `--recurse-submodules` materializes the whole ecosystem.
 
-## What's in here
+## What's published
 
-```mermaid
-graph LR
-    A[atoms]:::umbrella
-    A -.->|submodule| BA[brand-atoms]
-    A -.->|submodule| SA[service-atoms]
-    A -.->|submodule| PA[prompt-atoms]
-    A -.->|submodule| POL[policy-atoms]
-    A -.->|submodule| IA[identity-atoms]
-    A -.->|submodule| CA[compliance-atoms]
-    A -.->|submodule| WA[workflow-atoms]
-    A -.->|submodule| AA[agent-atoms]
-    A -.->|submodule| KA[knowledge-atoms]
-    A -.->|submodule| EA[event-atoms]
-    A -.->|submodule| PLA[plugin-atoms]
-    A -.->|submodule| TA[theme-atoms]
-    A -.->|submodule| PER[persona-atoms]
-    classDef umbrella fill:#1f3a5f,color:#fff,stroke:#fff,stroke-width:2px
+| Path | What |
+|---|---|
+| [`/spec/atom-spec.md`](https://atoms.convergent-systems.co/spec/atom-spec.md) | Normative Atom Spec, markdown |
+| [`/spec/atom-spec.toml`](https://atoms.convergent-systems.co/spec/atom-spec.toml) | Spec as a signed atom (canonical) |
+| [`/catalogs/<id>.toml`](https://atoms.convergent-systems.co/catalogs/) | One signed registry entry per catalog |
+| [`/catalogs/index.toml`](https://atoms.convergent-systems.co/catalogs/index.toml) | Catalog index (signed) |
+| [`/keys/root.toml`](https://atoms.convergent-systems.co/keys/root.toml) | Root signing key public record (self-signed) |
+| [`/keys.toml`](https://atoms.convergent-systems.co/keys.toml) | Umbrella key registry (Spec §20) |
+| [`/directory.json`](https://atoms.convergent-systems.co/directory.json) | Live runtime aggregation (atom counts, status) |
+
+All atoms are Ed25519-signed by the umbrella root key (`ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=`).
+
+## Repository layout
+
+```
+spec/                    Spec source + signed atom outputs
+catalogs/                Signed catalog registry atoms
+keys/                    Trust root records
+keys.toml                Umbrella key registry
+
+src/                     Go workspace + atom submodules
+  cmd/atoms/             `atoms` CLI binary (slice 4 — pending)
+  internal/              internal Go packages
+  pkg/                   public Go packages
+  plugins/               Go-loadable plugins (deferred)
+  <catalog>-atoms/ × 16  git submodules
+
+web/                     Astro frontend (Cloudflare Pages)
+infra/terraform/         Multi-env Terraform (modules/ + envs/{dev,prod}/)
+scripts/                 Signing + tooling
+docs/adr/                Architecture decisions (MADR)
 ```
 
-| Catalog | Status | What it catalogs |
-|---|---|---|
-| [`brand-atoms`](./brand-atoms) | Existing | Brand standards — palettes, fonts, glyphs, brand compositions |
-| [`service-atoms`](./service-atoms) | Bootstrap | Ecosystem-native services — identities, protocols, schemas, policies, endpoints |
-| [`prompt-atoms`](./prompt-atoms) | Bootstrap | LLM prompt fragments — personas, constraints, formats, tool-use, refusal patterns |
-| [`policy-atoms`](./policy-atoms) | Bootstrap | Governance rules — subjects, resources, actions, effects, conditions |
-| [`identity-atoms`](./identity-atoms) | Bootstrap | Identity primitives — auth methods, claims, trust frameworks, keys |
-| [`compliance-atoms`](./compliance-atoms) | Bootstrap | Compliance frameworks — SOC2, HIPAA, ISO27001, PCI, GDPR mapped once |
-| [`workflow-atoms`](./workflow-atoms) | Bootstrap | Workflow primitives — steps, triggers, states, gates |
-| [`agent-atoms`](./agent-atoms) | Bootstrap | AI agent primitives — personas, tools, capabilities, role boundaries |
-| [`knowledge-atoms`](./knowledge-atoms) | Bootstrap | Knowledge graph primitives — entities, relationships, provenance |
-| [`event-atoms`](./event-atoms) | Bootstrap | Event primitives — types, schemas, channels, delivery semantics |
-| [`plugin-atoms`](./plugin-atoms) | Bootstrap | Plugin interface standards — contracts, capabilities, lifecycle hooks |
-| [`theme-atoms`](./theme-atoms) | Bootstrap | Theme primitives — prompt segments, separators, glyph sets, role bindings, syntax schemes |
-| [`persona-atoms`](./persona-atoms) | Bootstrap | AI agent/LLM persona primitives — voice profiles, role definitions, behavioural constraints, knowledge boundaries, tone parameters |
+See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for the full component diagram.
 
-## Clone with submodules
+## Clone
 
 ```bash
 git clone --recurse-submodules https://github.com/convergent-systems-co/atoms.git
-# or, after a plain clone:
-cd atoms && git submodule update --init --recursive
+# or after a plain clone:
+git submodule update --init --recursive
 ```
 
-## Update every catalog to its latest main
+## Catalogs (16)
+
+| Catalog | Status | What it catalogs |
+|---|---|---|
+| [`brand-atoms`](./src/brand-atoms) | Bootstrap | Brand standards — palettes, fonts, glyphs |
+| [`theme-atoms`](./src/theme-atoms) | Bootstrap | Themes — prompt segments, separators, role bindings |
+| [`prompt-atoms`](./src/prompt-atoms) | Bootstrap | LLM prompt fragments — personas, constraints, formats |
+| [`agent-atoms`](./src/agent-atoms) | Bootstrap | AI agent primitives — personas, tools, capabilities |
+| [`persona-atoms`](./src/persona-atoms) | Bootstrap | AI persona profiles — voice, role, tone parameters |
+| [`profile-atoms`](./src/profile-atoms) | Bootstrap | User and product profiles |
+| [`channel-atoms`](./src/channel-atoms) | Bootstrap | Channels — protocols, endpoints, delivery semantics |
+| [`model-atoms`](./src/model-atoms) | Bootstrap | Model registry — capabilities, context windows, pricing |
+| [`service-atoms`](./src/service-atoms) | Bootstrap | Service primitives — identities, protocols, endpoints |
+| [`policy-atoms`](./src/policy-atoms) | Bootstrap | Governance rules — subjects, resources, actions |
+| [`identity-atoms`](./src/identity-atoms) | Bootstrap | Identity — auth methods, claims, trust frameworks |
+| [`compliance-atoms`](./src/compliance-atoms) | Bootstrap | Compliance — SOC2, HIPAA, ISO27001, GDPR mappings |
+| [`workflow-atoms`](./src/workflow-atoms) | Bootstrap | Workflows — steps, triggers, states, gates |
+| [`event-atoms`](./src/event-atoms) | Bootstrap | Events — types, schemas, channels |
+| [`knowledge-atoms`](./src/knowledge-atoms) | Bootstrap | Knowledge graph — entities, relationships, provenance |
+| [`plugin-atoms`](./src/plugin-atoms) | Bootstrap | Plugin interfaces — contracts, capabilities, lifecycle |
+
+Live aggregation status (atom counts, deploy state) at [`/directory.json`](https://atoms.convergent-systems.co/directory.json).
+
+## Development
+
+```bash
+make help              # list targets
+make build             # build the atoms CLI binary (dist/atoms)
+make test              # run Go tests across the workspace
+make lint              # golangci-lint
+make web-build         # build the Astro umbrella site
+make tf-plan ENV=prod  # plan production infra
+make sign              # re-sign Spec + registry + key records (needs 1Password CLI)
+```
+
+The signing operation needs an active 1Password CLI session with access to the `Convergent Systems LLC / atoms-root` item. CI never holds the private key; signed atoms are committed under `spec/`, `catalogs/`, `keys/`.
+
+## Updating submodules
 
 ```bash
 git submodule update --remote --merge
-git add .
+git add src/
 git commit -m "chore: bump submodule pointers"
 git push
 ```
 
-## Working on a single catalog
+## Related repos
 
-Each submodule is a real git repo. `cd` into it, branch, commit, push — the changes land in the catalog's own repository. Then commit the updated submodule pointer here.
+Not submodules; ecosystem peers and runtimes:
 
-```bash
-cd prompt-atoms
-git checkout -b feat/new-persona
-# edit, commit, push, open PR against prompt-atoms
-cd ..
-git add prompt-atoms
-git commit -m "chore: bump prompt-atoms to <sha>"
-```
-
-## Related repos (peers in the ecosystem)
-
-These are **not** submodules of `atoms` — they're federation infrastructure that operates *on* the catalogs:
-
-- **[xdao](https://github.com/convergent-systems-co/xdao)** — Federation portal source. The ecosystem directory at [xdao.co](https://xdao.co).
-- **[atoms-spec](https://github.com/convergent-systems-co/atoms-spec)** — Canonical JSON Schemas every catalog conforms to.
-- **[atoms-tools](https://github.com/convergent-systems-co/atoms-tools)** — Cross-platform CLI: validate, export, bootstrap, resolve.
-- **[xaips](https://github.com/convergent-systems-co/xaips)** — XDAO AI Improvement Proposals. RFC-style governance.
-
-And these are **runtimes** that consume the catalogs:
-
-- **[aish](https://github.com/convergent-systems-co/aish)** — AI-native, shell-native, OS-insensitive, fully reversible shell.
-- **olympus** — AI development runtime (Pantheon Modules, governance panels, agentic loop).
-- **universal-bus** — Future service-layer runtime.
-
-## Civilization-grade properties
-
-Every catalog in here satisfies these. Failing any of them in CI blocks merge.
-
-| Property | Validation |
-|---|---|
-| Typed | Every atom, composition, and rule validates against a JSON Schema |
-| Versioned | Every atom has a semver `version` field |
-| Machine-readable | `catalog.json` export is valid JSON parseable without manual intervention |
-| Composable | Compositions reference atoms by ID; references resolve; circular refs forbidden |
-| Open | LICENSE file is OSI-approved (Apache-2.0 default) |
-| Durable | No external dependencies that could disappear |
+- **[xdao](https://github.com/convergent-systems-co/xdao)** — Federation portal (`xdao.co`)
+- **[xaips](https://github.com/convergent-systems-co/xaips)** — RFC-style governance
+- **[aish](https://github.com/convergent-systems-co/aish)** — AI-native shell (runtime consumer)
+- **olympus** — AI development runtime
+- **universal-bus** — Future service-layer runtime
 
 ## License
 

@@ -3,7 +3,9 @@
 #   - Account → Cloudflare Pages → Edit
 #   - Zone → DNS → Edit (for the convergent-systems.co zone)
 # Module sourced from convergent-systems-co/core-infra (private repo) —
-# CI fetches it via CORE_INFRA_READ_TOKEN; see .github/workflows/tf-plan.yml.
+# CI fetches it via CORE_INFRA_READ_TOKEN (org-level secret, fine-grained
+# PAT with Contents:Read on core-infra only). See .github/workflows/tf-plan.yml
+# for the git url.insteadOf mapping that uses the token.
 provider "cloudflare" {}
 
 module "pages_project" {

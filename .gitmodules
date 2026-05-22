@@ -37,3 +37,9 @@
 [submodule "persona-atoms"]
 	path = persona-atoms
 	url = https://github.com/convergent-systems-co/persona-atoms.git
+[submodule "channel-atoms"]
+	path = channel-atoms
+	url = https://github.com/convergent-systems-co/channel-atoms.git
+[submodule "model-atoms"]
+	path = model-atoms
+	url = https://github.com/convergent-systems-co/model-atoms.git

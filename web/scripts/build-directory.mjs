@@ -9,22 +9,21 @@ const REPO_DIR = resolve(WEB_DIR, "..");
 const PUBLIC = join(WEB_DIR, "public");
 const OUT_PATH = join(PUBLIC, "directory.json");
 
-// Each catalog is a submodule directory at the repo root containing ATOMS.yml.
-const CATALOG_DIRS = [
-  "agent-atoms",
-  "brand-atoms",
-  "compliance-atoms",
-  "event-atoms",
-  "identity-atoms",
-  "knowledge-atoms",
-  "persona-atoms",
-  "plugin-atoms",
-  "policy-atoms",
-  "prompt-atoms",
-  "service-atoms",
-  "theme-atoms",
-  "workflow-atoms",
-];
+// Catalogs are auto-discovered by parsing .gitmodules at the repo root.
+// Any submodule whose path holds an ATOMS.yml is treated as a catalog.
+// Adding a new catalog = `git submodule add ...`; no code change here.
+async function discoverCatalogDirs() {
+  const gitmodulesPath = join(REPO_DIR, ".gitmodules");
+  if (!existsSync(gitmodulesPath)) return [];
+  const text = await readFile(gitmodulesPath, "utf-8");
+  const paths = [];
+  for (const line of text.split("\n")) {
+    const match = line.match(/^\s*path\s*=\s*(.+?)\s*$/);
+    if (match) paths.push(match[1]);
+  }
+  // Only keep submodule paths that contain an ATOMS.yml (i.e., are catalogs).
+  return paths.filter((p) => existsSync(join(REPO_DIR, p, "ATOMS.yml")));
+}
 
 const FETCH_TIMEOUT_MS = 5000;
 
@@ -84,8 +83,9 @@ async function readCatalog(name) {
 }
 
 async function main() {
-  console.log(`Building directory.json from ${CATALOG_DIRS.length} catalogs…`);
-  const catalogs = await Promise.all(CATALOG_DIRS.map(readCatalog));
+  const catalogDirs = await discoverCatalogDirs();
+  console.log(`Building directory.json from ${catalogDirs.length} catalogs…`);
+  const catalogs = await Promise.all(catalogDirs.map(readCatalog));
 
   const live_count = catalogs.filter((c) => c.status === "live").length;
   const bootstrap_count = catalogs.filter((c) => c.status === "bootstrap").length;

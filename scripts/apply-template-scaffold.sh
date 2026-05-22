@@ -26,6 +26,15 @@ Options:
 EOF
 }
 
+require_arg() {
+  local name="$1" val="$2"
+  if [[ -z "$val" ]]; then
+    echo "Error: required: --$name" >&2
+    usage >&2
+    exit 2
+  fi
+}
+
 main() {
   if [[ $# -eq 0 ]]; then usage; exit 1; fi
 
@@ -34,14 +43,32 @@ main() {
     case "$1" in
       --template) template="$2"; shift 2 ;;
       --target)   target="$2";   shift 2 ;;
-      --catalog) catalog="$2";   shift 2 ;;
+      --catalog)  catalog="$2";  shift 2 ;;
       --site)     site="$2";     shift 2 ;;
       --dry-run)  dry_run=1;     shift ;;
       --help)     usage; exit 0 ;;
       --version)  echo "$VERSION"; exit 0 ;;
-      *) echo "Unknown option: $1" >&2; usage; exit 2 ;;
+      *) echo "Unknown option: $1" >&2; usage >&2; exit 2 ;;
     esac
   done
+
+  require_arg "template" "$template"
+  require_arg "target"   "$target"
+  require_arg "catalog"  "$catalog"
+  require_arg "site"     "$site"
+
+  if [[ "$site" != "existing" && "$site" != "single" ]]; then
+    echo "Error: --site must be 'existing' or 'single' (got: $site)" >&2
+    exit 2
+  fi
+  if [[ ! -d "$template" ]]; then
+    echo "Error: template directory not found: $template" >&2
+    exit 2
+  fi
+  if [[ ! -d "$target" ]]; then
+    echo "Error: target directory not found: $target" >&2
+    exit 2
+  fi
 
   echo "[scaffold] template=$template target=$target catalog=$catalog site=$site dry_run=$dry_run"
 }

@@ -22,3 +22,42 @@ load helpers
   run "$SCRIPT" --bogus
   [ "$status" -eq 2 ]
 }
+
+@test "missing --template exits 2 with clear error" {
+  run "$SCRIPT" --target /tmp/x --catalog c --site single
+  [ "$status" -eq 2 ]
+  [[ "$output" =~ "required: --template" ]]
+}
+
+@test "missing --target exits 2" {
+  run "$SCRIPT" --template /tmp/t --catalog c --site single
+  [ "$status" -eq 2 ]
+}
+
+@test "missing --catalog exits 2" {
+  run "$SCRIPT" --template /tmp/t --target /tmp/x --site single
+  [ "$status" -eq 2 ]
+}
+
+@test "missing --site exits 2" {
+  run "$SCRIPT" --template /tmp/t --target /tmp/x --catalog c
+  [ "$status" -eq 2 ]
+}
+
+@test "--site must be existing or single" {
+  run "$SCRIPT" --template /tmp/t --target /tmp/x --catalog c --site bogus
+  [ "$status" -eq 2 ]
+  [[ "$output" =~ "--site must be" ]]
+}
+
+@test "--template must exist as a directory" {
+  run "$SCRIPT" --template /nonexistent --target /tmp/x --catalog c --site single
+  [ "$status" -eq 2 ]
+  [[ "$output" =~ "template directory not found" ]]
+}
+
+@test "--target must exist as a directory" {
+  run "$SCRIPT" --template /tmp --target /nonexistent --catalog c --site single
+  [ "$status" -eq 2 ]
+  [[ "$output" =~ "target directory not found" ]]
+}

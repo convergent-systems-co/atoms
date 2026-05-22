@@ -70,6 +70,11 @@ main() {
     exit 2
   fi
 
+  # shellcheck source=lib/scaffold-copy.sh
+  source "$(dirname "$0")/lib/scaffold-copy.sh"
+
+  copy_non_web_scaffold "$template" "$target" "$dry_run"
+
   echo "[scaffold] template=$template target=$target catalog=$catalog site=$site dry_run=$dry_run"
 }
 

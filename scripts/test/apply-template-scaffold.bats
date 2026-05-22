@@ -61,3 +61,48 @@ load helpers
   [ "$status" -eq 2 ]
   [[ "$output" =~ "target directory not found" ]]
 }
+
+@test "copies non-web files from template into empty target (Band B)" {
+  local tmpl tgt
+  tmpl=$(make_temp_dir); tgt=$(make_temp_dir)
+  make_fixture_template "$tmpl"
+  make_fixture_catalog_bandB "$tgt"
+
+  run "$SCRIPT" --template "$tmpl" --target "$tgt" --catalog test-atoms --site single
+  [ "$status" -eq 0 ]
+
+  # Non-web files should be copied
+  [ -f "$tgt/.github/workflows/ci.yml" ]
+  [ -f "$tgt/infra/terraform/envs/dev" ] || [ -d "$tgt/infra/terraform/envs/dev" ]
+  [ -f "$tgt/Makefile" ]
+}
+
+@test "no-overwrite: pre-existing target files are preserved" {
+  local tmpl tgt
+  tmpl=$(make_temp_dir); tgt=$(make_temp_dir)
+  make_fixture_template "$tmpl"
+  make_fixture_catalog_bandB "$tgt"
+
+  echo "PRE-EXISTING" > "$tgt/README.md"
+
+  run "$SCRIPT" --template "$tmpl" --target "$tgt" --catalog test-atoms --site single
+  [ "$status" -eq 0 ]
+
+  # README.md was not overwritten
+  grep -q "PRE-EXISTING" "$tgt/README.md"
+}
+
+@test "Band A: web/ tree is NOT touched" {
+  local tmpl tgt
+  tmpl=$(make_temp_dir); tgt=$(make_temp_dir)
+  make_fixture_template "$tmpl"
+  make_fixture_catalog_bandA "$tgt"
+
+  local pre_hash; pre_hash=$(find "$tgt/web" -type f -exec sha256sum {} \; | sort | sha256sum)
+
+  run "$SCRIPT" --template "$tmpl" --target "$tgt" --catalog test-atoms --site existing
+  [ "$status" -eq 0 ]
+
+  local post_hash; post_hash=$(find "$tgt/web" -type f -exec sha256sum {} \; | sort | sha256sum)
+  [ "$pre_hash" = "$post_hash" ]
+}

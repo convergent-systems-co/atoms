@@ -41,7 +41,7 @@ const catalogs = (directory.catalogs ?? []).slice().sort((a, b) => a.name.locale
     <tbody>
       {catalogs.map((c) => (
         <tr>
-          <td><strong>{c.name}</strong></td>
+          <td><a href={`/catalogs/${c.name}/`}><strong>{c.name}</strong></a></td>
           <td><code>{c.version ?? "—"}</code></td>
           <td><code>{c.domain ?? `${c.name}.com`}</code></td>
           <td>
@@ -49,7 +49,7 @@ const catalogs = (directory.catalogs ?? []).slice().sort((a, b) => a.name.locale
               {c.status ?? "bootstrap"}
             </span>
           </td>
-          <td><a href={`/catalogs/${c.name}.toml`}><code>{`/catalogs/${c.name}.toml`}</code></a></td>
+          <td><a href={`/catalogs/${c.name}.toml`}><code>.toml</code></a></td>
         </tr>
       ))}
     </tbody>

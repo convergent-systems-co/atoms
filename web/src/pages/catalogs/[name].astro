@@ -1,0 +1,155 @@
+---
+import Base from "../../layouts/Base.astro";
+import { parse as parseYaml } from "yaml";
+import { marked } from "marked";
+
+export async function getStaticPaths() {
+  const yamlFiles = import.meta.glob("../../../../src/*-atoms/ATOMS.yml", {
+    query: "?raw",
+    import: "default",
+    eager: true,
+  });
+  const readmeFiles = import.meta.glob("../../../../src/*-atoms/README.md", {
+    query: "?raw",
+    import: "default",
+    eager: true,
+  });
+
+  const paths = [];
+  for (const [path, rawYaml] of Object.entries(yamlFiles)) {
+    const yaml = parseYaml(rawYaml);
+    const name = yaml.name;
+    if (!name) continue;
+    const readmePath = path.replace("/ATOMS.yml", "/README.md");
+    const readme = readmeFiles[readmePath] ?? null;
+    paths.push({
+      params: { name },
+      props: { yaml, readme },
+    });
+  }
+  return paths;
+}
+
+const { yaml, readme } = Astro.props;
+
+// Render README to HTML if present. marked is GFM by default in v12+.
+marked.setOptions({ gfm: true, breaks: false });
+const readmeHtml = readme ? marked.parse(readme) : null;
+
+const status = "bootstrap"; // every catalog is currently bootstrap; future: query /directory.json
+const purpose = typeof yaml.purpose === "string" ? yaml.purpose.trim() : "";
+const atomTypes = Array.isArray(yaml.atomTypes) ? yaml.atomTypes : [];
+const ruleTypes = Array.isArray(yaml.ruleTypes) ? yaml.ruleTypes : [];
+const runtimeConsumers = Array.isArray(yaml.runtimeConsumers) ? yaml.runtimeConsumers : [];
+const federation = yaml.ecosystem?.federation ?? null;
+const domain = yaml.domain ?? `${yaml.name}.com`;
+---
+<Base
+  title={yaml.name}
+  description={purpose || `${yaml.name} — a catalog in the *-atoms ecosystem`}
+>
+  <nav class="breadcrumb">
+    <a href="/">Home</a> <span>/</span>
+    <a href="/catalogs/">Catalogs</a> <span>/</span>
+    <span>{yaml.name}</span>
+  </nav>
+
+  <header class="catalog-header">
+    <h1>{yaml.name}</h1>
+    <div class="badges">
+      <span class={`status status-${status}`}>{status} · v{yaml.version}</span>
+      <code class="domain">{domain}</code>
+    </div>
+    {purpose && <p class="purpose">{purpose}</p>}
+  </header>
+
+  <section>
+    <h2>At a glance</h2>
+    <table class="meta">
+      <tbody>
+        <tr><th>Spec</th><td><code>{yaml.spec ?? "atoms-spec/v1"}</code></td></tr>
+        <tr><th>License</th><td>{yaml.license ?? "Apache-2.0"}</td></tr>
+        {federation && (
+          <tr><th>Federation</th><td><a href={`https://${federation}`}><code>{federation}</code></a></td></tr>
+        )}
+        {atomTypes.length > 0 && (
+          <tr><th>Atom types</th><td><ul class="tags">{atomTypes.map((t) => <li><code>{t}</code></li>)}</ul></td></tr>
+        )}
+        {yaml.compositionType && (
+          <tr>
+            <th>Composition</th>
+            <td>
+              <code>{yaml.compositionType}</code>
+              {yaml.compositionDir && <> · directory <code>{yaml.compositionDir}/</code></>}
+            </td>
+          </tr>
+        )}
+        {ruleTypes.length > 0 && (
+          <tr><th>Rule types</th><td><ul class="tags">{ruleTypes.map((t) => <li><code>{t}</code></li>)}</ul></td></tr>
+        )}
+        {runtimeConsumers.length > 0 && (
+          <tr><th>Runtime consumers</th><td><ul class="tags">{runtimeConsumers.map((t) => <li><code>{t}</code></li>)}</ul></td></tr>
+        )}
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Links</h2>
+    <ul class="links">
+      <li><a href={`https://${domain}`}>Canonical domain</a> <span class="hint">(live when {yaml.name} is deployed)</span></li>
+      <li><a href={`https://${yaml.name}.pages.dev`}>Cloudflare Pages preview</a> <span class="hint">(live when deployed)</span></li>
+      <li><a href={`/catalogs/${yaml.name}.toml`}>Signed registry entry</a> <code>/catalogs/{yaml.name}.toml</code></li>
+      <li><a href={`https://github.com/convergent-systems-co/${yaml.name}`}>Source repository</a></li>
+    </ul>
+  </section>
+
+  {readmeHtml && (
+    <section>
+      <h2>README</h2>
+      <article class="readme" set:html={readmeHtml} />
+    </section>
+  )}
+
+  {!readmeHtml && (
+    <section>
+      <h2>README</h2>
+      <p class="missing">No README.md committed yet in <a href={`https://github.com/convergent-systems-co/${yaml.name}`}>convergent-systems-co/{yaml.name}</a>.</p>
+    </section>
+  )}
+</Base>
+
+<style>
+  .breadcrumb { font-size: 0.875rem; color: var(--muted); margin-bottom: 1rem; }
+  .breadcrumb a { color: var(--muted); }
+  .breadcrumb span { margin: 0 0.25rem; }
+
+  .catalog-header { margin-bottom: 2rem; }
+  .catalog-header h1 { margin-bottom: 0.5rem; }
+  .badges { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+  .domain { font-size: 0.875rem; }
+  .status { font-size: 0.85em; padding: 0.125rem 0.5rem; border-radius: 0.25rem; }
+  .status-bootstrap { background: #fff5e0; color: var(--bootstrap); }
+  .status-live { background: #e6f4ea; color: var(--live); }
+  .purpose { font-size: 1.0625rem; color: var(--fg); margin: 1rem 0 0; max-width: 50rem; }
+
+  .meta { border-collapse: collapse; width: 100%; max-width: 60rem; margin: 1rem 0; }
+  .meta th, .meta td { text-align: left; vertical-align: top; border: 1px solid var(--border); padding: 0.5rem 0.75rem; }
+  .meta th { background: var(--card); width: 12rem; }
+  .tags { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.375rem; }
+  .tags li { padding: 0.125rem 0.4rem; background: #f0f0f0; border-radius: 0.25rem; font-size: 0.875rem; }
+
+  .links { list-style: none; padding: 0; }
+  .links li { margin: 0.5rem 0; }
+  .links .hint { color: var(--muted); font-size: 0.875rem; margin-left: 0.5rem; }
+
+  .readme { padding: 1.5rem; background: var(--card); border: 1px solid var(--border); border-radius: 0.5rem; }
+  .readme :global(h1) { margin-top: 0; }
+  .readme :global(h1), .readme :global(h2), .readme :global(h3) { line-height: 1.2; }
+  .readme :global(pre) { font-size: 0.875rem; }
+  .readme :global(table) { border-collapse: collapse; }
+  .readme :global(th), .readme :global(td) { border: 1px solid var(--border); padding: 0.4rem 0.75rem; }
+  .readme :global(blockquote) { border-left: 3px solid var(--border); padding-left: 1rem; color: var(--muted); margin-left: 0; }
+
+  .missing { color: var(--muted); font-style: italic; }
+</style>

@@ -1,3 +1,8 @@
 # Per-env variables for prod.
-# cloudflare_account_id is supplied via TF_VAR_cloudflare_account_id
-# (read from ~/.env/convergent-systems.co/.env) — do not commit the value.
+#
+# Supply secrets via env vars, not committed values:
+#   export TF_VAR_cloudflare_account_id=<account-id>
+#   export TF_VAR_zone_id=<zone-id-for-convergent-systems.co>
+#
+# Look up the zone ID in the Cloudflare dashboard:
+#   dash.cloudflare.com → convergent-systems.co → Overview → "Zone ID"

@@ -106,3 +106,28 @@ load helpers
   local post_hash; post_hash=$(find "$tgt/web" -type f -exec sha256sum {} \; | sort | sha256sum)
   [ "$pre_hash" = "$post_hash" ]
 }
+
+@test "substitutes {{PROJECT_NAME}} with catalog name in copied files" {
+  local tmpl tgt
+  tmpl=$(make_temp_dir); tgt=$(make_temp_dir)
+  make_fixture_template "$tmpl"
+  echo "name: {{PROJECT_NAME}}" > "$tmpl/ARCHITECTURE.md"
+  make_fixture_catalog_bandB "$tgt"
+
+  run "$SCRIPT" --template "$tmpl" --target "$tgt" --catalog channel-atoms --site single
+  [ "$status" -eq 0 ]
+  grep -q "name: channel-atoms" "$tgt/ARCHITECTURE.md"
+  ! grep -q "{{PROJECT_NAME}}" "$tgt/ARCHITECTURE.md"
+}
+
+@test "substitutes site URL placeholder" {
+  local tmpl tgt
+  tmpl=$(make_temp_dir); tgt=$(make_temp_dir)
+  make_fixture_template "$tmpl"
+  echo "site: https://example.com" > "$tmpl/ARCHITECTURE.md"
+  make_fixture_catalog_bandB "$tgt"
+
+  run "$SCRIPT" --template "$tmpl" --target "$tgt" --catalog channel-atoms --site single
+  [ "$status" -eq 0 ]
+  grep -q "site: https://channel-atoms.com" "$tgt/ARCHITECTURE.md"
+}

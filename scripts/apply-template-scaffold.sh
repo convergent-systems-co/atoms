@@ -75,6 +75,11 @@ main() {
 
   copy_non_web_scaffold "$template" "$target" "$dry_run"
 
+  # shellcheck source=lib/scaffold-substitute.sh
+  source "$(dirname "$0")/lib/scaffold-substitute.sh"
+
+  substitute_tokens "$target" "$catalog" "$dry_run"
+
   echo "[scaffold] template=$template target=$target catalog=$catalog site=$site dry_run=$dry_run"
 }
 

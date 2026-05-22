@@ -42,3 +42,6 @@ logs/
 
 # AI tooling state (checkpoints, transient logs)
 .ai/
+
+# Spawn / orchestrator scratch
+.artifacts/

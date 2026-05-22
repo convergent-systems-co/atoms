@@ -43,3 +43,6 @@
 [submodule "model-atoms"]
 	path = model-atoms
 	url = https://github.com/convergent-systems-co/model-atoms.git
+[submodule "profile-atoms"]
+	path = profile-atoms
+	url = https://github.com/convergent-systems-co/profile-atoms.git

@@ -14,6 +14,16 @@ module "pages_project" {
   zone_id               = var.zone_id
 }
 
+# The Pages project resource moved when infra was migrated to the
+# multi-env layout in PR #13: from root-module `cloudflare_pages_project.this`
+# to `module.pages_project.cloudflare_pages_project.this`. The state on R2
+# still pins the old address, so without this block terraform would
+# destroy-then-create the live project. Resource itself is unchanged.
+moved {
+  from = cloudflare_pages_project.this
+  to   = module.pages_project.cloudflare_pages_project.this
+}
+
 variable "cloudflare_account_id" {
   description = "Cloudflare account ID that owns the Pages project."
   type        = string

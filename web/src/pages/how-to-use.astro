@@ -1,0 +1,74 @@
+---
+import Base from "../layouts/Base.astro";
+---
+<Base title="How to use" description="How AI agents and tools can consume the atoms directory.">
+  <h1>How to use the atoms directory</h1>
+
+  <h2>One request, every catalog</h2>
+  <p>Everything an agent needs to discover the Convergent Systems atoms ecosystem is at one URL:</p>
+  <pre><code>curl https://atoms.convergent-systems.com/directory.json</code></pre>
+
+  <h2>Shape</h2>
+  <pre><code>{`{
+  "ecosystem": "convergent-systems",
+  "spec": "atoms-spec/v1",
+  "built_at": "2026-05-21T22:00:00.000Z",
+  "summary": {
+    "total": 13,
+    "live": 4,
+    "bootstrap": 9
+  },
+  "catalogs": [
+    {
+      "name": "prompt-atoms",
+      "version": "0.1.0",
+      "status": "live",
+      "domain": "prompt-atoms.com",
+      "pages_url": "https://prompt-atoms.pages.dev",
+      "github_url": "https://github.com/convergent-systems-co/prompt-atoms",
+      "federation": "xdao.co",
+      "purpose": "Prompt engineering as a canonical, machine-readable, ...",
+      "atom_types": ["persona", "constraint", "format-instruction", "tool-use-template", "refusal-pattern", "output-schema"],
+      "composition_type": "prompts",
+      "composition_dir": "prompts",
+      "rule_types": ["model-compatibility", "token-length-constraint", "format-compatibility"],
+      "runtime_consumers": ["aish", "olympus"],
+      "license": "Apache-2.0",
+      "live": {
+        "catalog_url": "https://prompt-atoms.pages.dev/exports/catalog.json",
+        "atoms": 50,
+        "compositions": 2,
+        "rules": 2,
+        "built_at": "2026-05-21T..."
+      }
+    },
+    {
+      "name": "compliance-atoms",
+      "version": "0.1.0",
+      "status": "bootstrap",
+      "atom_types": [...],
+      "composition_type": "frameworks",
+      "live": null
+    }
+  ]
+}`}</code></pre>
+
+  <h2>Fields</h2>
+  <ul>
+    <li><code>status</code>: <code>live</code> (web app deployed, <code>/exports/catalog.json</code> reachable) or <code>bootstrap</code> (schemas + intent declared, no deploy yet).</li>
+    <li><code>atom_types</code>: declared types in <code>ATOMS.yml</code>. For live catalogs this matches the types in the live <code>catalog.json</code>.</li>
+    <li><code>composition_type</code> / <code>composition_dir</code>: where compositions live (<code>prompts</code>, <code>agents</code>, etc).</li>
+    <li><code>runtime_consumers</code>: products / runtimes that pull this catalog at runtime.</li>
+    <li><code>live</code>: present only when the catalog is deployed; contains the live atom / composition / rule counts and a <code>built_at</code> timestamp from the catalog's own export.</li>
+  </ul>
+
+  <h2>Consuming a specific catalog</h2>
+  <p>Each live catalog publishes its full content at <code>{`<pages_url>/exports/catalog.json`}</code>. Example:</p>
+  <pre><code>curl https://prompt-atoms.pages.dev/exports/catalog.json | jq '.atoms[0]'</code></pre>
+
+  <h2>Caching</h2>
+  <p>The directory is cached for 60s at the edge (<code>Cache-Control: public, max-age=60</code>). CORS is open (<code>Access-Control-Allow-Origin: *</code>) so any client can fetch.</p>
+
+  <h2>Rebuild cadence</h2>
+  <p>The directory rebuilds on every push to <code>main</code> of <a href="https://github.com/convergent-systems-co/atoms"><code>convergent-systems-co/atoms</code></a>. To force a refresh, push a no-op commit or re-run the deploy workflow.</p>
+</Base>

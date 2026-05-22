@@ -1,0 +1,64 @@
+---
+import Base from "../layouts/Base.astro";
+import CatalogCard from "../components/CatalogCard.astro";
+import directory from "../../public/directory.json";
+
+const live = directory.catalogs.filter((c: any) => c.status === "live");
+const bootstrap = directory.catalogs.filter((c: any) => c.status === "bootstrap");
+
+const totalAtoms = live.reduce((s: number, c: any) => s + (c.live?.atoms ?? 0), 0);
+const totalCompositions = live.reduce((s: number, c: any) => s + (c.live?.compositions ?? 0), 0);
+---
+<Base title="Home" description="Directory of every *-atoms catalog in the Convergent Systems ecosystem.">
+  <h1>atoms</h1>
+  <p style="font-size: 1.125rem; color: var(--muted); max-width: 50rem;">
+    The umbrella directory for every <code>*-atoms</code> catalog in the
+    Convergent Systems ecosystem — typed, versioned, composable libraries of
+    AI primitives. Each catalog is its own repository, its own release
+    cycle, its own deployed site. This page is the central directory both
+    humans and AI agents can use to discover what exists.
+  </p>
+
+  <section style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin: 2rem 0; padding: 1.5rem; background: var(--card); border: 1px solid var(--border); border-radius: 0.5rem;">
+    <div>
+      <div style="font-size: 2rem; font-weight: 600; line-height: 1;">{directory.summary.total}</div>
+      <div style="color: var(--muted); font-size: 0.875rem;">catalogs total · {directory.summary.live} live · {directory.summary.bootstrap} bootstrap</div>
+    </div>
+    <div>
+      <div style="font-size: 2rem; font-weight: 600; line-height: 1;">{totalAtoms}</div>
+      <div style="color: var(--muted); font-size: 0.875rem;">atoms across live catalogs</div>
+    </div>
+    <div>
+      <div style="font-size: 2rem; font-weight: 600; line-height: 1;">{totalCompositions}</div>
+      <div style="color: var(--muted); font-size: 0.875rem;">compositions across live catalogs</div>
+    </div>
+  </section>
+
+  {live.length > 0 && (
+    <section>
+      <h2>Live catalogs</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr)); gap: 1rem; margin-top: 1rem;">
+        {live.map((c: any) => <CatalogCard catalog={c} />)}
+      </div>
+    </section>
+  )}
+
+  {bootstrap.length > 0 && (
+    <section style="margin-top: 3rem;">
+      <h2>Bootstrap catalogs</h2>
+      <p style="color: var(--muted); margin-bottom: 1rem;">Catalogs with schemas + intent declared but no live deploy yet.</p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr)); gap: 1rem;">
+        {bootstrap.map((c: any) => <CatalogCard catalog={c} />)}
+      </div>
+    </section>
+  )}
+
+  <section style="margin-top: 3rem;">
+    <h2>For AI agents</h2>
+    <p>
+      Fetch <a href="/directory.json"><code>/directory.json</code></a> for the full
+      machine-readable directory. The same data drives this page. See <a href="/how-to-use/">how-to-use</a>
+      for the JSON shape.
+    </p>
+  </section>
+</Base>

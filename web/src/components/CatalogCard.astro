@@ -1,0 +1,40 @@
+---
+const { catalog } = Astro.props;
+const isLive = catalog.status === "live";
+const statusColor = isLive ? "var(--live)" : "var(--bootstrap)";
+const live = catalog.live;
+---
+<article style="border: 1px solid var(--border); border-radius: 0.5rem; padding: 1rem; background: var(--card); display: flex; flex-direction: column; gap: 0.5rem;">
+  <header style="display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;">
+    <h3 style="margin: 0;">
+      {isLive ? <a href={catalog.pages_url}>{catalog.name}</a> : catalog.name}
+    </h3>
+    <span style={`font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: ${statusColor};`}>
+      {catalog.status}{catalog.version && ` · v${catalog.version}`}
+    </span>
+  </header>
+
+  {catalog.purpose && (
+    <p style="margin: 0; color: var(--muted); font-size: 0.875rem; line-height: 1.45;">{catalog.purpose}</p>
+  )}
+
+  {catalog.atom_types && catalog.atom_types.length > 0 && (
+    <div style="font-size: 0.75rem; color: var(--muted);">
+      Atom types: {catalog.atom_types.map((t: string) => <code style="margin-right: 0.25rem;">{t}</code>)}
+    </div>
+  )}
+
+  {live && (
+    <div style="font-size: 0.875rem; display: flex; gap: 1rem; padding-top: 0.5rem; border-top: 1px dashed var(--border);">
+      <span><strong>{live.atoms}</strong> atoms</span>
+      <span><strong>{live.compositions}</strong> compositions</span>
+      <span><strong>{live.rules}</strong> rules</span>
+    </div>
+  )}
+
+  <div style="display: flex; gap: 1rem; font-size: 0.75rem; padding-top: 0.5rem;">
+    {isLive && <a href={`${catalog.pages_url}/exports/catalog.json`}>catalog.json</a>}
+    <a href={catalog.github_url}>GitHub</a>
+    {catalog.domain && isLive && <span style="color: var(--muted);">{catalog.domain}</span>}
+  </div>
+</article>

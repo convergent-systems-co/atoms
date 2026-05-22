@@ -1,0 +1,25 @@
+spec_version = "1.0.0"
+canonical_name = "atoms.convergent-systems.co/catalogs/brand-atoms"
+version = "0.1.0"
+atom_type = "atoms.convergent-systems.co/catalogs"
+authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
+created_at = "2026-05-22T03:40:32.832Z"
+
+[signatures]
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "QfzcAvnWoMEUQzUgMdpMgpn7ojEmVBY6ftb4nAgss7RITMssvj3ME/8U8yt1CnuzxephGVDQB9+UuiuJz9hLBQ=="
+
+[body]
+atom_types = ["palette", "font", "glyph"]
+canonical_domain = "brand-atoms.com"
+catalog_name = "brand-atoms"
+catalog_version = "0.1.0"
+composition_dir = "brands"
+composition_type = "brands"
+federation = "xdao.co"
+github_url = "https://github.com/convergent-systems-co/brand-atoms"
+implements_spec = "atoms-spec/v1"
+license = "Apache-2.0"
+pages_url = "https://brand-atoms.pages.dev"
+purpose = "Brand guidelines, from PDFs into typed YAML — machine-consumable, composable atoms covering palettes, fonts, and glyph sets."
+rule_types = ["contrastRatio", "fontPairing", "forbiddenTreatment", "numericRange"]
+runtime_consumers = ["aish", "olympus"]

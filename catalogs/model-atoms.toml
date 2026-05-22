@@ -1,0 +1,25 @@
+spec_version = "1.0.0"
+canonical_name = "atoms.convergent-systems.co/catalogs/model-atoms"
+version = "0.1.0"
+atom_type = "atoms.convergent-systems.co/catalogs"
+authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
+created_at = "2026-05-22T03:40:32.832Z"
+
+[signatures]
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "bp4N8xBIx8HthfnQMncygQnQZ3pWY4U8wxH59rXMzi3+cSNSfuzOUfPCeKIGFRgBdGEf6c7/iyAf9+Eck9goAQ=="
+
+[body]
+atom_types = ["model-card", "capability", "pricing-tier", "deprecation-policy", "tool-use-shape", "modality"]
+canonical_domain = "model-atoms.com"
+catalog_name = "model-atoms"
+catalog_version = "0.1.0"
+composition_dir = "models"
+composition_type = "models"
+federation = "xdao.co"
+github_url = "https://github.com/convergent-systems-co/model-atoms"
+implements_spec = "atoms-spec/v1"
+license = "Apache-2.0"
+pages_url = "https://model-atoms.pages.dev"
+purpose = "AI model definitions canonicalized — Claude, GPT, Llama, Gemini, Mistral variants with capabilities, context windows, pricing tiers, deprecation policy, tool-use shape, vision support, modality. One typed source-of-truth for what a model is, what it can do, and when it goes away."
+rule_types = ["model-compatibility", "capability-grant", "deprecation-window"]
+runtime_consumers = ["aish", "olympus"]

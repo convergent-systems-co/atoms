@@ -40,16 +40,14 @@ const SPEC_VERSION = "1.0.0";
     </tbody>
   </table>
 
-  <h2>Bootstrap status</h2>
+  <h2>Trust</h2>
   <p>
     Per Part IX §40, Spec v{SPEC_VERSION} is the bootstrap version — hand-authored
     and signed by the <code>atoms.convergent-systems.co</code> root key. The
-    root key has not been minted yet, so the published TOML carries
-    <code>authored_by = "ed25519:bootstrap-pending"</code> and an empty
-    <code>[signatures]</code> table. When the root key is generated, the Spec
-    atom will be re-emitted under the same canonical URLs with valid
-    signatures, and the catalog registry entries will be re-signed at the
-    same time.
+    root key public material is at <a href="/keys/root.toml"><code>/keys/root.toml</code></a>
+    and is listed in the umbrella's <a href="/keys.toml"><code>/keys.toml</code></a> registry.
+    The signature over the canonical hash of the Spec body lives in the
+    <code>[signatures]</code> table of the canonical TOML.
   </p>
 
   <h2>Reading the Spec</h2>

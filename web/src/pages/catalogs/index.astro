@@ -55,12 +55,12 @@ const catalogs = (directory.catalogs ?? []).slice().sort((a, b) => a.name.locale
     </tbody>
   </table>
 
-  <h2>Bootstrap status</h2>
+  <h2>Trust</h2>
   <p>
-    Entries currently carry <code>authored_by = "ed25519:bootstrap-pending"</code>
-    and an empty <code>[signatures]</code> table. They are signed in a
-    follow-up slice once the <code>atoms.convergent-systems.co</code> root
-    key is generated.
+    Each registry entry is signed by the <code>atoms.convergent-systems.co</code>
+    root key. Verify a signature by recomputing the canonical hash (SHA-256
+    of the canonical TOML with <code>[signatures]</code> excluded) and
+    checking against the public key at <a href="/keys/root.toml"><code>/keys/root.toml</code></a>.
   </p>
 </Base>
 

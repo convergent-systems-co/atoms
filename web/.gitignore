@@ -5,3 +5,5 @@ node_modules/
 public/directory.json
 public/spec/
 public/catalogs/
+public/keys/
+public/keys.toml

@@ -1,0 +1,70 @@
+---
+import Base from "../../layouts/Base.astro";
+import { readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+
+const HERE = dirname(fileURLToPath(import.meta.url));
+const ROOT_TOML_PATH = join(HERE, "../../../public/keys/root.toml");
+const rootToml = await readFile(ROOT_TOML_PATH, "utf-8");
+
+function extract(field) {
+  const re = new RegExp(`^${field}\\s*=\\s*(?:"""([\\s\\S]*?)"""|"([^"]*)")`, "m");
+  const m = rootToml.match(re);
+  return m ? (m[1] ?? m[2]) : null;
+}
+
+const fingerprint = extract("fingerprint");
+const publicKeyB64 = extract("public_key_base64");
+const publicKeyPem = extract("public_key_pem");
+const createdAt = extract("created_at");
+const role = extract("role");
+const status = extract("status");
+const authority = extract("authority");
+---
+<Base
+  title="Trust roots"
+  description="Signing keys recognized as authoritative for atoms.convergent-systems.co."
+>
+  <h1>Trust roots</h1>
+  <p>
+    Per <a href="/spec/">Spec</a> §20, every catalog publishes a key
+    registry at <code>/keys.toml</code> listing the signing keys it
+    recognizes. The atoms.convergent-systems.co registry currently lists
+    one key — the bootstrap root, established per Part IX §40.
+  </p>
+
+  <h2>Programmatic discovery</h2>
+  <pre><code>curl https://atoms.convergent-systems.co/keys.toml</code></pre>
+  <pre><code>curl https://atoms.convergent-systems.co/keys/root.toml</code></pre>
+
+  <h2>Root key</h2>
+  <table>
+    <tbody>
+      <tr><th>Fingerprint</th><td><code>{fingerprint}</code></td></tr>
+      <tr><th>Role</th><td>{role}</td></tr>
+      <tr><th>Status</th><td><span class={`status status-${status}`}>{status}</span></td></tr>
+      <tr><th>Authority</th><td><code>{authority}</code></td></tr>
+      <tr><th>Created</th><td><time datetime={createdAt}>{createdAt}</time></td></tr>
+      <tr><th>Public key (base64 raw)</th><td><code>{publicKeyB64}</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Public key (PEM)</h3>
+  <pre><code>{publicKeyPem}</code></pre>
+
+  <h3>Signed records</h3>
+  <ul>
+    <li><a href="/keys/root.toml"><code>/keys/root.toml</code></a> — full atom record (self-signed)</li>
+    <li><a href="/keys/index.toml"><code>/keys/index.toml</code></a> — keys class index</li>
+    <li><a href="/keys.toml"><code>/keys.toml</code></a> — umbrella key registry</li>
+  </ul>
+</Base>
+
+<style>
+  table { border-collapse: collapse; margin: 1rem 0; width: 100%; max-width: 60rem; }
+  th, td { text-align: left; border: 1px solid var(--border); padding: 0.5rem 0.75rem; }
+  th { background: var(--card); width: 14rem; }
+  .status { font-size: 0.85em; padding: 0.125rem 0.5rem; border-radius: 0.25rem; }
+  .status-active { background: #e6f4ea; color: var(--live); }
+</style>

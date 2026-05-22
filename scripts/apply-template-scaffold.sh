@@ -91,6 +91,10 @@ main() {
 
   write_license_bundle "$target" "$catalog" "$dry_run"
 
+  if [[ "$site" == "single" ]]; then
+    copy_web_single_site "$template" "$target" "$dry_run"
+  fi
+
   echo "[scaffold] template=$template target=$target catalog=$catalog site=$site dry_run=$dry_run"
 }
 

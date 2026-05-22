@@ -196,3 +196,31 @@ load helpers
     grep -q "Apache License" "$tgt/LICENSE"
   fi
 }
+
+@test "Band B: scaffolds web/ at root (NOT web/site/) from template's web/site/" {
+  local tmpl tgt
+  tmpl=$(make_temp_dir); tgt=$(make_temp_dir)
+  make_fixture_template "$tmpl"
+  make_fixture_catalog_bandB "$tgt"
+
+  run "$SCRIPT" --template "$tmpl" --target "$tgt" --catalog test-atoms --site single
+  [ "$status" -eq 0 ]
+
+  [ -f "$tgt/web/package.json" ]
+  [ -f "$tgt/web/src/pages/index.astro" ]
+  [ ! -d "$tgt/web/site" ]
+}
+
+@test "Band A (existing web/): script does NOT scaffold from template" {
+  local tmpl tgt
+  tmpl=$(make_temp_dir); tgt=$(make_temp_dir)
+  make_fixture_template "$tmpl"
+  make_fixture_catalog_bandA "$tgt"
+
+  run "$SCRIPT" --template "$tmpl" --target "$tgt" --catalog test-atoms --site existing
+  [ "$status" -eq 0 ]
+
+  # Existing package.json content unchanged
+  grep -q "@cat/web" "$tgt/web/package.json"
+  [ ! -f "$tgt/web/site/package.json" ]
+}

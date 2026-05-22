@@ -90,3 +90,36 @@ _copy_dir_norewrite() {
     fi
   done < <(find "$src" -mindepth 1 -print0)
 }
+
+# Copy template's web/site/* to target/web/* (subdir collapsed for single-site form).
+# Only called when --site single AND target has no web/.
+copy_web_single_site() {
+  local template="$1" target="$2" dry_run="$3"
+  local src="$template/web/site"
+  local dst="$target/web"
+
+  if [[ -e "$dst" ]]; then
+    echo "[skip] $dst (already exists)"
+    return 0
+  fi
+  if [[ ! -d "$src" ]]; then
+    echo "[warn] template has no web/site/ at $src" >&2
+    return 0
+  fi
+  if [[ "$dry_run" -eq 1 ]]; then
+    echo "[dry] scaffold single-site web: $src -> $dst"
+    return 0
+  fi
+  mkdir -p "$dst"
+  cp -R "$src"/. "$dst"/
+  echo "[scaffold] web/ from $src"
+
+  # Also write web/README.md noting the single-site convention
+  cat > "$dst/README.md" <<'EOF'
+# Web
+
+Single-site Astro project lives in this directory (not `web/site/`).
+The umbrella's `apply-template-scaffold.sh` collapses the template's
+multi-site convention to single-site form for `*-atoms` catalogs.
+EOF
+}

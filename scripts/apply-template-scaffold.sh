@@ -86,6 +86,11 @@ main() {
   transform_makefile_single_site "$target" "$dry_run"
   transform_workflows_single_site "$target" "$dry_run"
 
+  # shellcheck source=lib/scaffold-license.sh
+  source "$(dirname "$0")/lib/scaffold-license.sh"
+
+  write_license_bundle "$target" "$catalog" "$dry_run"
+
   echo "[scaffold] template=$template target=$target catalog=$catalog site=$site dry_run=$dry_run"
 }
 

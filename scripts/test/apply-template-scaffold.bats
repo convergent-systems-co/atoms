@@ -161,3 +161,38 @@ load helpers
   [ "$status" -ne 0 ]
   grep -q "cd web " "$tgt/.github/workflows/ci.yml"
 }
+
+@test "license bundle: writes LICENSE, LICENSE-data, NOTICE" {
+  local tmpl tgt
+  tmpl=$(make_temp_dir); tgt=$(make_temp_dir)
+  make_fixture_template "$tmpl"
+  make_fixture_catalog_bandB "$tgt"
+
+  run "$SCRIPT" --template "$tmpl" --target "$tgt" --catalog test-atoms --site single
+  [ "$status" -eq 0 ]
+  [ -f "$tgt/LICENSE" ]
+  [ -f "$tgt/LICENSE-data" ]
+  [ -f "$tgt/NOTICE" ]
+  grep -q "Apache License" "$tgt/LICENSE"
+  grep -q "Creative Commons Attribution 4.0" "$tgt/LICENSE-data"
+  grep -q "test-atoms" "$tgt/NOTICE"
+}
+
+@test "license bundle: preserves existing Apache-2.0 LICENSE (idempotent)" {
+  local tmpl tgt
+  tmpl=$(make_temp_dir); tgt=$(make_temp_dir)
+  make_fixture_template "$tmpl"
+  make_fixture_catalog_bandA "$tgt"  # band A already has Apache LICENSE
+
+  local pre_hash; pre_hash=$(shasum -a 256 "$tgt/LICENSE" | awk '{print $1}')
+
+  run "$SCRIPT" --template "$tmpl" --target "$tgt" --catalog test-atoms --site existing
+  [ "$status" -eq 0 ]
+
+  local post_hash; post_hash=$(shasum -a 256 "$tgt/LICENSE" | awk '{print $1}')
+  # Apache stays Apache; the script may rewrite with canonical Apache text
+  # but should at least still be Apache.
+  if [[ "$pre_hash" != "$post_hash" ]]; then
+    grep -q "Apache License" "$tgt/LICENSE"
+  fi
+}

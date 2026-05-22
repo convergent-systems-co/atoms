@@ -66,3 +66,24 @@ jobs:
         with:
           go-version: "1.22"
       - run: make build
+
+  web-build:
+    # Verifies the Astro umbrella site builds cleanly on every PR + push.
+    # Does NOT deploy — deploy.yml is the only path to Cloudflare Pages.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - name: Install web/ deps
+        working-directory: web
+        run: pnpm install --frozen-lockfile
+      - name: Build web/
+        working-directory: web
+        run: pnpm build

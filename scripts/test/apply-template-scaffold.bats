@@ -224,3 +224,38 @@ load helpers
   grep -q "@cat/web" "$tgt/web/package.json"
   [ ! -f "$tgt/web/site/package.json" ]
 }
+
+@test "idempotency: second run on same target produces no changes" {
+  local tmpl tgt
+  tmpl=$(make_temp_dir); tgt=$(make_temp_dir)
+  make_fixture_template "$tmpl"
+  make_fixture_catalog_bandB "$tgt"
+
+  run "$SCRIPT" --template "$tmpl" --target "$tgt" --catalog test-atoms --site single
+  [ "$status" -eq 0 ]
+
+  # Snapshot the target after first run.
+  local hash1; hash1=$(find "$tgt" -not -path "*/.git/*" -type f -exec shasum -a 256 {} \; | sort -k 2 | shasum -a 256 | awk '{print $1}')
+
+  # Second run, same arguments.
+  run "$SCRIPT" --template "$tmpl" --target "$tgt" --catalog test-atoms --site single
+  [ "$status" -eq 0 ]
+
+  local hash2; hash2=$(find "$tgt" -not -path "*/.git/*" -type f -exec shasum -a 256 {} \; | sort -k 2 | shasum -a 256 | awk '{print $1}')
+  [ "$hash1" = "$hash2" ]
+}
+
+@test "--dry-run does not modify target" {
+  local tmpl tgt
+  tmpl=$(make_temp_dir); tgt=$(make_temp_dir)
+  make_fixture_template "$tmpl"
+  make_fixture_catalog_bandB "$tgt"
+
+  local pre_hash; pre_hash=$(find "$tgt" -not -path "*/.git/*" -type f -exec shasum -a 256 {} \; | sort -k 2 | shasum -a 256 | awk '{print $1}')
+
+  run "$SCRIPT" --template "$tmpl" --target "$tgt" --catalog test-atoms --site single --dry-run
+  [ "$status" -eq 0 ]
+
+  local post_hash; post_hash=$(find "$tgt" -not -path "*/.git/*" -type f -exec shasum -a 256 {} \; | sort -k 2 | shasum -a 256 | awk '{print $1}')
+  [ "$pre_hash" = "$post_hash" ]
+}

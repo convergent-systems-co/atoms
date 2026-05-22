@@ -96,6 +96,11 @@ main() {
   fi
 
   echo "[scaffold] template=$template target=$target catalog=$catalog site=$site dry_run=$dry_run"
+  echo
+  echo "[scaffold] complete: $target"
+  if [[ "$dry_run" -eq 1 ]]; then
+    echo "[scaffold] (dry-run — no changes written)"
+  fi
 }
 
 main "$@"

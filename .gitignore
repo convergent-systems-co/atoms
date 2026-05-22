@@ -45,3 +45,4 @@ logs/
 
 # Spawn / orchestrator scratch
 .artifacts/
+dist/

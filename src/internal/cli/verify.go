@@ -1,11 +1,13 @@
 package cli
 
 import (
+	"context"
 	"encoding/base64"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -48,12 +50,12 @@ Examples:
 			}
 			out := cmd.OutOrStdout()
 			if result.Valid {
-				fmt.Fprintf(out, "VALID — %s\n", args[0])
+				_, _ = fmt.Fprintf(out, "VALID — %s\n", args[0])
 			} else {
-				fmt.Fprintf(out, "INVALID — %s\n", args[0])
+				_, _ = fmt.Fprintf(out, "INVALID — %s\n", args[0])
 			}
-			fmt.Fprintf(out, "  canonical hash (sha256-b64): %s\n", result.CanonicalHashBase64)
-			fmt.Fprintf(out, "  signed by:                   %s\n", result.KeyID)
+			_, _ = fmt.Fprintf(out, "  canonical hash (sha256-b64): %s\n", result.CanonicalHashBase64)
+			_, _ = fmt.Fprintf(out, "  signed by:                   %s\n", result.KeyID)
 			if !result.Valid {
 				return fmt.Errorf("signature did not verify")
 			}
@@ -62,9 +64,9 @@ Examples:
 	}
 }
 
-func readAtom(ctx interface{ Done() <-chan struct{} }, src string) ([]byte, error) {
+func readAtom(ctx context.Context, src string) ([]byte, error) {
 	if strings.HasPrefix(src, "http://") || strings.HasPrefix(src, "https://") {
-		req, err := http.NewRequest(http.MethodGet, src, nil)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, src, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -72,11 +74,15 @@ func readAtom(ctx interface{ Done() <-chan struct{} }, src string) ([]byte, erro
 		if err != nil {
 			return nil, err
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 		if resp.StatusCode != http.StatusOK {
 			return nil, fmt.Errorf("HTTP %d fetching %s", resp.StatusCode, src)
 		}
 		return io.ReadAll(resp.Body)
 	}
-	return os.ReadFile(src)
+	// User-supplied path is the expected input for the `atoms verify <path>`
+	// invocation. Clean it to mitigate the most common path-traversal patterns
+	// while still allowing arbitrary user-chosen paths.
+	clean := filepath.Clean(src)
+	return os.ReadFile(clean) //nolint:gosec // intentional — CLI accepts arbitrary user paths
 }

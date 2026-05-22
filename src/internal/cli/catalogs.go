@@ -31,9 +31,9 @@ func newCatalogsListCmd() *cobra.Command {
 				return fmt.Errorf("fetch /catalogs/index.toml: %w", err)
 			}
 			tw := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 0, 2, ' ', 0)
-			fmt.Fprintln(tw, "NAME\tVERSION\tDOMAIN\tURL")
+			_, _ = fmt.Fprintln(tw, "NAME\tVERSION\tDOMAIN\tURL")
 			for _, c := range idx.Body.Catalogs {
-				fmt.Fprintf(tw, "%s\t%s\t%s\t%s\n", c.Name, c.Version, c.CanonicalDomain, c.URL)
+				_, _ = fmt.Fprintf(tw, "%s\t%s\t%s\t%s\n", c.Name, c.Version, c.CanonicalDomain, c.URL)
 			}
 			return tw.Flush()
 		},
@@ -52,17 +52,17 @@ func newCatalogsShowCmd() *cobra.Command {
 				return err
 			}
 			out := cmd.OutOrStdout()
-			fmt.Fprintf(out, "canonical_name:   %s\n", atom.CanonicalName)
-			fmt.Fprintf(out, "version:          %s\n", atom.Version)
-			fmt.Fprintf(out, "atom_type:        %s\n", atom.AtomType)
-			fmt.Fprintf(out, "authored_by:      %s\n", atom.AuthoredBy)
-			fmt.Fprintf(out, "created_at:       %s\n", atom.CreatedAt)
+			_, _ = fmt.Fprintf(out, "canonical_name:   %s\n", atom.CanonicalName)
+			_, _ = fmt.Fprintf(out, "version:          %s\n", atom.Version)
+			_, _ = fmt.Fprintf(out, "atom_type:        %s\n", atom.AtomType)
+			_, _ = fmt.Fprintf(out, "authored_by:      %s\n", atom.AuthoredBy)
+			_, _ = fmt.Fprintf(out, "created_at:       %s\n", atom.CreatedAt)
 			for fp := range atom.Signatures {
-				fmt.Fprintf(out, "signed_by:        %s\n", fp)
+				_, _ = fmt.Fprintf(out, "signed_by:        %s\n", fp)
 			}
-			fmt.Fprintln(out, "")
-			fmt.Fprintln(out, "[body]")
-			fmt.Fprintln(out, atom.BodyRaw)
+			_, _ = fmt.Fprintln(out, "")
+			_, _ = fmt.Fprintln(out, "[body]")
+			_, _ = fmt.Fprintln(out, atom.BodyRaw)
 			_ = raw
 			return nil
 		},

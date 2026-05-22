@@ -55,7 +55,7 @@ func newCatalogListCmd(entry registry.CatalogIndexEntry) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Without a live <catalog>.com deploy yet, every catalog is bootstrap.
 			// Surface that honestly with a useful pointer.
-			fmt.Fprintf(cmd.OutOrStdout(),
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(),
 				`%s is in bootstrap status — its canonical domain (%s) is not
 yet serving atoms. To browse the registry entry instead:
 
@@ -82,7 +82,7 @@ func newCatalogShowRegistryCmd(entry registry.CatalogIndexEntry) *cobra.Command 
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "canonical_name: %s\nversion:        %s\ncreated_at:     %s\n\n%s\n",
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "canonical_name: %s\nversion:        %s\ncreated_at:     %s\n\n%s\n",
 				atom.CanonicalName, atom.Version, atom.CreatedAt, atom.BodyRaw)
 			return nil
 		},

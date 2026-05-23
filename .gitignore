@@ -49,3 +49,6 @@ logs/
 # Spawn / orchestrator scratch
 .artifacts/
 dist/
+
+# Git worktrees
+.worktrees/

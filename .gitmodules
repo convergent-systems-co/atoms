@@ -52,3 +52,6 @@
 [submodule "src/schema-atoms"]
 	path = src/schema-atoms
 	url = https://github.com/convergent-systems-co/schema-atoms.git
+[submodule "src/pipeline-atoms"]
+	path = src/pipeline-atoms
+	url = https://github.com/convergent-systems-co/pipeline-atoms.git

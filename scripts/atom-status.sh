@@ -74,16 +74,18 @@ probe_one() {
     apex_http=$(curl -o /dev/null -s -w '%{http_code}' --max-time 5 \
       --resolve "${apex}:443:${ip}" "https://${apex}" 2>/dev/null || echo "?")
     apex_title=$(curl -fsS --max-time 5 --resolve "${apex}:443:${ip}" "https://${apex}" 2>/dev/null \
-      | grep -oE '<title>[^<]*</title>' | head -1 | sed -E 's/<\/?title>//g' || echo "")
+      | grep -oE '<title>[^<]*</title>' | head -1 | sed -E 's/<\/?title>//g' || true)
+    [ -z "$apex_title" ] && apex_title="-"
   else
     apex_http="-"
-    apex_title=""
+    apex_title="-"
   fi
 
   pages_http=$(curl -o /dev/null -s -w '%{http_code}' --max-time 5 \
     "https://${atom}-atoms.pages.dev" 2>/dev/null || echo "?")
   pages_title=$(curl -fsS --max-time 5 "https://${atom}-atoms.pages.dev" 2>/dev/null \
-    | grep -oE '<title>[^<]*</title>' | head -1 | sed -E 's/<\/?title>//g' || echo "")
+    | grep -oE '<title>[^<]*</title>' | head -1 | sed -E 's/<\/?title>//g' || true)
+  [ -z "$pages_title" ] && pages_title="-"
 
   pr_count=$(gh pr list --repo "$repo" --state open --json number --jq 'length' 2>/dev/null || echo "?")
 

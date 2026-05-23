@@ -61,6 +61,7 @@ git submodule update --init --recursive
 | [`agent-atoms`](./src/agent-atoms) | Bootstrap | AI agent primitives — personas, tools, capabilities |
 | [`persona-atoms`](./src/persona-atoms) | Bootstrap | AI persona profiles — voice, role, tone parameters |
 | [`profile-atoms`](./src/profile-atoms) | Bootstrap | User and product profiles |
+| [`skill-atoms`](./src/skill-atoms) | Bootstrap | AI skills — discoverable, invocable units of capability |
 | [`channel-atoms`](./src/channel-atoms) | Bootstrap | Channels — protocols, endpoints, delivery semantics |
 | [`model-atoms`](./src/model-atoms) | Bootstrap | Model registry — capabilities, context windows, pricing |
 | [`service-atoms`](./src/service-atoms) | Bootstrap | Service primitives — identities, protocols, endpoints |

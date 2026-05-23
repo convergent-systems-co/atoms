@@ -1,0 +1,255 @@
+{
+  "repo": "convergent-systems-co/schema-atoms",
+  "spec_url": "https://github.com/convergent-systems-co/atoms/blob/main/specs/atom-schema-spec-v1.0.0-draft.md",
+  "design_url": "https://github.com/convergent-systems-co/atoms/blob/main/docs/superpowers/specs/2026-05-23-schema-atoms-issue-decomposition-design.md",
+  "labels": [
+    {"name": "agile/epic", "color": "5319e7", "description": "Multi-feature initiative spanning weeks or more"},
+    {"name": "agile/feature", "color": "0e8a16", "description": "Net-new user-visible capability slice"},
+    {"name": "agile/story", "color": "1d76db", "description": "Single contributor-week-sized chunk"},
+    {"name": "agile/task", "color": "c5def5", "description": "Single commit/PR-sized chunk"}
+  ],
+  "epics": [
+    {
+      "slug": "E1",
+      "title": "Epic: Conform schema-atoms catalog to atom-schema-spec v1.0.0",
+      "goal": "ATOMS.yml, repo layout, URL routing, and signing/quorum match Atom Schema Spec v1.0.0.",
+      "spec_sections": "Parts II, III, VI, VII",
+      "labels": ["agile/epic", "kind/refactor", "area/core", "priority/high", "status/triage"],
+      "features": [
+        {
+          "title": "Rewrite ATOMS.yml to spec v1.1.0 shape",
+          "goal": "ATOMS.yml conforms to Part VII of the spec.",
+          "spec_section": "Part VII",
+          "labels": ["agile/feature", "kind/refactor", "area/core", "priority/high", "status/triage"],
+          "stories": [
+            {"title": "ATOMS.yml: migrate camelCase fields to snake_case", "spec_section": "Part VII", "kind": "refactor"},
+            {"title": "ATOMS.yml: update spec_version to atoms-spec/v1.1.0", "spec_section": "Part VII", "kind": "refactor"},
+            {"title": "Spike: ATOMS.yml federation discrepancy (xdao.co vs convergent-systems.co)", "spec_section": "Part VII", "kind": "rfc", "extra_labels": ["status/needs-info"], "is_spike": true},
+            {"title": "ATOMS.yml: declare all 20 atom_types per spec Part II", "spec_section": "Part II", "kind": "feature"},
+            {"title": "ATOMS.yml: encode quorum_rules per class", "spec_section": "Part VII", "kind": "feature"},
+            {"title": "ATOMS.yml: configure signing algorithms (required ml-dsa-65; accepted 44/65/87)", "spec_section": "Part VII", "kind": "feature"}
+          ]
+        },
+        {
+          "title": "URL routing & catalog endpoints",
+          "goal": "schema-atoms.com serves the routes defined in Part VI.",
+          "spec_section": "Part VI",
+          "labels": ["agile/feature", "kind/feature", "area/infra", "priority/high", "status/triage"],
+          "stories": [
+            {"title": "URL routing: per-class / per-atom / per-version path resolution", "spec_section": "Part VI", "kind": "feature"},
+            {"title": "Catalog export: /exports/catalog.json", "spec_section": "Part VI", "kind": "feature"},
+            {"title": "Catalog export: /exports/by-class.json", "spec_section": "Part VI", "kind": "feature"},
+            {"title": "Catalog export: /exports/by-lifecycle.json", "spec_section": "Part VI", "kind": "feature"},
+            {"title": "Catalog export: /mirror.toml", "spec_section": "Part VI", "kind": "feature"}
+          ]
+        },
+        {
+          "title": "Repo scaffold conformance",
+          "goal": "schema-atoms repo layout matches spec conventions.",
+          "spec_section": "Part VII",
+          "labels": ["agile/feature", "kind/chore", "area/ci", "priority/medium", "status/triage"],
+          "stories": [
+            {"title": "Add compositions/ directory (composition_type: spec-compositions)", "spec_section": "Part VII", "kind": "chore"},
+            {"title": "Wire `atoms validate` in CI on every PR", "spec_section": "Part VIII Step 6", "kind": "chore"},
+            {"title": "Establish per-class subdirectory layout under /<class>/", "spec_section": "Part VI", "kind": "chore"}
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "E2",
+      "title": "Epic: Implement design-spec class & publish foundational specs",
+      "goal": "design-spec is the first fully working class; the Atom Schema Spec itself ships as the proof.",
+      "spec_sections": "Part II Family 1, Part IV, Part VIII",
+      "labels": ["agile/epic", "kind/feature", "area/core", "priority/high", "status/triage"],
+      "features": [
+        {
+          "title": "design-spec class TOML payload implementation",
+          "goal": "[spec] and [[spec.amendments]] sections parse and validate.",
+          "spec_section": "Part IV — design-spec payload",
+          "labels": ["agile/feature", "kind/feature", "area/core", "priority/high", "status/triage"],
+          "stories": [
+            {"title": "design-spec: [spec] section parser/validator", "spec_section": "Part IV", "kind": "feature"},
+            {"title": "design-spec: [[spec.amendments]] log support", "spec_section": "Part IV", "kind": "feature"},
+            {"title": "design-spec: conforms_to chain resolution", "spec_section": "Part IV", "kind": "feature"}
+          ]
+        },
+        {
+          "title": "Publish atom-schema-spec@1.0.0-draft (this spec)",
+          "goal": "The Atom Schema Spec itself is a published design-spec atom in schema-atoms.",
+          "spec_section": "Part VIII",
+          "labels": ["agile/feature", "kind/docs", "area/core", "priority/high", "status/triage"],
+          "stories": [
+            {"title": "Publish atom-schema-spec: author spec.md from this document", "spec_section": "Part VIII Step 1", "kind": "docs"},
+            {"title": "Publish atom-schema-spec: canonicalize TOML + compute content_hash", "spec_section": "Part VIII Steps 3-4", "kind": "chore"},
+            {"title": "Publish atom-schema-spec: sign with catalog-maintainer + editor", "spec_section": "Part VIII Step 5", "kind": "security"},
+            {"title": "Publish atom-schema-spec: validate + open PR", "spec_section": "Part VIII Steps 6-7", "kind": "chore"}
+          ]
+        },
+        {
+          "title": "Publish remaining foundational design-specs",
+          "goal": "atom-spec, ai-constitution-spec, olympus-spec, atom-key/cache/cli-spec, and per-catalog spec stubs.",
+          "spec_section": "Part II Family 1",
+          "labels": ["agile/feature", "kind/docs", "area/core", "priority/medium", "status/triage"],
+          "stories": [
+            {"title": "Publish atom-spec@1.1.0 at new design-spec/ path", "spec_section": "Part IX", "kind": "docs"},
+            {"title": "Publish ai-constitution-spec@1.0.0-draft", "spec_section": "Part II Family 1", "kind": "docs"},
+            {"title": "Publish olympus-spec@1.0.0-draft", "spec_section": "Part II Family 1", "kind": "docs"},
+            {"title": "Publish atom-key-spec@1.0.0-draft", "spec_section": "Part II Family 1", "kind": "docs"},
+            {"title": "Publish atom-cache-spec@1.0.0-draft", "spec_section": "Part II Family 1", "kind": "docs"},
+            {"title": "Publish atom-cli-spec@1.0.0-draft", "spec_section": "Part II Family 1", "kind": "docs"},
+            {"title": "Per-catalog design-spec stubs + tracking issues (persona, policy, channel, prompt, skill, theme, brand, profile, agent, model, service, knowledge, identity, workflow, pipeline, event, compliance, plugin)", "spec_section": "Part II Family 1", "kind": "docs"}
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "E3",
+      "title": "Epic: Migrate JSON Schemas to schema-atoms as json-schema atoms",
+      "goal": "Every JSON schema in the ecosystem becomes an independently versioned, signed json-schema atom.",
+      "spec_sections": "Part II Family 3, Part IV — data-schema payload",
+      "labels": ["agile/epic", "kind/refactor", "area/core", "priority/medium", "status/triage"],
+      "features": [
+        {
+          "title": "json-schema class implementation",
+          "goal": "[schema] payload + $id-matches-atom-id validator.",
+          "spec_section": "Part IV — data-schema payload",
+          "labels": ["agile/feature", "kind/feature", "area/core", "priority/high", "status/triage"],
+          "stories": [
+            {"title": "json-schema: [schema] TOML payload (json-schema class)", "spec_section": "Part IV", "kind": "feature"},
+            {"title": "json-schema validator: $id matches atom id", "spec_section": "Part IV", "kind": "feature"},
+            {"title": "json-schema validator: JSON Schema draft version matches schema_version", "spec_section": "Part IV", "kind": "feature"}
+          ]
+        },
+        {
+          "title": "Migrate existing JSON schemas",
+          "goal": "Each schema in src/*-atoms/schemas/ becomes a json-schema atom in schema-atoms.",
+          "spec_section": "Part II Family 3",
+          "labels": ["agile/feature", "kind/refactor", "area/core", "priority/medium", "status/triage"],
+          "stories": [
+            {"title": "Spike: inventory all JSON schemas across src/*-atoms/schemas/ and produce migration list", "spec_section": "Part II Family 3", "kind": "rfc", "extra_labels": ["status/needs-info"], "is_spike": true},
+            {"title": "Migrate json-schema/panels-config@1.0.0", "spec_section": "Part II Family 3", "kind": "refactor"},
+            {"title": "Migrate json-schema/project-config@1.0.0", "spec_section": "Part II Family 3", "kind": "refactor"},
+            {"title": "Migrate json-schema/agent-envelope@1.0.0", "spec_section": "Part II Family 3", "kind": "refactor"}
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "E4",
+      "title": "Epic: Import protocol-specs from standards bodies",
+      "goal": "Foundational external standards (FIPS-204, RFC-3339, RFC-7517) live as signed protocol-spec atoms with full provenance.",
+      "spec_sections": "Part II Family 4, Part V",
+      "labels": ["agile/epic", "kind/feature", "area/core", "priority/medium", "status/triage"],
+      "features": [
+        {
+          "title": "Provenance toolchain",
+          "goal": "[protocol.provenance] validator + import workflow CLI.",
+          "spec_section": "Part V",
+          "labels": ["agile/feature", "kind/feature", "area/cli", "priority/high", "status/triage"],
+          "stories": [
+            {"title": "[protocol.provenance] block validator", "spec_section": "Part V", "kind": "feature"},
+            {"title": "atoms import CLI: download → checksum → atom assembly", "spec_section": "Part V Import workflow", "kind": "feature"},
+            {"title": "Document upstream license handling per class (IETF Trust, FIPS public-domain, W3C, ISO)", "spec_section": "Part V", "kind": "docs"}
+          ]
+        },
+        {
+          "title": "Import foundational standards",
+          "goal": "FIPS-204, RFC-3339, RFC-7517 imported with full provenance.",
+          "spec_section": "Part II Family 4",
+          "labels": ["agile/feature", "kind/feature", "area/core", "priority/medium", "status/triage"],
+          "stories": [
+            {"title": "Import schema-atoms/fips/fips-204@1.0.0 (ML-DSA)", "spec_section": "Part II Family 4", "kind": "feature"},
+            {"title": "Import schema-atoms/rfc/rfc-3339@1.0.0 (timestamps)", "spec_section": "Part II Family 4", "kind": "feature"},
+            {"title": "Import schema-atoms/rfc/rfc-7517@1.0.0 (JWK)", "spec_section": "Part II Family 4", "kind": "feature"}
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "E5",
+      "title": "Epic: Implement remaining type families (api-spec, language-spec, taxonomy-spec)",
+      "goal": "All 13 remaining atom classes have working implementations + initial sample atoms.",
+      "spec_sections": "Part II Families 2, 5, 6; Part IV",
+      "labels": ["agile/epic", "kind/feature", "area/core", "priority/medium", "status/triage"],
+      "features": [
+        {
+          "title": "api-spec family class implementations",
+          "goal": "openapi-spec, asyncapi-spec, graphql-schema, grpc-spec, json-rpc-spec classes parse and validate.",
+          "spec_section": "Part II Family 2",
+          "labels": ["agile/feature", "kind/feature", "area/core", "priority/medium", "status/triage"],
+          "stories": [
+            {"title": "api-spec class: openapi-spec", "spec_section": "Part II Family 2", "kind": "feature"},
+            {"title": "api-spec class: asyncapi-spec", "spec_section": "Part II Family 2", "kind": "feature"},
+            {"title": "api-spec class: graphql-schema", "spec_section": "Part II Family 2", "kind": "feature"},
+            {"title": "api-spec class: grpc-spec", "spec_section": "Part II Family 2", "kind": "feature"},
+            {"title": "api-spec class: json-rpc-spec", "spec_section": "Part II Family 2", "kind": "feature"}
+          ]
+        },
+        {
+          "title": "language-spec family class implementations",
+          "goal": "ebnf-grammar (+bnf-grammar), language-reference, query-language-spec, regex-spec classes parse and validate.",
+          "spec_section": "Part II Family 5",
+          "labels": ["agile/feature", "kind/feature", "area/core", "priority/medium", "status/triage"],
+          "stories": [
+            {"title": "language-spec class: ebnf-grammar (+ bnf-grammar)", "spec_section": "Part II Family 5", "kind": "feature"},
+            {"title": "language-spec class: language-reference", "spec_section": "Part II Family 5", "kind": "feature"},
+            {"title": "language-spec class: query-language-spec", "spec_section": "Part II Family 5", "kind": "feature"},
+            {"title": "language-spec class: regex-spec", "spec_section": "Part II Family 5", "kind": "feature"}
+          ]
+        },
+        {
+          "title": "taxonomy-spec family class implementations",
+          "goal": "controlled-vocabulary, code-list, ontology classes parse and validate (inline + asset modes).",
+          "spec_section": "Part II Family 6",
+          "labels": ["agile/feature", "kind/feature", "area/core", "priority/medium", "status/triage"],
+          "stories": [
+            {"title": "taxonomy-spec class: controlled-vocabulary (inline + asset modes)", "spec_section": "Part II Family 6", "kind": "feature"},
+            {"title": "taxonomy-spec class: code-list", "spec_section": "Part II Family 6", "kind": "feature"},
+            {"title": "taxonomy-spec class: ontology", "spec_section": "Part II Family 6", "kind": "feature"}
+          ]
+        },
+        {
+          "title": "Publish initial atoms in new classes",
+          "goal": "Spec-example atoms exist as proofs.",
+          "spec_section": "Part II Families 5, 6",
+          "labels": ["agile/feature", "kind/docs", "area/core", "priority/low", "status/triage"],
+          "stories": [
+            {"title": "Publish controlled-vocabulary/atom-lifecycle-states@1.0.0", "spec_section": "Part II Family 6", "kind": "docs"},
+            {"title": "Publish controlled-vocabulary/signer-roles@1.0.0", "spec_section": "Part II Family 6", "kind": "docs"},
+            {"title": "Publish controlled-vocabulary/persona-domains@1.0.0", "spec_section": "Part II Family 6", "kind": "docs"},
+            {"title": "Publish ebnf-grammar/toml-1-0@1.0.0", "spec_section": "Part II Family 5", "kind": "docs"}
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "E6",
+      "title": "Epic: Execute spec → design-spec supersession (Part IX)",
+      "goal": "atom-spec@1.1.0 lives at the new design-spec/ path; the old spec class is historic.",
+      "spec_sections": "Part IX",
+      "labels": ["agile/epic", "kind/refactor", "area/core", "priority/medium", "status/triage"],
+      "features": [
+        {
+          "title": "Supersession execution",
+          "goal": "Publish new path, mark old path historic, update ATOMS.yml + consumers.",
+          "spec_section": "Part IX",
+          "labels": ["agile/feature", "kind/refactor", "area/core", "priority/medium", "status/triage"],
+          "stories": [
+            {"title": "Publish schema-atoms/design-spec/atom-spec@1.1.0 (supersedes + migration_notes)", "spec_section": "Part IX Step 1", "kind": "docs"},
+            {"title": "Republish schema-atoms/spec/atom-spec@1.1.0 (superseded_by + lifecycle=historic)", "spec_section": "Part IX Step 2", "kind": "docs"},
+            {"title": "ATOMS.yml: remove `spec` from atom_types, add `design-spec` (depends on Epic 1)", "spec_section": "Part IX Step 3", "kind": "refactor"},
+            {"title": "Update downstream consumers (ai-constitution, olympus, atoms-tools) to use new path", "spec_section": "Part IX Step 3", "kind": "refactor"}
+          ]
+        }
+      ]
+    }
+  ],
+  "spikes": [
+    {"title": "Spike: Q1 — conformance-spec class location (schema-atoms vs test-atoms catalog)", "spec_section": "Part XI Q1", "labels": ["agile/story", "kind/rfc", "area/core", "priority/low", "status/needs-info"]},
+    {"title": "Spike: Q2 — math-spec class (theorem statements, crypto primitives)", "spec_section": "Part XI Q2", "labels": ["agile/story", "kind/rfc", "area/core", "priority/low", "status/needs-info"]},
+    {"title": "Spike: Q3 — legal-spec class (contracts, license texts, regulations)", "spec_section": "Part XI Q3", "labels": ["agile/story", "kind/rfc", "area/core", "priority/low", "status/needs-info"]},
+    {"title": "Spike: Q4 — versioning policy for imported RFCs with errata", "spec_section": "Part XI Q4", "labels": ["agile/story", "kind/rfc", "area/core", "priority/low", "status/needs-info"]},
+    {"title": "Spike: Q5 — inline-vs-asset size threshold for controlled-vocabulary", "spec_section": "Part XI Q5", "labels": ["agile/story", "kind/rfc", "area/core", "priority/low", "status/needs-info"]}
+  ]
+}

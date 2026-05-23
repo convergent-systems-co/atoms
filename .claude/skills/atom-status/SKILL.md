@@ -1,11 +1,11 @@
 ---
 name: atom-status
-description: Run a fleet snapshot of all 19 *-atoms.com catalog sites under convergent-systems-co — GitHub repo description, latest deploy on main, apex DNS, apex HTTPS reachability, *.pages.dev reachability, and open PR count. Use when the user asks about the state of the atoms catalog ecosystem, wants to verify deployments across the fleet, or asks for a "fleet snapshot" / "fleet status" / "atom status" report.
+description: Run a fleet snapshot of all 19 *-atoms.com catalog sites under convergent-systems-co — GitHub repo description, latest deploy on main, apex DNS, apex HTTPS reachability, *.pages.dev reachability, open PR count, and code + data license SPDX ids. Use when the user asks about the state of the atoms catalog ecosystem, wants to verify deployments across the fleet, or asks for a "fleet snapshot" / "fleet status" / "atom status" / license audit report.
 ---
 
 # /atom-status
 
-Runs `scripts/atom-status.sh` and reports the **Fleet Snapshot** — one row per catalog site, deployment-and-health view of the *-atoms.com ecosystem.
+Runs `scripts/atom-status.sh` and reports the **Fleet Snapshot** — one row per catalog site, deployment-and-health-and-licensing view of the *-atoms.com ecosystem.
 
 ## What it shows
 
@@ -18,6 +18,10 @@ Per atom catalog (19 total):
 | Apex | HTTPS status code at `https://<atom>-atoms.com` |
 | Pages | HTTPS status code at `https://<atom>-atoms.pages.dev` |
 | PRs | Open pull request count (dependabot + feature) |
+| Code | SPDX id of the repo `LICENSE` (via GitHub's detection at `/repos/.../license`) |
+| Data | SPDX id derived from the first line of `LICENSE-data` (`MISSING` if the file is absent) |
+
+Catalog convention (per the umbrella `atoms` README) is **Apache-2.0** for code and **CC-BY-4.0** for data. Any divergence — non-Apache code license, missing `LICENSE-data` — is surfaced as a footer warning. AGPL or GPL on a catalog is a compliance red flag under `~/.ai/Code.md §6` ("Avoid GPL / AGPL in commercial contexts without explicit approval") and must be intentional.
 
 In `--verbose` mode it also prints the GitHub repo description and the `<title>` from each apex / pages.dev response.
 

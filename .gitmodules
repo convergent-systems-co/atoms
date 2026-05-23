@@ -46,3 +46,6 @@
 [submodule "profile-atoms"]
 	path = src/profile-atoms
 	url = https://github.com/convergent-systems-co/profile-atoms.git
+[submodule "src/skill-atoms"]
+	path = src/skill-atoms
+	url = https://github.com/convergent-systems-co/skill-atoms.git

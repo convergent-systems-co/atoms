@@ -20,6 +20,9 @@ desktop.ini
 *.sublime-project
 *.code-workspace
 
+# Claude Code per-user state (skills under .claude/skills/ are committed)
+.claude/settings.local.json
+
 # Environment files
 .env
 .env.local

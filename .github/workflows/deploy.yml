@@ -1,9 +1,10 @@
 name: Deploy to Cloudflare Pages
 
+# Deploys only on push to main (i.e., after a PR has been merged).
+# PR build verification lives in ci.yml — that catches broken Astro
+# builds before merge without firing a Cloudflare Pages deploy per PR.
 on:
   push:
-    branches: [main]
-  pull_request:
     branches: [main]
 
 jobs:

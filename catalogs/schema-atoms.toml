@@ -1,0 +1,29 @@
+spec_version = "1.0.0"
+canonical_name = "atoms.convergent-systems.co/catalogs/schema-atoms"
+version = "0.1.0"
+atom_type = "atoms.convergent-systems.co/catalogs"
+authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
+created_at = "2026-05-23T18:01:22.471Z"
+
+[signatures]
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "YMGmQ70i4QZasnx27HGqzDe56+REfoDoNpO7SfmuZJ0uZzzALCXnknw//TjXwnLxF+vnpbvy4OiIakaRUxMfCg=="
+
+[body]
+atom_types = []
+canonical_domain = "schema-atoms.com"
+catalog_name = "schema-atoms"
+catalog_version = "0.1.0"
+composition_dir = "schemas"
+composition_type = "schemas"
+federation = "xdao.co"
+github_url = "https://github.com/convergent-systems-co/schema-atoms"
+implements_spec = "atoms-spec/v1"
+license = "Apache-2.0"
+pages_url = "https://schema-atoms.pages.dev"
+purpose = """
+Canonical JSON Schemas for instance files in *-atoms catalogs. One schema per
+top-level type, served via content-addressable $id URLs under
+https://schema-atoms.com/v1/<type>.schema.json. Consumed by every atoms
+catalog repo to validate its content at CI time."""
+rule_types = []
+runtime_consumers = ["aish", "olympus"]

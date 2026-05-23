@@ -3,10 +3,10 @@ canonical_name = "atoms.convergent-systems.co/catalogs/theme-atoms"
 version = "0.1.0"
 atom_type = "atoms.convergent-systems.co/catalogs"
 authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
-created_at = "2026-05-22T03:40:32.832Z"
+created_at = "2026-05-23T18:01:22.471Z"
 
 [signatures]
-"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "qmt1018fMaG3zFqOat+6Q7PrYXdvnmzkBo331W038TmMjyzoDLirb56HdufcH4MJoZcF/g4dF0PVglIgv+W5Aw=="
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "5q7Xs10XeJUdWOhPWIKN/S40thln6cUD3M50XPoONRutWYw5zV5KRqa/TuF0LcSrLe8beyz8k3B5OHrX+UPBDQ=="
 
 [body]
 atom_types = ["prompt-segment", "separator-style", "glyph-set", "role-binding", "syntax-scheme"]

@@ -3,10 +3,10 @@ canonical_name = "atoms.convergent-systems.co/spec/atom-spec"
 version = "1.0.0"
 atom_type = "atoms.convergent-systems.co/spec"
 authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
-created_at = "2026-05-22T03:40:32.832Z"
+created_at = "2026-05-23T18:01:22.471Z"
 
 [signatures]
-"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "3vCM2r3A1zDvYXz3GZSOBwewQVy76lyLgTdaFza3ybDUt62Dcd+D90hOIyE3DrgtOn5lhi8yvPF1n5NxC/1FAQ=="
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "HUZg/e976dHF9LJNgMGIeyNjzQP/Tz2mv/xW4Gs5J4gMcdku7ar9FDfsQ5YU2MyfTGd86KBmp7Y40mFWzl6JAA=="
 
 [body]
 markdown = """

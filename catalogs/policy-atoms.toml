@@ -3,10 +3,10 @@ canonical_name = "atoms.convergent-systems.co/catalogs/policy-atoms"
 version = "0.1.0"
 atom_type = "atoms.convergent-systems.co/catalogs"
 authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
-created_at = "2026-05-22T03:40:32.832Z"
+created_at = "2026-05-23T18:01:22.471Z"
 
 [signatures]
-"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "Xn8jIjgzs01HngjOCUPb8fJQzNe76G1YjndCYU0BNEdGMvu9yxboJpUP1vQe7Hd3j/nhwaevxTcuAABZuxLCAQ=="
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "TBtpky6to1QrUXiBYx/ANLIths4apscCPEc6/UKm43Jd4gk1EW3qZPI/t+sYtpiXIiX58g3M4AJbtv36cQ30Aw=="
 
 [body]
 atom_types = ["subject", "resource", "action", "effect", "condition"]

@@ -3,14 +3,14 @@ canonical_name = "atoms.convergent-systems.co/catalogs/index"
 version = "1.0.0"
 atom_type = "atoms.convergent-systems.co/class-index"
 authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
-created_at = "2026-05-22T03:40:32.832Z"
+created_at = "2026-05-23T18:01:22.471Z"
 
 [signatures]
-"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "fbM5vYFH/m+u6QUhVvKrt13o2BNGgV0uvK9g0d9NNgJWYLz6R0/oTDzZ08sjkSxf01XVKMXA84y6zarriXvnDA=="
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "+nwLCbkbhxuq357piFircOqRN87OcVP+a1puOBJjFbsGpjvj0uXgwRk0o/wDzUH1ZfmgT9Glu2O8vAkdbdvuCA=="
 
 [body]
 class = "catalogs"
-total = 16
+total = 19
 
 [[body.catalogs]]
 canonical_domain = "agent-atoms.com"
@@ -67,6 +67,12 @@ url = "/catalogs/persona-atoms.toml"
 version = "0.1.0"
 
 [[body.catalogs]]
+canonical_domain = "pipeline-atoms.com"
+name = "pipeline-atoms"
+url = "/catalogs/pipeline-atoms.toml"
+version = "0.1.0"
+
+[[body.catalogs]]
 canonical_domain = "plugin-atoms.com"
 name = "plugin-atoms"
 url = "/catalogs/plugin-atoms.toml"
@@ -91,9 +97,21 @@ url = "/catalogs/prompt-atoms.toml"
 version = "0.1.0"
 
 [[body.catalogs]]
+canonical_domain = "schema-atoms.com"
+name = "schema-atoms"
+url = "/catalogs/schema-atoms.toml"
+version = "0.1.0"
+
+[[body.catalogs]]
 canonical_domain = "service-atoms.com"
 name = "service-atoms"
 url = "/catalogs/service-atoms.toml"
+version = "0.1.0"
+
+[[body.catalogs]]
+canonical_domain = "skill-atoms.com"
+name = "skill-atoms"
+url = "/catalogs/skill-atoms.toml"
 version = "0.1.0"
 
 [[body.catalogs]]

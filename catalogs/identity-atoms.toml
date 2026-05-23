@@ -3,10 +3,10 @@ canonical_name = "atoms.convergent-systems.co/catalogs/identity-atoms"
 version = "0.1.0"
 atom_type = "atoms.convergent-systems.co/catalogs"
 authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
-created_at = "2026-05-22T03:40:32.832Z"
+created_at = "2026-05-23T18:01:22.471Z"
 
 [signatures]
-"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "R4QBrOr2GK3/6+1r9EaJ3EMZeQu/4I2e4TqRNg66TtLVV3fjrX6IuEPssiR+q+QBhwxlEdatkhAgW1wfsI5oAA=="
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "3zbznQ/ROOZ+hSwLnle8ArQ+QYIDx57La0ZqEZOT1oPuLw1siZon05g975voT/Ar3rOUSYfS2DHH+CLCHp7dDQ=="
 
 [body]
 atom_types = ["auth-method", "claim-type", "trust-framework", "key-cert-type"]

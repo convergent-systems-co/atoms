@@ -3,10 +3,10 @@ canonical_name = "atoms.convergent-systems.co/spec/index"
 version = "1.0.0"
 atom_type = "atoms.convergent-systems.co/class-index"
 authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
-created_at = "2026-05-22T03:40:32.832Z"
+created_at = "2026-05-23T18:01:22.471Z"
 
 [signatures]
-"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "w/YWHJiBVqoJUpJAtoCFVtGozof45dstcEPeND+eN3pQHF9u/S9a3CooGxrsSz0ExqsyyPdjYedFpz0uc+SwAA=="
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "UYwSLMytdkqf6plzgB0IQrIhfA2XZp0+cgr1ImDEfLSrzd9ct6/yxko0KAD8H59dqX2THgY+8R7VP2jhfa1TAg=="
 
 [body]
 class = "spec"

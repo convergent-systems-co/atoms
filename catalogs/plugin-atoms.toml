@@ -3,10 +3,10 @@ canonical_name = "atoms.convergent-systems.co/catalogs/plugin-atoms"
 version = "0.1.0"
 atom_type = "atoms.convergent-systems.co/catalogs"
 authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
-created_at = "2026-05-22T03:40:32.832Z"
+created_at = "2026-05-23T18:01:22.471Z"
 
 [signatures]
-"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "p6/WFSwI8h+Fh5v/Qj3v8m2QysOOn+XMQxdU2G9Y3Xk1UWCVk837J7Ht7CnLVCFQhfaXZ/a2qGO8+wFjUb+YCg=="
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "Oy/cBm3pHRyQWhqLMkwR2ooEUpkYB8p8kJpODYlwbTrTRRzPDOK+x3tNUsW4UDkHbAageZ+P0MFK9FhYUNn7CA=="
 
 [body]
 atom_types = ["interface-contract", "capability-declaration", "permission-scope", "lifecycle-hook", "trust-primitive"]

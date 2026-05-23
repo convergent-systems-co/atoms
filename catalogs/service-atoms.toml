@@ -3,10 +3,10 @@ canonical_name = "atoms.convergent-systems.co/catalogs/service-atoms"
 version = "0.1.0"
 atom_type = "atoms.convergent-systems.co/catalogs"
 authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
-created_at = "2026-05-22T03:40:32.832Z"
+created_at = "2026-05-23T18:01:22.471Z"
 
 [signatures]
-"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "CQGw9XCLyIEqvWFOOACLFck7xcdFUyVPdyFCrnGR8MoLe19sFbMPQNluft5pu0LJ6fUpMjVb8wpGcPUXpfmvDw=="
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "loAveXpP2M4y4rIcA3bw3RdynsL9sp3uxHpn01SgC1bA2Bs9vDpWJ8gDAEi6/a7y50atnr6Pl3ozsAL+B5vfCA=="
 
 [body]
 atom_types = ["identity", "protocol", "schema", "policy", "endpoint-pattern"]

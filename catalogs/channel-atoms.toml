@@ -3,10 +3,10 @@ canonical_name = "atoms.convergent-systems.co/catalogs/channel-atoms"
 version = "0.1.0"
 atom_type = "atoms.convergent-systems.co/catalogs"
 authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
-created_at = "2026-05-22T03:40:32.832Z"
+created_at = "2026-05-23T18:01:22.471Z"
 
 [signatures]
-"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "9+gkf3r81xM74hirQh+n8V79WY2naPBTnrRuV4POA/BlRxr3z6EXV17jhAwdS83egi/DQLXPh91jKHw5lbeUCg=="
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "QkONzQgA6+qFQE3LwNB3T2zSw8+/KthWc9G6sBK7Yp6NwxXeOjrZ0ca3GxFwyz72r/uH0/IWvrkZ3c2Rcx8RBw=="
 
 [body]
 atom_types = ["protocol", "endpoint", "delivery-semantic", "transport", "auth-method"]

@@ -284,10 +284,10 @@ Idempotently creates the schema-atoms issue hierarchy from the Atom Schema Spec 
 
 ```bash
 # Dry-run (prints what would be created, no GitHub mutations)
-python scripts/issue-creation/create-issues.py --dry-run
+python3 scripts/issue-creation/create-issues.py --dry-run
 
 # Apply
-python scripts/issue-creation/create-issues.py --apply
+python3 scripts/issue-creation/create-issues.py --apply
 ```
 
 ## Re-run semantics
@@ -591,7 +591,7 @@ git commit -m "chore(issue-creation): scaffold script directory"
 
 Run:
 ```bash
-python -c "import json; json.load(open('scripts/issue-creation/issues.json'))" && echo "OK"
+python3 -c "import json; json.load(open('scripts/issue-creation/issues.json'))" && echo "OK"
 ```
 Expected: `OK`.
 
@@ -599,7 +599,7 @@ Expected: `OK`.
 
 Run:
 ```bash
-python -c "
+python3 -c "
 import json
 d = json.load(open('scripts/issue-creation/issues.json'))
 e = len(d['epics'])
@@ -723,7 +723,7 @@ Decision recorded in:
 The directory name has a dash, so the module must be loaded by file path rather than `import`. Run:
 
 ```bash
-python -c "import importlib.util; s=importlib.util.spec_from_file_location('t','scripts/issue-creation/templates.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); print(m.epic_body({'goal':'x','spec_sections':'y'}, 'u', 'v'))"
+python3 -c "import importlib.util; s=importlib.util.spec_from_file_location('t','scripts/issue-creation/templates.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); print(m.epic_body({'goal':'x','spec_sections':'y'}, 'u', 'v'))"
 ```
 Expected: prints the epic body markdown starting with `## Goal\nx\n...`.
 
@@ -752,8 +752,8 @@ the GitHub GraphQL API. Re-run safe: existing labels and existing issues
 (matched by title) are skipped.
 
 Usage:
-    python create-issues.py --dry-run    # print plan, no mutations
-    python create-issues.py --apply      # do it
+    python3 create-issues.py --dry-run    # print plan, no mutations
+    python3 create-issues.py --apply      # do it
 """
 
 from __future__ import annotations
@@ -1007,7 +1007,7 @@ chmod +x scripts/issue-creation/create-issues.py
 
 Run:
 ```bash
-python -m py_compile scripts/issue-creation/create-issues.py && echo "OK"
+python3 -m py_compile scripts/issue-creation/create-issues.py && echo "OK"
 ```
 Expected: `OK`.
 
@@ -1028,7 +1028,7 @@ git commit -m "feat(issue-creation): add idempotent creator script"
 
 Run:
 ```bash
-python scripts/issue-creation/create-issues.py --dry-run | tee /tmp/schema-atoms-dryrun.txt
+python3 scripts/issue-creation/create-issues.py --dry-run | tee /tmp/schema-atoms-dryrun.txt
 ```
 
 Expected: prints a plan showing 4 label creates, 6 epics, 15 features, 61 stories, 5 spikes. No GitHub mutations.
@@ -1074,7 +1074,7 @@ Read the dry-run output from Task 8 one more time. Confirm titles, labels, and s
 
 Run:
 ```bash
-python scripts/issue-creation/create-issues.py --apply 2>&1 | tee /tmp/schema-atoms-apply.txt
+python3 scripts/issue-creation/create-issues.py --apply 2>&1 | tee /tmp/schema-atoms-apply.txt
 ```
 
 Expected: ~87 issues created (6 epics + 15 features + 61 stories + 5 spikes), sub-issue links established, `state.json` populated. Total runtime ~5–8 minutes (includes deliberate per-call sleeps to avoid burst rate limiting).
@@ -1197,7 +1197,7 @@ Expected: each affected story's body ends with `**Blocked by:** #<spike>`.
 - [ ] **Step 1: Run the script in `--dry-run` again**
 
 ```bash
-python scripts/issue-creation/create-issues.py --dry-run
+python3 scripts/issue-creation/create-issues.py --dry-run
 ```
 
 Expected: every issue reported as `exists #<N>` (no `[dry-run] create issue` lines). This proves idempotency.

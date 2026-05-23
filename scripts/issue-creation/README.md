@@ -7,10 +7,10 @@ Idempotently creates the schema-atoms issue hierarchy from the Atom Schema Spec 
 
 ```bash
 # Dry-run (prints what would be created, no GitHub mutations)
-python scripts/issue-creation/create-issues.py --dry-run
+python3 scripts/issue-creation/create-issues.py --dry-run
 
 # Apply
-python scripts/issue-creation/create-issues.py --apply
+python3 scripts/issue-creation/create-issues.py --apply
 ```
 
 ## Re-run semantics
@@ -32,5 +32,5 @@ on re-run. Safe to delete; the script will rebuild it.
 
 ## Outputs
 
-- ~80 issues in `convergent-systems-co/schema-atoms`.
+- ~87 issues in `convergent-systems-co/schema-atoms`.
 - Updates `state.json` after each successful creation.

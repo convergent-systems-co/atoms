@@ -1,7 +1,16 @@
 # CLOUDFLARE_API_TOKEN from env, never in code. See ~/.ai/Common.md §4.
-# Required token scopes:
+# Token scopes required for this module (mirrors the core-infra token
+# decomposition at convergent-systems-co/core-infra/terraform/cloudflare/*):
+#
 #   - Account → Cloudflare Pages → Edit
-#   - Zone → DNS → Edit (for the convergent-systems.co zone)
+#       (created by terraform/cloudflare/account-token in core-infra)
+#   - Zone → DNS → Edit  on the convergent-systems.co zone
+#       (created by terraform/cloudflare/dns-token in core-infra)
+#
+# The intended operator workflow is: apply core-infra's token modules
+# once, capture the value into the org secret store, then export that
+# value as CLOUDFLARE_API_TOKEN before running this module.
+#
 # Module sourced from convergent-systems-co/core-infra (private repo) —
 # CI fetches it via CORE_INFRA_READ_TOKEN (org-level secret, fine-grained
 # PAT with Contents:Read on core-infra only). See .github/workflows/tf-plan.yml

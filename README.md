@@ -61,6 +61,7 @@ git submodule update --init --recursive
 | [`agent-atoms`](./src/agent-atoms) | Bootstrap | AI agent primitives — personas, tools, capabilities |
 | [`persona-atoms`](./src/persona-atoms) | Bootstrap | AI persona profiles — voice, role, tone parameters |
 | [`profile-atoms`](./src/profile-atoms) | Bootstrap | User and product profiles |
+| [`schema-atoms`](./src/schema-atoms) | Bootstrap | Canonical JSON Schemas for instance files (one per top-level type) |
 | [`skill-atoms`](./src/skill-atoms) | Bootstrap | AI skills — discoverable, invocable units of capability |
 | [`channel-atoms`](./src/channel-atoms) | Bootstrap | Channels — protocols, endpoints, delivery semantics |
 | [`model-atoms`](./src/model-atoms) | Bootstrap | Model registry — capabilities, context windows, pricing |
@@ -69,6 +70,7 @@ git submodule update --init --recursive
 | [`identity-atoms`](./src/identity-atoms) | Bootstrap | Identity — auth methods, claims, trust frameworks |
 | [`compliance-atoms`](./src/compliance-atoms) | Bootstrap | Compliance — SOC2, HIPAA, ISO27001, GDPR mappings |
 | [`workflow-atoms`](./src/workflow-atoms) | Bootstrap | Workflows — steps, triggers, states, gates |
+| [`pipeline-atoms`](./src/pipeline-atoms) | Bootstrap | CI/CD pipeline primitives — steps, triggers, gates, deployment recipes |
 | [`event-atoms`](./src/event-atoms) | Bootstrap | Events — types, schemas, channels |
 | [`knowledge-atoms`](./src/knowledge-atoms) | Bootstrap | Knowledge graph — entities, relationships, provenance |
 | [`plugin-atoms`](./src/plugin-atoms) | Bootstrap | Plugin interfaces — contracts, capabilities, lifecycle |

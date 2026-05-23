@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Create ~80 GitHub issues in `convergent-systems-co/schema-atoms` that decompose the Atom Schema Spec v1.0.0-draft into an epic/feature/story tree, plus five standalone spikes, with native sub-issue parent/child links.
+**Goal:** Create ~87 GitHub issues in `convergent-systems-co/schema-atoms` that decompose the Atom Schema Spec v1.0.0-draft into an epic/feature/story tree, plus five standalone spikes, with native sub-issue parent/child links.
 
 **Architecture:** A data file (`issues.json`) describes the full hierarchy. A Python script (`create-issues.py`) reads it, idempotently creates labels via `gh label create`, creates issues via `gh issue create`, and links sub-issues via the GraphQL `addSubIssue` mutation. Idempotency is by title — a re-run skips existing issues. Dry-run mode prints the plan without mutating GitHub.
 
@@ -609,9 +609,17 @@ sp = len(d['spikes'])
 print(f'epics={e} features={f} stories={s} spikes={sp} total={e+f+s+sp}')
 "
 ```
-Expected output: `epics=6 features=14 stories=46 spikes=5 total=71`.
+Expected output: `epics=6 features=15 stories=61 spikes=5 total=87`.
 
-(Total comes in lower than the ~80 design estimate because the Epic 3 per-schema migration stories are stubbed by the inventory spike; final count grows after that spike runs.)
+Per-epic breakdown for cross-checking:
+- E1: features=3 stories=14
+- E2: features=3 stories=14
+- E3: features=2 stories=7
+- E4: features=2 stories=6
+- E5: features=4 stories=16
+- E6: features=1 stories=4
+
+(Epic 3's `stories=7` reflects the inventory spike + 3 example schemas only; the inventory spike will discover ~50 more schemas, expanding the final count well beyond 87 over time.)
 
 - [ ] **Step 4: Commit**
 
@@ -1023,7 +1031,7 @@ Run:
 python scripts/issue-creation/create-issues.py --dry-run | tee /tmp/schema-atoms-dryrun.txt
 ```
 
-Expected: prints a plan showing 4 label creates, 6 epics, 14 features, 46 stories, 5 spikes. No GitHub mutations.
+Expected: prints a plan showing 4 label creates, 6 epics, 15 features, 61 stories, 5 spikes. No GitHub mutations.
 
 - [ ] **Step 2: Verify issue counts in dry-run output**
 
@@ -1031,14 +1039,13 @@ Run:
 ```bash
 echo "epics:    $(grep -c '^Epic ' /tmp/schema-atoms-dryrun.txt)"
 echo "features: $(grep -c '^  Feature: ' /tmp/schema-atoms-dryrun.txt)"
-echo "stories:  $(grep -c '^    \[dry-run\] create issue' /tmp/schema-atoms-dryrun.txt)"
-echo "spikes:   $(grep -c '^  \[dry-run\] create issue' /tmp/schema-atoms-dryrun.txt)"
+echo "stories+spikes (dry-run creates): $(grep -c '\[dry-run\] create issue' /tmp/schema-atoms-dryrun.txt)"
 ```
 
-Expected (approximately — exact grep matching depends on output format):
+Expected:
 - epics: 6
-- features: 14
-- stories+spikes printed via `[dry-run] create issue`: 51
+- features: 15
+- stories+spikes printed via `[dry-run] create issue`: 66 (= 61 stories + 5 spikes)
 
 If counts are wrong, fix `issues.json` and re-run dry-run before applying.
 
@@ -1070,7 +1077,7 @@ Run:
 python scripts/issue-creation/create-issues.py --apply 2>&1 | tee /tmp/schema-atoms-apply.txt
 ```
 
-Expected: ~71 issues created (6 epics + 14 features + 46 stories + 5 spikes), sub-issue links established, `state.json` populated. Total runtime ~3–6 minutes (includes deliberate per-call sleeps to avoid burst rate limiting).
+Expected: ~87 issues created (6 epics + 15 features + 61 stories + 5 spikes), sub-issue links established, `state.json` populated. Total runtime ~5–8 minutes (includes deliberate per-call sleeps to avoid burst rate limiting).
 
 - [ ] **Step 3: Verify totals**
 
@@ -1081,7 +1088,7 @@ gh issue list --repo convergent-systems-co/schema-atoms --state open --label "ag
 gh issue list --repo convergent-systems-co/schema-atoms --state open --label "agile/story" --json number --jq 'length'
 ```
 
-Expected: `6`, `14`, `51` (stories + spikes both carry `agile/story`).
+Expected: `6`, `15`, `66` (stories + spikes both carry `agile/story`).
 
 - [ ] **Step 4: Spot-check sub-issue linking on Epic 1**
 
@@ -1204,7 +1211,7 @@ for L in agile/epic agile/feature agile/story; do
 done
 ```
 
-Expected: `agile/epic: 6`, `agile/feature: 14`, `agile/story: 51`.
+Expected: `agile/epic: 6`, `agile/feature: 15`, `agile/story: 66`.
 
 - [ ] **Step 3: Confirm sub-issue depth**
 

@@ -601,9 +601,9 @@ The spec acknowledges, honestly, that it is currently the work of a single contr
 
 ---
 
-**End of Atom Spec v1.1.0.**
+**End of Atom Spec v1.2.0.**
 
-*This spec atom is published at `schema-atoms/spec/atom-spec@1.1.0` with `content_hash` and signatures recorded in the canonical TOML companion.*
+*This spec atom is published at `schema-atoms/spec/atom-spec@1.2.0` with `content_hash` and signatures recorded in the canonical TOML companion.*
 
 ---
 

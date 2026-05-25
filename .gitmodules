@@ -55,3 +55,6 @@
 [submodule "src/pipeline-atoms"]
 	path = src/pipeline-atoms
 	url = https://github.com/convergent-systems-co/pipeline-atoms.git
+[submodule "src/context-atoms"]
+	path = src/context-atoms
+	url = https://github.com/convergent-systems-co/context-atoms.git

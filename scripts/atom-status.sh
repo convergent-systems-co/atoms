@@ -5,7 +5,7 @@
 # apex HTTPS reachability, *.pages.dev reachability, open PR count.
 #
 # Usage:
-#   scripts/atom-status.sh                # all 19
+#   scripts/atom-status.sh                # all 25
 #   scripts/atom-status.sh --atom brand   # one catalog
 #   scripts/atom-status.sh --verbose      # include titles + descriptions
 #
@@ -13,9 +13,11 @@
 
 set -euo pipefail
 
-ATOMS=(agent brand channel compliance event identity knowledge model
-       persona pipeline plugin policy profile prompt schema service
-       skill theme workflow)
+ATOMS=(action agent amendment brand channel
+       compliance constitution context doc event
+       identity key knowledge model persona
+       pipeline plugin policy profile prompt
+       schema service skill theme workflow)
 
 ORG="convergent-systems-co"
 
@@ -73,9 +75,16 @@ probe_one() {
 
   local desc deploy_concl deploy_sha ip apex_http apex_title pages_http pages_title pr_count code_lic data_lic data_first
 
+  if ! gh repo view "$repo" --json name >/dev/null 2>&1; then
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+      "$atom" "absent" "-" "NONE" "-" "-" "-" "-" "-" "ABSENT" "ABSENT"
+    printf '%s\n' "(repo does not exist)" > "$tmpdir/${atom}.desc"
+    return 0
+  fi
+
   desc=$(gh repo view "$repo" --json description --jq '.description // ""' 2>/dev/null || echo "")
 
-  code_lic=$(gh api "repos/${repo}" --jq '.license.spdx_id // "MISSING"' 2>/dev/null || echo "?")
+  code_lic=$(gh api "repos/${repo}" --jq '.license.spdx_id // "MISSING"' 2>/dev/null)
   [ -z "$code_lic" ] || [ "$code_lic" = "null" ] && code_lic="MISSING"
 
   data_first=$(gh api "repos/${repo}/contents/LICENSE-data" --jq '.content' 2>/dev/null | base64 -d 2>/dev/null | head -1 | tr -d '\r' || true)
@@ -120,6 +129,7 @@ mark_deploy() {
   case "$1" in
     success) printf '\xe2\x9c\x93' ;;
     failure) printf '\xe2\x9c\x97' ;;
+    absent)  printf '\xe2\x80\x94' ;;
     *)       printf '?' ;;
   esac
 }

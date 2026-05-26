@@ -3,23 +3,19 @@ canonical_name = "atoms.convergent-systems.co/catalogs/plugin-atoms"
 version = "0.1.0"
 atom_type = "atoms.convergent-systems.co/catalogs"
 authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
-created_at = "2026-05-23T18:01:22.471Z"
+created_at = "2026-05-26T14:30:58.668Z"
 
 [signatures]
-"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "Oy/cBm3pHRyQWhqLMkwR2ooEUpkYB8p8kJpODYlwbTrTRRzPDOK+x3tNUsW4UDkHbAageZ+P0MFK9FhYUNn7CA=="
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "VDxAHRle0FrUdje6XC+qjViQfFPY63zS/2OIKVX1naAuUK6eQquavyzIXsyN8Mws9s864R9+RqbaJEiO4gAqAg=="
 
 [body]
-atom_types = ["interface-contract", "capability-declaration", "permission-scope", "lifecycle-hook", "trust-primitive"]
+atom_types = []
 canonical_domain = "plugin-atoms.com"
 catalog_name = "plugin-atoms"
 catalog_version = "0.1.0"
-composition_dir = "conventions"
-composition_type = "conventions"
-federation = "xdao.co"
 github_url = "https://github.com/convergent-systems-co/plugin-atoms"
 implements_spec = "atoms-spec/v1"
 license = "Apache-2.0"
 pages_url = "https://plugin-atoms.pages.dev"
-purpose = "Plugin interface standards — not implementations — making plugins ecosystem-portable across Convergent Systems runtimes. USB-C for software plugins."
-rule_types = ["capability-grant", "semver-compatibility", "trust-chain-verification"]
-runtime_consumers = ["aish", "olympus", "universal-bus"]
+rule_types = []
+runtime_consumers = []

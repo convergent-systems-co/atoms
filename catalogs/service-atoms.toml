@@ -3,23 +3,19 @@ canonical_name = "atoms.convergent-systems.co/catalogs/service-atoms"
 version = "0.1.0"
 atom_type = "atoms.convergent-systems.co/catalogs"
 authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
-created_at = "2026-05-23T18:01:22.471Z"
+created_at = "2026-05-26T14:30:58.668Z"
 
 [signatures]
-"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "loAveXpP2M4y4rIcA3bw3RdynsL9sp3uxHpn01SgC1bA2Bs9vDpWJ8gDAEi6/a7y50atnr6Pl3ozsAL+B5vfCA=="
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "mcV5sfVqCVMa47KeCcFA39HsND3K/kiJny3vNnoo3MWz35xOdeWmXvDKcBFdqdmDhFDi83Ki6U+clkd3kK/dBg=="
 
 [body]
-atom_types = ["identity", "protocol", "schema", "policy", "endpoint-pattern"]
+atom_types = []
 canonical_domain = "service-atoms.com"
 catalog_name = "service-atoms"
 catalog_version = "0.1.0"
-composition_dir = "services"
-composition_type = "services"
-federation = "xdao.co"
 github_url = "https://github.com/convergent-systems-co/service-atoms"
 implements_spec = "atoms-spec/v1"
 license = "Apache-2.0"
 pages_url = "https://service-atoms.pages.dev"
-purpose = "Replaces DNS for services inside the ecosystem while remaining decentralized at the implementation layer — identity, protocol, schema, policy, and endpoint primitives composed into typed services."
-rule_types = ["version-compatibility", "auth-required", "schema-evolution"]
-runtime_consumers = ["universal-bus", "aish"]
+rule_types = []
+runtime_consumers = []

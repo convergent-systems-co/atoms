@@ -1,0 +1,26 @@
+spec_version = "1.0.0"
+canonical_name = "atoms.convergent-systems.co/catalogs/constitution-atoms"
+version = "0.1.0"
+atom_type = "atoms.convergent-systems.co/catalogs"
+authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
+created_at = "2026-05-26T14:30:58.668Z"
+
+[signatures]
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "ZUkfw3NxX7oC7JxsHdOttBdrhQKOTJ7rKO4V2N16SGCcTfTLkqLiqWpvOiHpRbuX5+udy/ZhPbftkNsOi/LgDQ=="
+
+[body]
+atom_types = []
+canonical_domain = "constitution-atoms.com"
+catalog_name = "constitution-atoms"
+catalog_version = "0.1.0"
+github_url = "https://github.com/convergent-systems-co/constitution-atoms"
+implements_spec = "atoms-spec/v1"
+license = "Apache-2.0"
+pages_url = "https://constitution-atoms.pages.dev"
+purpose = """
+Organizational constitutions canonicalized — bylaws, charters, mission
+statements, principle hierarchies, value declarations — composed into typed
+governance corpora that downstream policy-atoms and compliance-atoms
+reference."""
+rule_types = []
+runtime_consumers = []

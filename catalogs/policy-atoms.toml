@@ -3,23 +3,19 @@ canonical_name = "atoms.convergent-systems.co/catalogs/policy-atoms"
 version = "0.1.0"
 atom_type = "atoms.convergent-systems.co/catalogs"
 authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
-created_at = "2026-05-23T18:01:22.471Z"
+created_at = "2026-05-26T14:30:58.668Z"
 
 [signatures]
-"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "TBtpky6to1QrUXiBYx/ANLIths4apscCPEc6/UKm43Jd4gk1EW3qZPI/t+sYtpiXIiX58g3M4AJbtv36cQ30Aw=="
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "cWk14nptTFVT+Qv1co02xXtOLobvT2cvGV7eMCdCTyf0SmubtIUl8pQAn3K8i5HANs51iEnIED/1U7XPgEaGCA=="
 
 [body]
-atom_types = ["subject", "resource", "action", "effect", "condition"]
+atom_types = []
 canonical_domain = "policy-atoms.com"
 catalog_name = "policy-atoms"
 catalog_version = "0.1.0"
-composition_dir = "policies"
-composition_type = "policies"
-federation = "xdao.co"
 github_url = "https://github.com/convergent-systems-co/policy-atoms"
 implements_spec = "atoms-spec/v1"
 license = "Apache-2.0"
 pages_url = "https://policy-atoms.pages.dev"
-purpose = "Governance rules as typed, versioned, catalog-driven artifacts — subjects, resources, actions, effects, and conditions — so every organization stops reinventing the same policies."
-rule_types = ["precedence", "conflict-resolution", "scope-inheritance"]
-runtime_consumers = ["olympus", "aish"]
+rule_types = []
+runtime_consumers = []

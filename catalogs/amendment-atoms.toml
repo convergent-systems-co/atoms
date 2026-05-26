@@ -1,0 +1,27 @@
+spec_version = "1.0.0"
+canonical_name = "atoms.convergent-systems.co/catalogs/amendment-atoms"
+version = "0.1.0"
+atom_type = "atoms.convergent-systems.co/catalogs"
+authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
+created_at = "2026-05-26T14:30:58.668Z"
+
+[signatures]
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "8baumIt5N9grarn7uFji4fsJBMVgfy+Y8iRC6BQzU02PL9Tq3L5JtmnnEJeBlx/kevgbtHRG/FKGntf/5zfdDw=="
+
+[body]
+atom_types = []
+canonical_domain = "amendment-atoms.com"
+catalog_name = "amendment-atoms"
+catalog_version = "0.1.0"
+github_url = "https://github.com/convergent-systems-co/amendment-atoms"
+implements_spec = "atoms-spec/v1"
+license = "Apache-2.0"
+pages_url = "https://amendment-atoms.pages.dev"
+purpose = """
+Amendments to specifications and constitutional documents — typed proposal,
+ratification, revocation, and effective-date primitives. The change-control
+vocabulary downstream catalogs (constitution-atoms, policy-atoms, schema-atoms)
+compose against to evolve their published documents under a sanctioned,
+signed, auditable lineage."""
+rule_types = []
+runtime_consumers = []

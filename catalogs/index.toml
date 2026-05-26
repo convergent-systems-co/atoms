@@ -3,19 +3,31 @@ canonical_name = "atoms.convergent-systems.co/catalogs/index"
 version = "1.0.0"
 atom_type = "atoms.convergent-systems.co/class-index"
 authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
-created_at = "2026-05-23T18:01:22.471Z"
+created_at = "2026-05-26T14:30:58.668Z"
 
 [signatures]
-"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "+nwLCbkbhxuq357piFircOqRN87OcVP+a1puOBJjFbsGpjvj0uXgwRk0o/wDzUH1ZfmgT9Glu2O8vAkdbdvuCA=="
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "TeC7g2+PRbG9RPNUou1mgD00ev6md4JTy02wu7GuCcgtS9qRBydA57zjG9l21tHo3J91tDYFhO5cjIP+PyTyDw=="
 
 [body]
 class = "catalogs"
-total = 19
+total = 25
+
+[[body.catalogs]]
+canonical_domain = "action-atoms.com"
+name = "action-atoms"
+url = "/catalogs/action-atoms.toml"
+version = "0.1.0"
 
 [[body.catalogs]]
 canonical_domain = "agent-atoms.com"
 name = "agent-atoms"
 url = "/catalogs/agent-atoms.toml"
+version = "0.1.0"
+
+[[body.catalogs]]
+canonical_domain = "amendment-atoms.com"
+name = "amendment-atoms"
+url = "/catalogs/amendment-atoms.toml"
 version = "0.1.0"
 
 [[body.catalogs]]
@@ -37,6 +49,24 @@ url = "/catalogs/compliance-atoms.toml"
 version = "0.1.0"
 
 [[body.catalogs]]
+canonical_domain = "constitution-atoms.com"
+name = "constitution-atoms"
+url = "/catalogs/constitution-atoms.toml"
+version = "0.1.0"
+
+[[body.catalogs]]
+canonical_domain = "context-atoms.com"
+name = "context-atoms"
+url = "/catalogs/context-atoms.toml"
+version = "0.1.0"
+
+[[body.catalogs]]
+canonical_domain = "doc-atoms.com"
+name = "doc-atoms"
+url = "/catalogs/doc-atoms.toml"
+version = "0.1.0"
+
+[[body.catalogs]]
 canonical_domain = "event-atoms.com"
 name = "event-atoms"
 url = "/catalogs/event-atoms.toml"
@@ -46,6 +76,12 @@ version = "0.1.0"
 canonical_domain = "identity-atoms.com"
 name = "identity-atoms"
 url = "/catalogs/identity-atoms.toml"
+version = "0.1.0"
+
+[[body.catalogs]]
+canonical_domain = "key-atoms.com"
+name = "key-atoms"
+url = "/catalogs/key-atoms.toml"
 version = "0.1.0"
 
 [[body.catalogs]]
@@ -100,7 +136,7 @@ version = "0.1.0"
 canonical_domain = "schema-atoms.com"
 name = "schema-atoms"
 url = "/catalogs/schema-atoms.toml"
-version = "0.1.0"
+version = "1.0.0-draft"
 
 [[body.catalogs]]
 canonical_domain = "service-atoms.com"

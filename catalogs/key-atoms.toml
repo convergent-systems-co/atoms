@@ -1,0 +1,27 @@
+spec_version = "1.0.0"
+canonical_name = "atoms.convergent-systems.co/catalogs/key-atoms"
+version = "0.1.0"
+atom_type = "atoms.convergent-systems.co/catalogs"
+authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
+created_at = "2026-05-26T14:30:58.668Z"
+
+[signatures]
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "0l0ZuFDEQb/c+Ss4pnmPS8LlvnznUQeaNFZ++SUs+oqU/MBmuBzvMGGphhXxScgTCtcbWpn+9sZu+wLzCeh9CQ=="
+
+[body]
+atom_types = []
+canonical_domain = "key-atoms.com"
+catalog_name = "key-atoms"
+catalog_version = "0.1.0"
+github_url = "https://github.com/convergent-systems-co/key-atoms"
+implements_spec = "atoms-spec/v1"
+license = "Apache-2.0"
+pages_url = "https://key-atoms.pages.dev"
+purpose = """
+Cryptographic keys, key roles, key successions, and revocations as atoms.
+Public-key records only — private key material NEVER lives in this repo
+and is held exclusively in the principal's offline secret store. Every
+*-atoms catalog in the convergent-systems.co federation depends on
+key-atoms for signature verification under atoms-spec/v1.1.0."""
+rule_types = []
+runtime_consumers = []

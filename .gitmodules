@@ -58,3 +58,18 @@
 [submodule "src/context-atoms"]
 	path = src/context-atoms
 	url = https://github.com/convergent-systems-co/context-atoms.git
+[submodule "src/action-atoms"]
+	path = src/action-atoms
+	url = https://github.com/convergent-systems-co/action-atoms.git
+[submodule "src/amendment-atoms"]
+	path = src/amendment-atoms
+	url = https://github.com/convergent-systems-co/amendment-atoms.git
+[submodule "src/constitution-atoms"]
+	path = src/constitution-atoms
+	url = https://github.com/convergent-systems-co/constitution-atoms.git
+[submodule "src/key-atoms"]
+	path = src/key-atoms
+	url = https://github.com/convergent-systems-co/key-atoms.git
+[submodule "src/doc-atoms"]
+	path = src/doc-atoms
+	url = https://github.com/convergent-systems-co/doc-atoms.git

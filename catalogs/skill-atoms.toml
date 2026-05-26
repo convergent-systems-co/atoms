@@ -3,27 +3,19 @@ canonical_name = "atoms.convergent-systems.co/catalogs/skill-atoms"
 version = "0.1.0"
 atom_type = "atoms.convergent-systems.co/catalogs"
 authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
-created_at = "2026-05-23T18:01:22.471Z"
+created_at = "2026-05-26T14:30:58.668Z"
 
 [signatures]
-"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "0NSmYfpBp+QOpT4Gk2q8BgXlIs0bpswhKFd/CHUfOkSVaZOp++Q4nLUBZ/19OHIFsFgiZHeAtGx1GfrGjkY/CQ=="
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "hEM3cnxdBeKS15H904NavhJ5EkSp2UIwnGmzj4oCK/6EYmEcBV+JCt1FT9YiItAYgJF30twUGc6Tcc08LenjCg=="
 
 [body]
 atom_types = []
 canonical_domain = "skill-atoms.com"
 catalog_name = "skill-atoms"
 catalog_version = "0.1.0"
-composition_dir = "skills"
-composition_type = "skills"
-federation = "xdao.co"
 github_url = "https://github.com/convergent-systems-co/skill-atoms"
 implements_spec = "atoms-spec/v1"
 license = "Apache-2.0"
 pages_url = "https://skill-atoms.pages.dev"
-purpose = """
-Skill primitives for AI runtimes — discoverable, invocable units of capability that agents
-load on demand. Each skill bundles a description, an invocation contract, and the prompt or
-reference material the agent needs to perform a bounded task. Composable, versioned, and
-catalog-addressable."""
 rule_types = []
-runtime_consumers = ["aish", "olympus"]
+runtime_consumers = []

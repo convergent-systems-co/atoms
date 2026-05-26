@@ -3,23 +3,19 @@ canonical_name = "atoms.convergent-systems.co/catalogs/theme-atoms"
 version = "0.1.0"
 atom_type = "atoms.convergent-systems.co/catalogs"
 authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
-created_at = "2026-05-23T18:01:22.471Z"
+created_at = "2026-05-26T14:30:58.668Z"
 
 [signatures]
-"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "5q7Xs10XeJUdWOhPWIKN/S40thln6cUD3M50XPoONRutWYw5zV5KRqa/TuF0LcSrLe8beyz8k3B5OHrX+UPBDQ=="
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "XczPzbYOLWifpeGaNlf5DmazgG39lACyK2KJhRvqX7AetLKl1sf8vB4s97M6Yh2Jt0aCpn/ALuXWp1OiW/ujDA=="
 
 [body]
-atom_types = ["prompt-segment", "separator-style", "glyph-set", "role-binding", "syntax-scheme"]
+atom_types = []
 canonical_domain = "theme-atoms.com"
 catalog_name = "theme-atoms"
 catalog_version = "0.1.0"
-composition_dir = "themes"
-composition_type = "themes"
-federation = "xdao.co"
 github_url = "https://github.com/convergent-systems-co/theme-atoms"
 implements_spec = "atoms-spec/v1"
 license = "Apache-2.0"
 pages_url = "https://theme-atoms.pages.dev"
-purpose = "Theme primitives for terminal, shell, editor, and TUI experiences — prompt segments, separators, glyph sets, role bindings, syntax schemes. Composable surface designs that extend brands with surface-specific behavior."
-rule_types = ["brand-conformance", "contrast-requirement", "glyph-completeness"]
-runtime_consumers = ["aish", "olympus"]
+rule_types = []
+runtime_consumers = []

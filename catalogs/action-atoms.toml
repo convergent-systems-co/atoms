@@ -1,0 +1,21 @@
+spec_version = "1.0.0"
+canonical_name = "atoms.convergent-systems.co/catalogs/action-atoms"
+version = "0.1.0"
+atom_type = "atoms.convergent-systems.co/catalogs"
+authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
+created_at = "2026-05-26T14:30:58.668Z"
+
+[signatures]
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "nSh8ZGZjUB0SyD/MnVGdoMANbkmIK2F7FbZ3/mM0SNhmUTQMrPuNQWW9t/QsAgTN5WfUbzu7pv9Bec9fGiSdAQ=="
+
+[body]
+atom_types = []
+canonical_domain = "action-atoms.com"
+catalog_name = "action-atoms"
+catalog_version = "0.1.0"
+github_url = "https://github.com/convergent-systems-co/action-atoms"
+implements_spec = "atoms-spec/v1"
+license = "Apache-2.0"
+pages_url = "https://action-atoms.pages.dev"
+rule_types = []
+runtime_consumers = []

@@ -1,0 +1,27 @@
+spec_version = "1.0.0"
+canonical_name = "atoms.convergent-systems.co/catalogs/context-atoms"
+version = "0.1.0"
+atom_type = "atoms.convergent-systems.co/catalogs"
+authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
+created_at = "2026-05-26T14:30:58.668Z"
+
+[signatures]
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "XkPlC8v/AwBnOLKtfJp1uvhxl5DBczR79eU+zsI3vue4C0090r24NAZaFlRaJvQGuEYvy6qBuAq6t8mMw7e7DA=="
+
+[body]
+atom_types = []
+canonical_domain = "context-atoms.com"
+catalog_name = "context-atoms"
+catalog_version = "0.1.0"
+github_url = "https://github.com/convergent-systems-co/context-atoms"
+implements_spec = "atoms-spec/v1"
+license = "Apache-2.0"
+pages_url = "https://context-atoms.pages.dev"
+purpose = """
+Context primitives for AI runtimes — situational frames, environment descriptors,
+conversation scopes, working-memory shapes, attention budgets. Composes with
+agent-atoms and prompt-atoms so an agent's situational context is expressed as
+typed, versioned, signed atoms rather than free-text prose dumped into a system
+prompt."""
+rule_types = []
+runtime_consumers = []

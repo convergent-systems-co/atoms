@@ -3,10 +3,10 @@ canonical_name = "atoms.convergent-systems.co/keys"
 version = "1.0.0"
 atom_type = "atoms.convergent-systems.co/key-registry"
 authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
-created_at = "2026-05-23T18:01:22.471Z"
+created_at = "2026-05-26T14:30:58.668Z"
 
 [signatures]
-"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "q4wpTYusExk7dp3DRRIOsDTCApZ3KmgquBzEG+pTOv+opZkoTwYtf9PcWbpZ4jtaF+c3Um5X4fSMN4U19qHsBQ=="
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "GJdQQJNsIsDce5JE0YKWFmNg7qyZcTAqXN6RCy6f5RJ6uw269MSfpLeVea4YZU9WQJCBu60q2KlGcpbtJOf9BA=="
 
 [body]
 authority = "atoms.convergent-systems.co"

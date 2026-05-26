@@ -3,23 +3,19 @@ canonical_name = "atoms.convergent-systems.co/catalogs/prompt-atoms"
 version = "0.1.0"
 atom_type = "atoms.convergent-systems.co/catalogs"
 authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
-created_at = "2026-05-23T18:01:22.471Z"
+created_at = "2026-05-26T14:30:58.668Z"
 
 [signatures]
-"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "ydOYV5+/dhwAHzvt3RShJKhS+OX5KVmkSZqeWkx6A9PTQMKEKsEJAMMMXkmN+KaQwkh7jU+v+dSQ1h4iCekxAQ=="
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "lBhrph7Ksfow9kZ6P71fhj7nTBKcih51uJgQ8BCoxiVsX55e6K3uTHhuLT12vdeRt0Hzy1bFtVkeanUcrkuPAg=="
 
 [body]
-atom_types = ["persona", "constraint", "format-instruction", "tool-use-template", "refusal-pattern", "output-schema"]
+atom_types = []
 canonical_domain = "prompt-atoms.com"
 catalog_name = "prompt-atoms"
 catalog_version = "0.1.0"
-composition_dir = "prompts"
-composition_type = "prompts"
-federation = "xdao.co"
 github_url = "https://github.com/convergent-systems-co/prompt-atoms"
 implements_spec = "atoms-spec/v1"
 license = "Apache-2.0"
 pages_url = "https://prompt-atoms.pages.dev"
-purpose = "Prompt engineering as a canonical, machine-readable, versioned library — replacing closed vendor libraries and scattered cookbooks with typed personas, constraints, formats, tool-use templates, refusal patterns, and output schemas."
-rule_types = ["model-compatibility", "token-length-constraint", "format-compatibility"]
-runtime_consumers = ["aish", "olympus"]
+rule_types = []
+runtime_consumers = []

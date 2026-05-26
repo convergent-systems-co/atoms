@@ -3,23 +3,19 @@ canonical_name = "atoms.convergent-systems.co/catalogs/compliance-atoms"
 version = "0.1.0"
 atom_type = "atoms.convergent-systems.co/catalogs"
 authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
-created_at = "2026-05-23T18:01:22.471Z"
+created_at = "2026-05-26T14:30:58.668Z"
 
 [signatures]
-"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "TbDPeo26661/2fJqcB+35lHTwmpNFrlQKpQ+G9a66L7nSi99MZ8GEtlLvImMsvnRqOE3pk/Fz+zycfouZ2xGAw=="
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "KIwIdD7NfYkxF4MppB4a65ouXA0v4PiPdfqwhU/oUgF+jauOGjbFAQeEjNwNkQ1LajUGA3aFPREihW2PBkbsBQ=="
 
 [body]
-atom_types = ["control-family", "control", "evidence-type", "audit-requirement"]
+atom_types = []
 canonical_domain = "compliance-atoms.com"
 catalog_name = "compliance-atoms"
 catalog_version = "0.1.0"
-composition_dir = "frameworks"
-composition_type = "frameworks"
-federation = "xdao.co"
 github_url = "https://github.com/convergent-systems-co/compliance-atoms"
 implements_spec = "atoms-spec/v1"
 license = "Apache-2.0"
 pages_url = "https://compliance-atoms.pages.dev"
-purpose = "SOC2, HIPAA, ISO27001, PCI, GDPR mapped once with shared control families, evidence types, audit requirements, and cross-framework equivalence — ending the industry-wide redundancy of duplicate control mappings."
-rule_types = ["framework-requirement", "evidence-sufficiency", "cross-framework-equivalence"]
-runtime_consumers = ["olympus", "aish"]
+rule_types = []
+runtime_consumers = []

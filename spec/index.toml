@@ -1,0 +1,20 @@
+spec_version = "1.0.0"
+canonical_name = "atoms.convergent-systems.co/spec/index"
+version = "1.0.0"
+atom_type = "atoms.convergent-systems.co/class-index"
+authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
+created_at = "2026-05-26T14:30:58.668Z"
+
+[signatures]
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "gpNdfcFDjqrBCkdVhCsaD++8IdSeoLXcZhoAoBn9TRc3bAkQSI+zMcQlm7yM9MNwpyJVALV+DEVwfCLJ4xswAg=="
+
+[body]
+class = "spec"
+
+[[body.versions]]
+latest_markdown = "/spec/atom-spec.md"
+latest_toml = "/spec/atom-spec.toml"
+markdown = "/spec/atom-spec@1.0.0.md"
+status = "active"
+toml = "/spec/atom-spec@1.0.0.toml"
+version = "1.0.0"

@@ -6,6 +6,8 @@
 
 It is not a monorepo. Each catalog stays its own repository — donatable, transferable, federatable, with its own release cycle. `atoms` pins each via git submodule under `src/<catalog>-atoms/`, so a single clone with `--recurse-submodules` materializes the whole ecosystem.
 
+See [GOALS.md](GOALS.md) for the roadmap and milestone acceptance criteria.
+
 ## What's published
 
 | Path | What |

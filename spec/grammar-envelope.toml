@@ -1,0 +1,70 @@
+# grammar-envelope.toml — Grammar Atom Envelope Spec
+#
+# Defines the TOML shape for grammar atoms in schema-atoms.
+# A grammar atom is a toml-schema atom whose payload describes the
+# structural contract (fields, types, required-ness, references,
+# constraints) of one atom class in any catalog.
+#
+# Conforms to: Atom Spec v1.2.0 (universal envelope in Part I)
+# Catalog:     schema-atoms  (class: toml-schema, family: data-schema)
+# Status:      draft
+
+# ── Universal envelope ──────────────────────────────────────────────────────
+id           = "schema-atoms/toml-schema/grammar-envelope"
+version      = "1.0.0-draft"
+# content_hash is placeholder — set by signing toolchain before publication
+content_hash = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+lifecycle    = "draft"
+created_at   = "2026-05-26T00:00:00Z"
+
+# ── Data-schema payload (toml-schema class) ──────────────────────────────────
+[schema]
+class          = "toml-schema"
+title          = "Grammar Atom Envelope"
+summary        = "Structural contract for grammar atoms: the TOML shape every grammar atom must satisfy."
+schema_version = "1.0.0-draft"
+# The asset field names the normative schema file that validators consume.
+# The schema file itself lives at schemas/grammar.schema.toml in schema-atoms.
+asset          = "schemas/grammar.schema.toml"
+validates      = "grammar atoms — atoms of kind = \"grammar\" in any catalog"
+
+# ── Grammar envelope definition ───────────────────────────────────────────────
+#
+# A grammar atom MUST include the following top-level fields (in addition to
+# the universal envelope above).  This section is the human-readable source
+# of truth; the machine-readable version lives in schemas/grammar.schema.toml.
+#
+# Required fields on every grammar atom
+# ──────────────────────────────────────
+# kind    = "grammar"           string, constant
+# name    = "<human label>"     string, non-empty
+# class   = "<atom-class>"      string — the atom class this grammar applies to
+#                               (e.g. "persona", "prompt", "policy")
+#
+# [[fields]]                    one or more field definitions
+#   name     = string           field identifier as used in atom TOML
+#   type     = string           TOML type: string | bool | integer | float |
+#                               datetime | array | table | atom-ref
+#   required = bool             whether the field is required on every atom
+#   description = string        (optional) human-readable intent
+#
+# Optional fields on a grammar atom
+# ───────────────────────────────────
+# [[references]]                cross-references to other grammar atoms
+#   name       = string         label for this reference relationship
+#   target     = string         grammar atom id: "<catalog>/<class>/<slug>@<version>"
+#   cardinality = string        "one" | "many" | "optional"
+#
+# [[constraints]]               validation rules expressed as strings
+#   rule = string               human-readable constraint; tools may parse these
+#
+# description = string          (optional) free-text description of the atom class
+
+# ── Signatures (unsigned placeholder — filled by signing toolchain) ──────────
+[[signatures]]
+algorithm     = "ml-dsa-65"
+signer_role   = "catalog-maintainer"
+signer_key_id = "k_cs_schema_2026"
+signature     = "UNSIGNED-PLACEHOLDER"
+signed_at     = "2026-05-26T00:00:00Z"
+covers        = "content_hash"

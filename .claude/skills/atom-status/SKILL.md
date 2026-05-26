@@ -2,8 +2,9 @@
 name: atom-status
 description: >
   Full fleet snapshot of all *-atoms.com catalog sites — deploy health, DNS, HTTPS
-  reachability, atom_types per catalog, schema compliance, /ai/index.json, Terraform
-  vs Wrangler, DeployAfterMerge gate, open PRs, and license audit. Use when the user
+  reachability, atom_types per catalog with item counts, schema compliance,
+  /ai/index.json, Terraform backend, right-side sidenav, brand asset uniformity,
+  builder script, federation field, and registry presence. Use when the user
   asks about the state of the atoms fleet, wants to verify deployments, asks for a
   "fleet snapshot" / "fleet status" / "atom status" / "atom-state" / schema compliance
   / license audit report, or before starting any cross-fleet work.
@@ -11,196 +12,298 @@ description: >
 
 # /atom-status — Atoms Fleet Snapshot
 
-Produces a single consolidated report for every `*-atoms.com` catalog site.
-Run from the `atoms` repo root; reads `ATOMS_LIST.md` and `catalogs/*.toml`.
+Produces a single consolidated report for every `*-atoms.com` catalog site. The goal is **uniform state** — every catalog should have the same structure, same brand assets, same services available in the same way. This skill checks all uniformity criteria and surfaces gaps.
 
-## Data sources (run in parallel)
+Run from the `atoms` repo root.
 
-| Source | Provides |
-|--------|----------|
-| `scripts/atom-status.sh` | Deploy · DNS · Apex · Pages · PRs · Code · Data |
-| `catalogs/<name>.toml → [body] atom_types` | Atom types per catalog |
-| GitHub API repo tree | `infra/terraform/`, `wrangler.toml`, deploy workflow triggers |
-| `ATOMS.yml → spec_version` | Schema compliance (v1.1.0 vs v1) |
-| Live HTTP probe | `/ai/index.json` reachability |
+## The 25 catalogs
 
-**GH token:** prefix all `gh` commands with `GH_TOKEN=$(gh auth token --user itsfwcp_JMF)`.
-
----
-
-## Step 1 — Run the fleet script
-
-```bash
-scripts/atom-status.sh          # Deploy · DNS · Apex · Pages · PRs · Code · Data
-scripts/atom-status.sh --verbose  # also prints repo description + page titles
-scripts/atom-status.sh --atom brand  # single catalog
+```
+action-atoms      agent-atoms       amendment-atoms   brand-atoms
+channel-atoms     compliance-atoms  constitution-atoms context-atoms
+doc-atoms         event-atoms       identity-atoms    key-atoms
+knowledge-atoms   model-atoms       persona-atoms     pipeline-atoms
+plugin-atoms      policy-atoms      profile-atoms     prompt-atoms
+schema-atoms      service-atoms     skill-atoms       theme-atoms
+workflow-atoms
 ```
 
+Local path: `src/<name>/`   Umbrella: this repo root   Domain: `<name>.com`
+
+**Auth:** Use `polliard` account for GitHub API calls (has org-level access).
+
 ---
 
-## Step 2 — atom_types per catalog
+## Uniformity checklist — what every catalog MUST have
 
-Read directly from `catalogs/<name>.toml` in this repo — the canonical source:
+| # | Check | How to verify |
+|---|---|---|
+| 1 | **Registered in catalog** | `catalogs/<name>.toml` exists in umbrella repo |
+| 2 | **Live site** | `curl https://<name>.com/` returns 200 |
+| 3 | **Right-side sidenav** | Homepage HTML contains `class="sidenav"` |
+| 4 | **Brand assets from CDN** | Favicon, wordmark, hero icon, CSS all load from `brand-atoms.com/dist/brands/atom-family/1.0.0/` |
+| 5 | **Atom types listed on homepage** | Every `atom_types` entry from ATOMS.yml appears as a link on the homepage |
+| 6 | **Item count per class shown** | Each type link shows `N atoms` count on the homepage |
+| 7 | **AI discovery endpoint** | `https://<name>.com/ai/index.json` returns 200 + valid JSON |
+| 8 | **Federation is convergent-systems.co** | `ATOMS.yml` has `federation: convergent-systems.co` (exactly, no trailing dot) |
+| 9 | **Builder script** | `scripts/build-exports.py` exists in the repo |
+| 10 | **Terraform backend wired** | `infra/terraform/envs/dev/backend.tf` contains `cs-tfstate` (not a stub) |
+| 11 | **Schema version** | `ATOMS.yml` has `spec_version: atoms-spec/v1.1.0` |
+| 12 | **Deploy after merge** | Deploy workflow fires on `push: branches: [main]` only |
+
+---
+
+## Data collection (run all in parallel)
+
+### A. Filesystem checks (fast — no network)
 
 ```bash
-for toml in catalogs/*-atoms.toml; do
-  name=$(basename "$toml" .toml)
-  types=$(grep "^atom_types" "$toml" \
-    | sed 's/atom_types = \[//;s/\]//;s/"//g;s/, */,/g' | tr -d ' ')
-  echo "$name|${types:-—}"
+BASE=/path/to/atoms/src
+UMBRELLA=/path/to/atoms
+
+for name in action-atoms agent-atoms ...; do
+  DIR="$BASE/$name"
+  
+  # 1. Registry
+  REG=$(test -f "$UMBRELLA/catalogs/$name.toml" && echo "✓" || echo "✗")
+  
+  # 8. Federation
+  FED=$(python3 -c "import yaml; d=yaml.safe_load(open('$DIR/ATOMS.yml')); print(d.get('federation','missing'))" 2>/dev/null)
+  FED_OK=$([ "$FED" = "convergent-systems.co" ] && echo "✓" || echo "✗ ($FED)")
+  
+  # 9. Builder
+  BUILDER=$(test -f "$DIR/scripts/build-exports.py" && echo "✓" || echo "✗")
+  
+  # 10. Terraform
+  TF_FILE="$DIR/infra/terraform/envs/dev/backend.tf"
+  TF=$(grep -q "cs-tfstate" "$TF_FILE" 2>/dev/null && echo "✓" || echo "✗")
+  
+  # 11. Schema version
+  SCHEMA=$(python3 -c "import yaml; d=yaml.safe_load(open('$DIR/ATOMS.yml')); print(d.get('spec_version', d.get('spec','missing')))" 2>/dev/null)
+  
+  # Atom types declared
+  TYPES=$(python3 -c "import yaml; d=yaml.safe_load(open('$DIR/ATOMS.yml')); print(len(d.get('atom_types',[])))" 2>/dev/null)
+  
+  # Item counts from local catalog.json
+  CAT_JSON=$([ -f "$DIR/exports/catalog.json" ] && echo "$DIR/exports/catalog.json" || echo "$DIR/web/public/exports/catalog.json")
+  COUNTS=$(python3 -c "
+import json, os
+p='$CAT_JSON'
+if os.path.exists(p):
+    d=json.load(open(p))
+    t={}
+    for a in d.get('atoms',[]): t[a.get('type','?')]=t.get(a.get('type','?'),0)+1
+    total=sum(t.values())
+    detail=', '.join(f'{k}:{v}' for k,v in sorted(t.items()))
+    print(f'{total}|{detail}')
+else:
+    print('0|no catalog.json')
+" 2>/dev/null)
+  
+  echo "$name|$REG|$FED_OK|$BUILDER|$TF|$SCHEMA|$TYPES types|$COUNTS"
 done
 ```
 
-Empty `[]` → report as `—` with a note: composition-only, spec, or TBD.
-
----
-
-## Step 3 — Schema compliance (ATOMS.yml spec_version)
+### B. Live HTTP checks (parallel curl, ~8s total)
 
 ```bash
-GH_TOKEN=$(gh auth token --user itsfwcp_JMF) \
-  gh api "repos/convergent-systems-co/<name>/contents/ATOMS.yml" \
-  --jq '.content' | base64 -d | grep -E "^spec_version|^spec:" | head -1
+for name in action-atoms agent-atoms ...; do
+  DOMAIN="${name}.com"
+  (
+    # 2. Live site
+    LIVE=$(curl -s -o /tmp/atom-${name}.html -w "%{http_code}" --max-time 8 "https://$DOMAIN/")
+    
+    # Read homepage HTML for multiple checks
+    HTML=$(cat /tmp/atom-${name}.html 2>/dev/null)
+    
+    # 3. Right-side sidenav
+    NAV=$(echo "$HTML" | grep -q 'class="sidenav"' && echo "✓" || echo "✗")
+    
+    # 4. Brand assets
+    BRAND=$(echo "$HTML" | grep -q "brand-atoms.com/dist/brands/atom-family/1.0.0/" && echo "✓" || echo "✗")
+    FAVICON=$(echo "$HTML" | grep -q "favicon.svg" && echo "✓" || echo "✗")
+    LOGO=$(echo "$HTML" | grep -q "atom-family-wordmark" && echo "✓" || echo "✗")
+    
+    # 5+6. Types listed with counts
+    LISTED_TYPES=$(echo "$HTML" | grep -oP '(?<=type=)[a-z][a-z0-9-]+' | sort -u | wc -l)
+    HAS_COUNTS=$(echo "$HTML" | grep -qP '\d+ atoms?' && echo "✓" || echo "✗")
+    
+    # 7. AI discovery
+    AI=$(curl -s -o /tmp/ai-${name}.json -w "%{http_code}" --max-time 6 "https://$DOMAIN/ai/index.json")
+    AI_OK=$([ "$AI" = "200" ] && echo "✓" || echo "✗")
+    
+    # How-to and install pages (bonus)
+    HOWTO=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 "https://$DOMAIN/how-to-use")
+    INSTALL=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 "https://$DOMAIN/install")
+    
+    rm -f /tmp/atom-${name}.html /tmp/ai-${name}.json
+    echo "$name|$LIVE|$NAV|$BRAND/$FAVICON/$LOGO|$LISTED_TYPES|$HAS_COUNTS|$AI_OK|$HOWTO|$INSTALL"
+  ) &
+done
+wait
 ```
 
-- `spec_version: atoms-spec/v1.1.0` → ✅
-- `spec: atoms-spec/v1` → ⚠️ old
-- absent → ❌
-
----
-
-## Step 4 — /ai/index.json reachability
+### C. Deploy CI status (GitHub API)
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}" --max-time 6 \
-  "https://<name>-atoms.com/ai/index.json"
+for name in action-atoms agent-atoms ...; do
+  SHA=$(git -C src/$name rev-parse HEAD 2>/dev/null)
+  DEPLOY=$(gh api "repos/convergent-systems-co/$name/commits/$SHA/check-runs" \
+    --jq '[.check_runs[] | select(.name == "deploy") | .conclusion] | .[0]' 2>/dev/null || echo "unknown")
+  echo "$name: deploy=$DEPLOY"
+done
 ```
-
-200 → ✅ · anything else → ❌
-
----
-
-## Step 5 — Terraform vs Wrangler
-
-```bash
-GH_TOKEN=$(gh auth token --user itsfwcp_JMF) \
-  gh api "repos/convergent-systems-co/<name>/git/trees/HEAD?recursive=1" \
-  --jq '{
-    terraform: ([.tree[].path | select(startswith("infra/terraform/") or endswith(".tf"))] | length),
-    wrangler:  ([.tree[].path | select(. == "wrangler.toml")] | length)
-  }' 2>/dev/null
-```
-
-- `terraform > 0` AND `wrangler == 0` → ✅ Terraform
-- `wrangler > 0` → ⚠️ Wrangler
-- both 0 → ➖ Neither
-
----
-
-## Step 6 — DeployAfterMerge
-
-Fetch deploy workflow and inspect `on:` trigger:
-
-```bash
-GH_TOKEN=$(gh auth token --user itsfwcp_JMF) \
-  gh api "repos/convergent-systems-co/<name>/contents/.github/workflows/deploy.yml" \
-  --jq '.content' | base64 -d | grep -A 10 "^on:" 2>/dev/null
-```
-
-- `push: branches: [main]` only (or `workflow_dispatch`) → ✅
-- `pull_request` or unfiltered `push` → ⚠️ Premature
-- no deploy workflow → ➖
 
 ---
 
 ## Output format
 
-Two blocks: fleet table then atom_types detail.
+### Summary block
 
 ```
-# Atoms Fleet Snapshot — {date}
-Reference: brand-atoms.com | Org: convergent-systems-co
+# Atoms Fleet Snapshot — {ISO-8601 UTC}
+Federation target: convergent-systems.co | Org: convergent-systems-co
+Brand CDN: brand-atoms.com/dist/brands/atom-family/1.0.0/
 
-## Summary
-- Catalogs tracked:    25
-- Apex LIVE (2xx):     N
-- Apex offline (000):  N
-- /ai/index.json ✅:   N / N live
-- Schema v1.1.0 ✅:    N / 25
-- Terraformed ✅:      N / 25
-- DeployAfterMerge ✅: N / 25
+Uniformity score: N/25 catalogs fully uniform
 
-## Fleet Status
+  Live sites:          N/25
+  AI discovery:        N/25
+  Right-side nav:      N/25
+  Brand assets OK:     N/25
+  Atom types listed:   N/25  (with counts)
+  Builder script:      N/25
+  Terraform wired:     N/25
+  Federation correct:  N/25
+  Registry entry:      N/25
+  Schema v1.1.0:       N/25
+```
 
-| Catalog              | Deploy     | DNS  | Apex | /ai/ | Schema  | Terraform | AfterMerge | PRs | Code       | Data      |
-|----------------------|------------|------|------|------|---------|:---------:|:----------:|-----|------------|-----------|
-| brand-atoms.com      | ✅ a1b2c3d | LIVE | 200  | ✅   | ✅ v1.1 | ✅        | ✅         | 0   | Apache-2.0 | CC-BY-4.0 |
-| schema-atoms.com     | ✅ a1b2c3d | LIVE | 200  | ✅   | ✅ v1.1 | ✅        | ✅         | 0   | Apache-2.0 | CC-BY-4.0 |
-| pipeline-atoms.com   | ✅ a1b2c3d | NONE | 000  | ❌   | ✅ v1.1 | ➖        | ✅         | 0   | Apache-2.0 | CC-BY-4.0 |
-| ...                  | ...        | ...  | ...  | ...  | ...     | ...       | ...        | ... | ...        | ...       |
+### Main fleet table
 
-Column keys:
-  Deploy:     ✅ green · ❌ failed · ⏳ running · — no run found
-  /ai/:       ✅ 200 · ❌ non-200 or offline
-  Schema:     ✅ v1.1.0 · ⚠️ v1 (old) · ❌ missing
-  Terraform:  ✅ infra/terraform/ present, no wrangler.toml · ⚠️ wrangler.toml · ➖ none
-  AfterMerge: ✅ deploy triggers on push:main only · ⚠️ fires on PRs/branches · ➖ no pipeline
+```
+Catalog              | Live | /ai/ | Nav | Brand | Builder | TF  | Fed | Reg | Schema  | Deploy
+---------------------|------|------|-----|-------|---------|-----|-----|-----|---------|-------
+action-atoms         |  ✗   |  ✗   |  ✗  |  ✗    |   ✓     |  ✗  |  ✓  |  ✓  | v1.1.0  | ❌
+agent-atoms          |  ✓   |  ✓   |  ✓  |  ✓    |   ✓     |  ✓  |  ✓  |  ✓  | v1.1.0  | ✅
+...
+```
 
-## Atom Types per Catalog
+Column key:
+- **Live**: 200 from homepage
+- **/ai/**: `/ai/index.json` returns 200
+- **Nav**: `class="sidenav"` present (right-side menu)
+- **Brand**: all assets from `brand-atoms.com/dist/brands/atom-family/1.0.0/`
+- **Builder**: `scripts/build-exports.py` exists
+- **TF**: Terraform backend has `cs-tfstate`
+- **Fed**: `federation: convergent-systems.co` exactly
+- **Reg**: `catalogs/<name>.toml` in umbrella repo
+- **Schema**: spec_version field value
+- **Deploy**: last CI deploy conclusion
 
-Source: catalogs/<name>.toml → [body] atom_types (read live, not from memory)
+### Atom types and item counts per catalog
 
-| Catalog          | atom_types                                                                               |
-|------------------|------------------------------------------------------------------------------------------|
-| brand-atoms      | palette, font, glyph                                                                     |
-| service-atoms    | identity, protocol, schema, policy, endpoint-pattern                                     |
-| prompt-atoms     | persona, constraint, format-instruction, tool-use-template, refusal-pattern, output-schema |
-| policy-atoms     | subject, resource, action, effect, condition                                             |
-| identity-atoms   | auth-method, claim-type, trust-framework, key-cert-type                                  |
-| compliance-atoms | control-family, control, evidence-type, audit-requirement                                |
-| workflow-atoms   | step-type, trigger-type, state-type, gate-type, github                                   |
-| agent-atoms      | persona, tool-definition, capability-declaration, role-boundary, isolation-constraint    |
-| knowledge-atoms  | entity-type, relationship-type, provenance-atom, fact-type, confidence-primitive         |
-| event-atoms      | event-type, schema, channel, subscription-pattern, delivery-semantics                    |
-| plugin-atoms     | interface-contract, capability-declaration, permission-scope, lifecycle-hook, trust-primitive |
-| theme-atoms      | prompt-segment, separator-style, glyph-set, role-binding, syntax-scheme                  |
-| persona-atoms    | voice-profile, role-definition, behavioural-constraint, knowledge-boundary, tone-parameter |
-| channel-atoms    | protocol, endpoint, delivery-semantic, transport, auth-method                            |
-| model-atoms      | model-card, capability, pricing-tier, deprecation-policy, tool-use-shape, modality       |
-| action-atoms     | github                                                                                   |
-| profile-atoms    | — (composition-only; primitives live in other catalogs)                                  |
-| skill-atoms      | — (TBD — schema authoring deferred)                                                      |
-| schema-atoms     | — (spec compositions; no typed atom instances)                                           |
-| pipeline-atoms   | — (TBD — schema authoring deferred)                                                      |
+```
+Atom Types & Item Counts per Catalog
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Catalog              | Types declared | Atoms (per class)
+---------------------|----------------|------------------------------------------------
+agent-atoms          | 5              | 48 total: tool-definition:20 persona:10 capability-declaration:8 role-boundary:5 isolation-constraint:5
+brand-atoms          | 3              |  0 total: (no catalog.json atoms — composition-only)
+compliance-atoms     | 4              | 17 total: control:9 control-family:5 evidence-type:3
+...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
 
-## Needs Attention
+### Gaps section
 
-Flag any catalog where:
-- Apex 000 but Deploy green → DNS not routed yet
-- /ai/ ❌ on a live apex → missing AI endpoint
-- Schema ⚠️/❌ → ATOMS.yml not on v1.1.0
-- Terraform ⚠️ → Wrangler present; ➖ → infra not provisioned
-- AfterMerge ⚠️ → deploy pipeline fires prematurely on PRs
+Group by pattern, sorted by count descending:
 
-## License conventions
+```
+GAPS TO FIX (grouped by type)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[7] Sites not live — probably CF Pages project not created:
+    action-atoms, amendment-atoms, constitution-atoms, context-atoms,
+    doc-atoms, key-atoms, pipeline-atoms
 
-Catalog default: **Apache-2.0** (code) · **CC-BY-4.0** (data).
-AGPL or GPL is a compliance red flag (Code.md §6) — surface explicitly.
-Missing `LICENSE-data` → warn as `MISSING`.
+[7] Missing /ai/index.json — add Astro page at src/pages/ai/index.json.ts:
+    (same 7 as above)
 
-## What this does NOT check
+[N] Missing right-side sidenav — <nav class="sidenav"> not in HTML:
+    list repos...
 
-- Cloudflare Pages project state directly (HTTP probe stands in)
-- Terraform state drift (only checks for path presence)
-- Submodule pointer freshness in the umbrella repo
-- DNS-token allowlist or zone-level config
+[N] Brand assets not from CDN — check web/src/pages/index.astro for
+    correct brand-atoms.com/dist/brands/atom-family/1.0.0/ URLs:
+    list repos...
+
+[2] Missing build-exports.py:
+    policy-atoms, schema-atoms
+
+[1] Terraform not wired — backend.tf still has REPLACE-ME stub:
+    action-atoms
+```
+
+---
+
+## How to fix gaps (reference)
+
+**Site not live** → CF Pages project doesn't exist. Run:
+```bash
+npx wrangler@3 pages project create <name> --production-branch=main
+```
+Then trigger a redeploy by pushing a commit or re-running the deploy workflow.
+
+**Missing /ai/index.json** → Add `web/src/pages/ai/index.json.ts` (Astro static endpoint):
+```typescript
+import type { APIRoute } from 'astro';
+import catalog from '../../public/exports/catalog.json';
+import atomsYml from '../../../ATOMS.yml'; // via Vite yaml import or inline
+
+export const GET: APIRoute = () => {
+  return new Response(JSON.stringify({
+    name: "<name>",
+    description: "...",
+    canonical_domain: "<name>.com",
+    atom_types: [...],
+    catalog_url: "https://<name>.com/exports/catalog.json",
+    federation: "convergent-systems.co",
+    total_atoms: catalog.atoms.length,
+    total_compositions: catalog.compositions.length,
+  }), { headers: { 'Content-Type': 'application/json' } });
+};
+```
+
+**Missing sidenav** → The index.astro template is missing the sidenav block. All pages should use the shared shell layout from `atoms-catalog.css` which includes the `<nav class="sidenav">` markup.
+
+**Wrong brand assets** → Update `web/src/pages/index.astro` to use:
+```html
+<link rel="icon" type="image/svg+xml" href="https://brand-atoms.com/dist/brands/atom-family/1.0.0/assets/favicon.svg" />
+<link rel="stylesheet" href="https://brand-atoms.com/dist/brands/atom-family/1.0.0/css/tokens.css" />
+<link rel="stylesheet" href="https://brand-atoms.com/dist/brands/atom-family/1.0.0/ui/atoms-catalog.css" />
+<!-- Hero: -->
+<img src="https://brand-atoms.com/dist/brands/atom-family/1.0.0/assets/atom-family-icon.png" />
+<!-- Wordmark in sidenav: -->
+<img src="https://brand-atoms.com/dist/brands/atom-family/1.0.0/assets/atom-family-wordmark.png" />
+```
+
+**Missing builder** → Copy from agent-atoms:
+```bash
+cp src/agent-atoms/scripts/build-exports.py src/<name>/scripts/build-exports.py
+```
+Then update `CATALOG_NAME` and `COMPOSITIONS_DIR` in the script (or use the universal version that reads ATOMS.yml automatically).
+
+---
+
+## Bonus checks (include if time permits)
+
+- **How-to and Install pages** — `/how-to-use` and `/install` return 200
+- **Open PRs** — count via `gh pr list --repo convergent-systems-co/<name> --state open`
+- **License files** — `LICENSE` (Apache-2.0) and `LICENSE-data` (CC-BY-4.0) both present
+- **Atom types on homepage match ATOMS.yml** — every declared type appears as a link
+
+---
 
 ## Output discipline
 
-ASCII to stdout — no Mermaid in TUI. Per `Common.md §U16.1`, keep ASCII table
-form when relaying results in a terminal session; Mermaid only in `.md` artifacts.
-
-## Dependencies
-
-`gh`, `jq`, `dig`, `curl` — standard on the operator workstation.
-`scripts/atom-status.sh` handles the deploy/DNS/HTTPS/PR/license columns.
+ASCII to stdout only. No Mermaid in TUI (`Common.md §U16.1`).
+Use emoji (✓ ✗ ⚠) but keep table borders ASCII.

@@ -1,1 +1,1 @@
-atom-spec-v1.2.0.md
+atom-spec-v1.3.0.md

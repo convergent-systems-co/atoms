@@ -1,0 +1,863 @@
+# The Atom Spec — v1.3.0
+
+**Status:** v1.3.0 — Additive revision of v1.2.0. Adds Part XV (Umbrella Registry AI Discovery), extends Part XIV with `/ai/instructions.md`, documents `directory.json` schema, and clarifies ATOMS.yml field encoding. All v1.2.0 atoms remain valid.
+
+**Predecessor:** v1.2.0. All v1.2.0 atoms remain verifiable; v1.3.0 is backward-compatible at the verification layer.
+
+**Author of this revision:** convergent-systems-co (sole contributor at time of writing — see Part XII, Phase Model).
+
+---
+
+## Summary of changes from v1.0.0
+
+This revision adds the following capabilities to the spec. Each is documented in the Part referenced below.
+
+**New in v1.3.0:**
+
+20. **Umbrella Registry AI Discovery** — `atoms.convergent-systems.co/ai/index.json` and `/ai/instructions.md` defined as the master AI entry points for the full ecosystem (Part XV, new)
+21. **`/ai/instructions.md`** — RECOMMENDED artifact on every catalog site; explains the catalog's atom types, navigation, and invocation contract to AI consumers (Part XIV §XIV.6, new)
+22. **`directory.json` schema** — formally documents the umbrella registry's machine-readable catalog list including `ai_endpoint` and `local_atoms` fields (Part XV §XV.3)
+23. **ATOMS.yml field encoding clarification** — all fields use snake_case; camelCase aliases do not exist (Part VIII §VIII.clarification, new)
+
+**Previously added (v1.1.0 / v1.2.0):**
+
+1. **Federation correction** — `xdao.co` → `convergent-systems.co` (Part VII)
+2. **Dual-license model** — Apache-2.0 for code, CC-BY-4.0 for data (Part VII)
+3. **`spec` and `schema` as first-class atom types** in schema-atoms (Part II)
+4. **Required `content_hash` field** on every atom (Part I)
+5. **Optional `supersedes` / `superseded_by` fields** for atom lineage (Part V)
+6. **Required `lifecycle` field** with four-value enum (Part V)
+7. **Role-based signing language** — sign by role, not by person (Part IV)
+8. **Catalog-steward vs infrastructure-operator distinction** (Part VII)
+9. **Conforming mirror definition** (Part VII)
+10. **Optional `migration_notes` field** (Part V)
+11. **Reserved `governance/` namespace** in every catalog (Part II)
+12. **Structured signature objects** — `signatures` is an array of typed objects (Part IV)
+13. **Quorum semantics declared per atom type**, decoupled from algorithm (Part IV)
+14. **Keys as atoms** in dedicated `key-atoms` catalog (Part IV)
+15. **Algorithm declarations in catalog manifests** (Part IV)
+16. **ML-DSA-65 as the Phase 1 signing baseline** — quantum-resistant from inception (Part IV)
+17. **Phase model** — bootstrap / adoption / steward-independence (Part XII, new)
+18. **Civilization-grade open questions** added to Part XI (key succession, multi-party ratification, formal review cycles, retirement paths, succession of stewardship)
+19. **Private deployments** as a first-class spec concern (Part XIII, new)
+
+Changes are additive at the verification layer. v1.0.0 atoms verify under v1.1.0 by treating missing fields as their default values and by accepting the legacy single-signature-string form as equivalent to a single-element `signatures` array.
+
+---
+
+## Part I — What an atom is (revised)
+
+An atom is a typed, signed, versioned, content-addressed TOML artifact.
+
+Every atom MUST declare the following fields at the top level:
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `id` | string | yes | `<catalog-id>/<class>/<slug>` |
+| `version` | SemVer string | yes | Immutable once published |
+| `content_hash` | string | yes | **NEW v1.1.0.** SHA-256 hex of the canonical TOML body excluding the `[signatures]` table. Used for content addressability and as the signing target. |
+| `lifecycle` | enum | yes | **NEW v1.1.0.** One of `draft`, `published`, `adopted`, `historic`. See Part V. |
+| `created_at` | RFC 3339 timestamp | yes | |
+| `signatures` | array of signature objects | yes | **REVISED v1.1.0.** See Part IV. |
+
+Optional fields added in v1.1.0:
+
+| Field | Type | Notes |
+|---|---|---|
+| `supersedes` | atom reference | This atom replaces the referenced atom. See Part V. |
+| `superseded_by` | atom reference | This atom has been replaced. Set retroactively on the old atom by republishing with this field — the only sanctioned mutation, and only to record the supersession relationship. |
+| `migration_notes` | string | Free-text note documenting non-machine-resolvable history (legacy corrections, informal predecessors, contextual rationale). |
+
+### Content addressability
+
+The `content_hash` field is the SHA-256 of the canonical TOML body with the `[signatures]` table removed (signatures are over the hash, so they can't be inside the hash input). Canonical TOML is produced by:
+
+1. Sort all keys lexicographically within each table.
+2. Use Unix line endings (`\n`).
+3. Encode strings as UTF-8 without BOM.
+4. Normalize numeric representations (integers as base-10, no leading zeros; floats in shortest round-trip form).
+5. Remove all comments before hashing.
+
+The `content_hash` enables verification of an atom regardless of where it was retrieved from. URL is the discovery mechanism; the hash is the verification mechanism. A CATF-compliant storage layer (or any future content-addressed store) can serve atoms by hash directly.
+
+### Catalogs reference atoms by hash where possible
+
+When a composition references atom dependencies, references SHOULD include both the identifier and the expected `content_hash`:
+
+```toml
+[[atoms]]
+ref = "prompt-atoms/persona/cautious-assistant@1.2.0"
+content_hash = "sha256:abc123..."
+```
+
+This protects against registry compromise: even if a malicious mirror serves a different atom under the same identifier, the hash mismatch is detectable.
+
+---
+
+## Part II — Catalogs and atom types (revised)
+
+A catalog groups atoms into classes (types) under a canonical domain. Each catalog declares its atom types in `ATOMS.yml` (see Part VIII).
+
+### Reserved namespaces
+
+Every catalog MUST reserve the following namespaces, even if currently empty:
+
+- `governance/` — **NEW v1.1.0.** Atoms representing governance decisions (ratifications, designations, role assignments, formal retirements). Subject to higher-quorum signing rules (see Part IV).
+- `keys/` — Per-catalog signing key atoms. References to `key-atoms` are preferred for ecosystem-wide keys; the `keys/` namespace holds catalog-scoped keys if a catalog operates its own signing authority.
+
+These reservations cost nothing today and prevent future namespace collisions.
+
+### schema-atoms — new atom types in v1.1.0
+
+The schema-atoms catalog gains two first-class atom types beyond the implementation-internal schemas previously held there:
+
+- `spec` — Normative design specifications. Prose-with-structure, versioned, referenced by other artifacts, subject to amendment. The Atom Spec itself is the canonical first `spec` atom (see Part IX, revised).
+- `schema` — Machine-validatable contracts. JSON Schema, OpenAPI, AsyncAPI, Protobuf definitions, etc.
+
+Additional atom types may live in schema-atoms (`api-spec`, `data-model`, `contract`, etc.). The catalog's `ATOMS.yml` is authoritative.
+
+### Distinction from doc-atoms
+
+Specs are normative and versioned and amended. Documentation is explanatory, narrates or teaches, and is not normative. The Atom Spec is a `spec` (lives in schema-atoms). A blog post explaining the Atom Spec is a `doc` (lives in doc-atoms). The JSON Schema validating an atom TOML file is a `schema` (lives in schema-atoms). Three types, three catalogs, no redundancy.
+
+---
+
+## Part III — References (unchanged)
+
+References resolve via `<catalog-id>/<class>/<slug>@<version>` exactly as in v1.0.0. The optional `content_hash` parameter (Part I) does not change resolution; it only adds verification.
+
+---
+
+## Part IV — Signing and trust (substantially revised)
+
+This is the largest revision in v1.1.0. The signing model moves from "Ed25519 signature string" to a structured, crypto-agile, role-based, quorum-aware model that supports current single-party signing today and multi-party post-quantum signing later without breaking changes.
+
+### The signatures array
+
+Every atom's `[signatures]` section is an array of structured signature objects:
+
+```toml
+[[signatures]]
+algorithm = "ml-dsa-65"
+signer_role = "root"
+signer_key_id = "k_abc123"
+signature = "base64-encoded-signature-bytes"
+signed_at = "2026-05-23T14:30:00Z"
+covers = "content_hash"
+```
+
+| Field | Required | Notes |
+|---|---|---|
+| `algorithm` | yes | Signature algorithm identifier. See "Supported algorithms" below. |
+| `signer_role` | yes | The role authorizing this signature (e.g., `root`, `catalog-maintainer`, `editor`, `ratifier`). Not a person's name. |
+| `signer_key_id` | yes | Identifier of the key atom in `key-atoms` that produced this signature. |
+| `signature` | yes | Base64-encoded signature bytes. |
+| `signed_at` | yes | RFC 3339 timestamp. |
+| `covers` | yes | What the signature is over. Default and currently only value: `content_hash` (the `content_hash` field of this atom). Future values may include `content_hash+timestamp`, `content_hash+revocation_log_entry`, etc. |
+
+### Supported algorithms
+
+v1.1.0 mandates the following algorithm identifiers:
+
+- `ml-dsa-65` — **Phase 1 baseline.** NIST FIPS 204 standardized post-quantum signature. ML-DSA-65 is the security-level-3 parameter set. Public keys ~1952 bytes, signatures ~3293 bytes. Quantum-resistant.
+- `ml-dsa-44` — Lower security (level 2), smaller signatures. Acceptable for high-volume, low-stakes signing.
+- `ml-dsa-87` — Higher security (level 5), larger signatures. Acceptable for highest-stakes signing (e.g., root key, governance atoms).
+- `ed25519` — Permitted for backward compatibility with v1.0.0 atoms. **NOT permitted for new atoms in v1.1.0 catalogs.** Verifiers MUST accept Ed25519 signatures on atoms with `spec_version <= 1.0.0`.
+
+Future algorithms (threshold ML-DSA variants, BLS for multi-signature aggregation, new NIST PQC selections) will be added in subsequent spec revisions. The structure does not require breaking changes to accommodate them.
+
+### Why ML-DSA from Phase 1
+
+Atoms are intended to remain verifiable indefinitely. Ed25519 is vulnerable to Shor's algorithm given a cryptographically relevant quantum computer (CRQC). CRQCs do not exist as of this writing, but the "harvest now, decrypt later" threat model applies: signatures produced today may be forgeable in the future if quantum computing achieves the necessary scale. Civilization-grade infrastructure cannot accept future signature forgeability as a known property.
+
+ML-DSA-65 is production-ready (FIPS 204 finalized August 2024), has mature implementations in Rust, Go, and increasingly other languages, and adds ~3KB per signature. For a corpus of hundreds to thousands of atoms, this overhead is trivial. The cost of migrating later (re-signing the entire historical corpus, or accepting that early atoms expire) is far higher.
+
+### Signer roles
+
+The spec defines roles, not persons. Roles are filled by entities. A single entity may hold multiple roles. Roles defined in v1.1.0:
+
+- `root` — Ecosystem root signing authority. Signs the Atom Spec itself, the umbrella registry, and root key successions.
+- `editor` — Authority over a specific spec atom. May approve amendments to that spec within scope.
+- `catalog-maintainer` — Authority over a specific catalog. Signs catalog releases and atom publications.
+- `ratifier` — Authority over governance atoms requiring multi-party ratification.
+- `mirror-operator` — Authority designated to operate a conforming mirror.
+
+Today, all roles in the convergent-systems ecosystem are held by convergent-systems-co. The keys may be identical across roles. The spec's distinction is structural, not operational — when roles transition to separate holders, the spec already accommodates it.
+
+### Quorum semantics
+
+Catalogs declare verification rules per atom type in their `ATOMS.yml` (see Part VIII). Examples:
+
+```yaml
+quorum_rules:
+  # Default rule applies to all atom types not otherwise specified
+  default: "1 of role:catalog-maintainer"
+  
+  # Governance atoms require multi-party
+  "governance/*": "3 of 5 of role:ratifier"
+  
+  # Spec atoms require editor signature
+  "spec": "1 of role:editor"
+  
+  # Root keys themselves require root signature
+  "key": "1 of role:root"
+```
+
+The verifier checks that the `signatures` array contains enough valid signatures to satisfy the quorum rule. This logic is independent of the underlying signature algorithm — single-party Ed25519, single-party ML-DSA, threshold ML-DSA, and BLS multi-signature all produce the same per-signature objects, just with different `algorithm` values and different cooperative-signing protocols.
+
+### key-atoms
+
+Keys are themselves atoms, living in the `key-atoms` catalog (catalog #25 in the convergent-systems ecosystem, bootstrap status as of v1.1.0). Each key atom has the following shape:
+
+```toml
+id = "key-atoms/key/root-cs-2026"
+version = "1.0.0"
+content_hash = "sha256:..."
+lifecycle = "published"
+
+[key]
+key_id = "k_root_cs_2026"
+algorithm = "ml-dsa-65"
+public_key = "base64-encoded-public-key-bytes"
+role = "root"
+holder = "convergent-systems-co"
+issued_at = "2026-05-23T00:00:00Z"
+expires_at = "2031-05-23T00:00:00Z"
+succeeded_by = ""  # set when rotated
+
+[[signatures]]
+# A root key is self-signed at issuance; subsequent roots sign successors
+algorithm = "ml-dsa-65"
+signer_role = "root"
+signer_key_id = "k_root_cs_2026"
+signature = "..."
+signed_at = "2026-05-23T00:00:00Z"
+covers = "content_hash"
+```
+
+Key rotation, succession, and revocation become atom-publishing operations. The `succeeded_by` field, once set, links the rotated key to its replacement; verifiers walking a key chain follow `succeeded_by` to find the current authoritative key for a role. Old key atoms remain immutable; the supersession relationship is the only sanctioned post-publication mutation, and it follows the same constrained pattern as Part V's `superseded_by`.
+
+key-atoms is foundational: every other catalog depends on it for verification. As such, in Phase 2 (see Part XII) it requires stricter governance than other catalogs — multi-party ratification of key publications, mandatory transparency log entries (when transparency logs exist), and longer minimum quorum sizes.
+
+---
+
+## Part V — Versioning, lifecycle, and lineage (revised)
+
+v1.0.0 specified SemVer immutability. v1.1.0 retains that and adds lifecycle state and lineage tracking.
+
+### Lifecycle states
+
+Every atom MUST declare a `lifecycle` field with one of four values:
+
+- `draft` — The author is iterating. Consumers should not depend on this atom; it may be republished with breaking changes within the same version number before reaching `published`. Drafts are still SemVer-versioned and signed, but the immutability guarantee is relaxed for this state only.
+- `published` — The author considers this atom stable. SemVer immutability applies. This is the default state for atoms intended for use.
+- `adopted` — At least one independent runtime (operated by an entity other than the atom's catalog-maintainer) consumes this atom in production. Adoption is a fact about the world, not a self-declaration; the criteria for marking an atom as adopted are defined in Part XII.
+- `historic` — Superseded, deprecated, or no longer recommended. The atom remains verifiable and reachable, but consumers should prefer the successor (if any) or look elsewhere.
+
+Lifecycle transitions are one-way: `draft` → `published` → `adopted`, with `historic` as a terminal state reachable from any of the others. The transition is recorded by republishing the atom with the new lifecycle value; the `content_hash` changes; the previous lifecycle's content_hash remains valid for verification of historical references.
+
+### Supersession
+
+Two optional fields document lineage:
+
+- `supersedes` — An atom reference indicating that this atom replaces the referenced atom. Set at publication time on the new atom.
+- `superseded_by` — An atom reference indicating that this atom has been replaced. Set retroactively on the old atom by republishing it (the only sanctioned mutation, and only to record this relationship).
+
+The pattern: when atom A is replaced by atom B, B is published with `supersedes = "A@<version>"`, and A is republished with `superseded_by = "B@<version>"` and `lifecycle = "historic"`. Both atoms remain in the registry. References to A continue to resolve and verify; consumers see the supersession and can choose to migrate.
+
+### Migration notes
+
+The optional `migration_notes` field is a free-text string documenting non-machine-resolvable history. Examples of appropriate use:
+
+- "This atom corrects a federation reference from `xdao.co` to `convergent-systems.co` present in earlier informal drafts."
+- "Earlier versions of this atom assumed Ed25519 signing; this version mandates ML-DSA-65."
+- "This atom merges concepts previously split across three drafts that were never formally published."
+
+`migration_notes` is for the paper trail of a real ecosystem — corrections, informal predecessors, contextual rationale — that doesn't fit into machine-resolvable supersession but matters for future understanding.
+
+---
+
+## Part VI — Converters (unchanged)
+
+Converters transform canonical TOML into consumer formats (W3C tokens, CSS, Tailwind, Rego, etc.) as in v1.0.0. Converters MAY consume the `content_hash` field to confirm they're operating on the canonical atom; they MUST NOT depend on signature fields (signatures cover the atom; converters operate on it).
+
+---
+
+## Part VII — Federation, hosting, licensing (revised)
+
+### Federation correction
+
+The federation under which catalogs in the convergent-systems ecosystem operate is **`convergent-systems.co`**. Prior references to `xdao.co` in v1.0.0 spec text and catalog manifests are corrected. v1.0.0 atoms referencing `xdao.co` remain valid for verification; new atoms in v1.1.0 catalogs MUST reference `convergent-systems.co`.
+
+A `migration_notes` field on any atom that previously declared `xdao.co` federation is RECOMMENDED for the historical record.
+
+### Dual-license model
+
+The ecosystem operates under a dual-license model:
+
+- **Code** — Apache License 2.0. Applies to the spec's prose, schemas, the atoms-tools implementation, converters, validators, builders, and any reference implementations.
+- **Data** — Creative Commons Attribution 4.0 International (CC-BY-4.0). Applies to atom content (the values inside atoms, the canonical TOML of catalog atoms), composition definitions, and any prose published as a `doc` atom.
+
+Each catalog's repository MUST include both `LICENSE` (Apache-2.0 text) and `LICENSE-data` (CC-BY-4.0 text) files. The `ATOMS.yml` manifest MAY override licensing per catalog if there is a justified reason; the umbrella registry records the per-catalog license declarations.
+
+### Catalog steward vs infrastructure operator
+
+The spec recognizes two distinct roles for each catalog, even when held by the same entity:
+
+- **Catalog steward** — Curates the catalog's content, accepts contributions, signs releases, advances atoms through lifecycle states.
+- **Infrastructure operator** — Runs the website, build pipeline, storage, CDN, signing infrastructure.
+
+Today, convergent-systems-co holds both roles for all 25 catalogs. The distinction is structural: when infrastructure is handed off (to a hosting provider, foundation, or community), the spec already accommodates the separation without requiring rewrites.
+
+### Conforming mirrors
+
+A conforming mirror of a catalog or of the umbrella registry MUST:
+
+1. Serve the same content under the same URL structure as the canonical site.
+2. Preserve all signatures intact (no re-signing or stripping).
+3. Declare its mirror status via a `/mirror.toml` file at the root of the site, containing:
+   - `status` — one of `canonical`, `authorized-mirror`, `unofficial-mirror`
+   - `mirrors` — the canonical URL it mirrors
+   - `operator` — the entity operating this mirror
+   - `last_sync` — RFC 3339 timestamp of last sync with canonical
+4. Refuse to serve content whose signatures do not verify under the published key atoms.
+5. Make the umbrella's `directory.json` and per-catalog `exports/catalog.json` available with the same caching and CORS rules as canonical.
+
+A mirror designated `canonical` is the single canonical site. There is exactly one canonical site per ecosystem at any given time. Designation as canonical is itself a governance atom signed by the root role.
+
+`authorized-mirror` status indicates the mirror operator has been recognized by the root role and operates with the root's authorization. Authorized mirrors are listed in a governance atom maintained by the root.
+
+`unofficial-mirror` status is self-declared and requires no authorization, but unofficial mirrors MUST clearly indicate their status and MUST NOT claim to be canonical or authorized.
+
+### Why this matters now
+
+Defining the mirror contract before any mirrors exist means:
+
+- Anyone can run a mirror at any time without coordination overhead.
+- CATF-compliant storage layers can implement the mirror contract directly.
+- The canonical designation can transition (the canonical site is just an authorized mirror that holds the canonical designation; if convergent-systems.co transitions stewardship, the new canonical site is just a conforming mirror that the root role designates).
+
+---
+
+## Part VIII — Catalog manifests (revised)
+
+Every catalog declares itself via an `ATOMS.yml` file at the repository root. v1.1.0 adds the following required fields:
+
+```yaml
+spec_version: atoms-spec/v1.1.0
+name: example-atoms
+version: 0.1.0
+canonical_domain: example-atoms.com
+federation: convergent-systems.co
+
+atom_types:
+  - example-type-one
+  - example-type-two
+
+composition_type: examples
+composition_dir: examples/
+
+# NEW v1.1.0
+signing:
+  required_algorithms: ["ml-dsa-65"]
+  accepted_algorithms: ["ml-dsa-65", "ml-dsa-44"]
+  quorum_rules:
+    default: "1 of role:catalog-maintainer"
+    "governance/*": "1 of role:catalog-maintainer + 1 of role:ratifier"
+
+# NEW v1.1.0
+lifecycle:
+  current: "bootstrap"  # bootstrap | published | adopted | historic
+  
+licensing:
+  code: "Apache-2.0"
+  data: "CC-BY-4.0"
+
+steward: convergent-systems-co
+infrastructure_operator: convergent-systems-co
+
+runtime_consumers: ["aish", "olympus"]
+```
+
+The `signing.quorum_rules` table is enforced by the catalog's CI on every atom publication. Atoms whose `signatures` array does not satisfy the relevant rule are rejected at build time.
+
+---
+
+## Part IX — Self-reference (revised)
+
+v1.0.0 stated "the Spec is its own first instance." v1.1.0 makes this structural rather than philosophical: **the Atom Spec is the canonical first `spec` atom in the schema-atoms catalog.**
+
+Specifically, the Atom Spec v1.1.0 is published as:
+
+- `id`: `schema-atoms/spec/atom-spec`
+- `version`: `1.1.0`
+- `lifecycle`: `published`
+- `content_hash`: SHA-256 of the canonical TOML body
+- `signatures`: signed by `role:root` and `role:editor` (held by the same entity in Phase 1)
+
+This makes the spec's self-reference machine-resolvable: implementations validating an atom can look up the spec version it conforms to and verify the spec atom itself by hash and signature, exactly like any other atom.
+
+---
+
+## Part X — Spec evolution (revised)
+
+The spec evolves via amendments. Amendment authority and process depend on the current Phase (see Part XII).
+
+### Phase 1 (current)
+
+Spec changes are stewarded by convergent-systems-co. Public review periods are not yet mandatory, but RECOMMENDED for any change that adds or modifies a required field. A four-week minimum review period is RECOMMENDED.
+
+### Phase 2
+
+Spec changes follow a defined amendment process. Working Draft → Candidate Spec → Adopted Spec. Public review of no less than four weeks at each stage. Multi-party signing required for the Adopted Spec state. See Part XII.
+
+### Phase 3
+
+Spec changes are governed by an independent body with formal voting. See Part XII.
+
+### Versioning policy
+
+The spec follows SemVer:
+
+- Patch (`1.1.x`) — corrections, clarifications, typo fixes. No new fields, no new requirements.
+- Minor (`1.x.0`) — new fields, new atom types, new algorithms, new optional behaviors. Backward-compatible at the verification layer.
+- Major (`x.0.0`) — breaking changes to verification, atom format, or required fields. Requires a migration plan and a transition period during which both spec versions are accepted.
+
+---
+
+## Part XI — Open questions (revised)
+
+v1.0.0 listed localization, archival, and federation as open questions. v1.1.0 retains those and adds the following civilization-grade open questions, naming them as known-unsolved rather than overlooking them:
+
+### Key succession across decades
+
+Current root key (`k_root_cs_2026`) expires in 2031. The successor is signed by the current root. But what happens if the current root holder dies, disappears, or loses key custody before signing a successor? Phase 1 has no defined recovery mechanism. Phase 2 introduces multi-party root signing (M-of-N), which mitigates but does not fully solve this. Active question for future revisions: hardware-backed root key custody, geographic distribution, formal escrow with revocation rights.
+
+### Multi-party ratification mechanics
+
+Quorum rules in `ATOMS.yml` define the *result* required (3 of 5 of role:ratifier). They do not yet define the *process* by which ratification happens — discovery of ratifiers, off-chain coordination, signature collection, deadlines for ratification. Phase 2 will need to specify this. Current placeholder: ratification happens via PR review on the catalog repository, with each ratifier countersigning the atom commit.
+
+### Formal review cycles
+
+ISO requires every standard to be reviewed every 5 years. Atoms have no equivalent. An atom published in 2026 and unchanged in 2050 may still be cryptographically valid but practically obsolete. Open question: should the spec mandate periodic review (catalog steward must affirm `lifecycle = "published"` every N years, else atom transitions to `historic`)? Active discussion deferred to Phase 2.
+
+### Retirement paths beyond `historic`
+
+`historic` covers most cases. Edge cases worth eventual resolution: atoms that should be hidden but not deleted (e.g., security disclosures embedded in old atom content); atoms that need to be re-signed after key rotation without changing their `content_hash` (currently impossible — supersession is the only path).
+
+### Succession of stewardship
+
+When a catalog steward transitions (planned handoff, unexpected unavailability, formal foundation takeover), the new steward inherits the catalog. How? The catalog repository's main branch is one signal, but doesn't extend to signing authority. Phase 2 needs a defined process: outgoing steward signs an atom in `governance/` designating the successor; if outgoing steward is unavailable, root role can designate after a defined waiting period.
+
+### Storage durability beyond URLs
+
+The current spec assumes atoms are reachable via URLs. URLs depend on DNS, hosting, and the operator's continued operation. CATF (Convergent Atoms Trust Framework, separate project) addresses content-addressed storage and signing infrastructure as a deeper durability layer. Open question: when CATF is mature, the spec gains a "storage protocol" part defining how atoms are stored and retrieved at the CATF layer, with URLs as one of multiple resolution mechanisms.
+
+### Adversarial readiness
+
+The current spec assumes good-faith participants. At civilization scale, adversarial behaviors must be considered: dependency confusion (publishing `constitution-atoms` to a registry that resolves before the canonical), typosquatting (`constitutional-atoms.com`), social engineering of catalog stewards, supply chain attacks on builders and signers. The spec does not yet address these. Phase 2 should include an explicit threat model and corresponding mitigations.
+
+### Localization (from v1.0.0)
+
+Atom prose content is currently single-language (English). Multi-language atoms remain an open question.
+
+### Archival (from v1.0.0)
+
+Long-term archival policy (decades, centuries) is undefined. Related to storage durability above.
+
+### Federation across multiple umbrellas (from v1.0.0)
+
+Cross-ecosystem federation — a non-convergent-systems umbrella referencing atoms from convergent-systems — is undefined. May not be needed; recorded as a known limitation.
+
+---
+
+## Part XII — Phase model (NEW)
+
+The Atom Spec acknowledges three phases of ecosystem maturity. Civilization-grade infrastructure is not a self-declared property; it is earned through adoption, independent implementation, and steward independence. The spec names the current phase honestly and commits to criteria for advancement.
+
+### Phase 1: Bootstrap (current)
+
+**Properties:**
+- Single steward (convergent-systems-co)
+- Single root signing authority
+- One reference implementation (atoms-tools)
+- No independent runtimes in production
+- Spec changes stewarded by single party with informal review
+
+**Honest framing:** Phase 1 is the bootstrap of civilization-grade infrastructure, not civilization-grade infrastructure itself. The spec is designed to evolve into Phase 2 and Phase 3 without breaking changes.
+
+**Limitations the steward acknowledges:**
+- Single point of failure (the steward)
+- No external verification of decisions
+- No formal review process
+- All atoms verifiable only against the single root key chain
+
+These limitations are accepted as appropriate for the current ecosystem size and trajectory. They will be addressed in Phase 2.
+
+### Phase 2: Adoption
+
+**Entry criteria:**
+- Three or more independent organizations (not including convergent-systems-co) operate runtimes that consume atoms from this ecosystem in production for a continuous period of at least six months.
+- At least one of those organizations has contributed a non-trivial atom or rule that has been accepted into a catalog.
+- The Atom Spec has had at least one revision adopted via the Phase 2 amendment process (which itself must be defined and signed into the spec before Phase 2 is officially entered).
+
+**Required properties:**
+- Multi-party root signing (M-of-N, with M ≥ 3 and N ≥ 5)
+- Spec changes require public review periods of no less than four weeks per stage
+- Maturity levels for spec versions: Working Draft → Candidate → Adopted
+- At least one conforming mirror operated by an entity other than the steward
+- Adopted atoms (`lifecycle = "adopted"`) require evidence of independent production use
+
+**Process for advancement to Phase 2:**
+- Steward verifies entry criteria are met.
+- Steward publishes a governance atom in `key-atoms/governance/phase-advancement` declaring Phase 2 entry, signed by root and by at least two independent runtime operators.
+- Spec version increments to v2.0.0 with the Phase 2 amendment process specified.
+
+### Phase 3: Steward Independence
+
+**Entry criteria:**
+- An independent governance body exists with defined membership, term limits, and succession procedures.
+- The body has formal authority over spec evolution, root key custody, and canonical designation.
+- Convergent-systems-co retains contributor status but no longer holds unilateral authority.
+- Threshold post-quantum signing is in production for root and editor roles.
+
+**Required properties:**
+- Multi-party root signing with threshold cryptography (no single key suffices)
+- Systematic review of every catalog at least every five years
+- Formal retirement paths for catalogs and atom types
+- Patent and IP policy aligned with the dual-license model
+- Defined succession for all governance roles
+
+**Process for advancement to Phase 3:**
+- Phase 2 governance body formally proposes the structure for Phase 3.
+- Public review of no less than twelve weeks.
+- Approval by 2/3 of Phase 2 governance body members and at least 1/2 of runtime operators counted as voting members.
+
+### Note on phase advancement
+
+Phases are entered only when criteria are objectively met. The spec does not permit self-declaration of advanced phase status. If the ecosystem fails to attract independent adopters, it remains in Phase 1 indefinitely — which is honest about the world and does not undermine the spec's integrity. The phase is the truth, not the aspiration.
+
+---
+
+## Part XIII — Private deployments (NEW)
+
+Catalogs MAY be deployed privately. A private deployment is a conforming registry that is not publicly accessible, typically operated by an organization for internal use.
+
+### Properties of a conforming private deployment
+
+1. **Spec conformance.** The private deployment serves atoms conforming to the same spec version as the public ecosystem.
+2. **Signing.** Atoms are signed by keys controlled by the deploying organization. These keys are NOT part of the public ecosystem's root chain. The deployment defines its own trust boundary.
+3. **Composition with public atoms.** A private deployment MAY consume public atoms (by reference and hash verification). The hash verification ensures the public atom is the canonical one regardless of intermediate caching.
+4. **Override and extension.** A private deployment MAY publish atoms with the same identifiers as public atoms, with the deployment's signing key. Consumers within the deployment trust the deployment's signing key over the public root for these identifiers.
+5. **No claim of public canonicity.** A private deployment MUST NOT serve content claiming to be the canonical version of a public atom (i.e., MUST NOT impersonate the public ecosystem).
+
+### Use cases
+
+- An organization adopts the Atom Spec for internal governance and wants its constitution atoms private.
+- A regulated enterprise mirrors public catalogs in an air-gapped environment.
+- A research group iterates on draft atoms before publishing them to a public catalog.
+
+### Relation to CATF
+
+When CATF (Convergent Atoms Trust Framework) is mature, private deployments will likely run on CATF infrastructure. The Atom Spec defines what a conforming deployment must do; CATF defines how to implement it durably. The two are independent: any conforming implementation satisfies the spec, regardless of whether it uses CATF.
+
+### Docker images for self-hosted deployments
+
+Catalogs that anticipate frequent private deployment SHOULD provide a Docker image bundling the catalog server, builder, and (optionally) the `atoms` CLI. The image is the unit of distribution for self-hosters. constitution-atoms and amendment-atoms are the first two catalogs slated for Docker-image distribution, as their adoption demand for private deployment is highest.
+
+---
+
+## Migration guide: v1.0.0 → v1.1.0
+
+### For existing v1.0.0 atoms
+
+Existing v1.0.0 atoms remain verifiable under v1.1.0. The verifier:
+
+- Treats missing `content_hash` as "compute from the canonical body on the fly" (still verifiable, just not content-addressable until republished).
+- Treats missing `lifecycle` as `published` (the v1.0.0 implicit default).
+- Treats a legacy single-signature string as equivalent to a one-element `signatures` array with `algorithm = "ed25519"` and `signer_role = "root"`.
+
+### For new atoms under v1.1.0
+
+New atoms MUST:
+
+- Include `content_hash`.
+- Include `lifecycle` with one of the four defined values.
+- Use the structured `signatures` array.
+- Be signed with `ml-dsa-65` (or `ml-dsa-44` / `ml-dsa-87` if justified for the use case).
+
+### For catalogs upgrading to v1.1.0
+
+Catalog maintainers SHOULD:
+
+1. Update `ATOMS.yml` to declare `spec_version: atoms-spec/v1.1.0` and add the `signing`, `lifecycle`, and `licensing` sections.
+2. Generate ML-DSA key atoms and publish them to `key-atoms`.
+3. Re-sign all existing atoms with ML-DSA-65 in a new `signatures` array entry (Ed25519 signatures remain valid for backward compatibility but are deprecated for new content).
+4. Add `LICENSE-data` (CC-BY-4.0) to the repository alongside `LICENSE` (Apache-2.0).
+5. Update the catalog README to reference v1.1.0.
+
+### Compatibility window
+
+v1.0.0 and v1.1.0 are simultaneously supported indefinitely. No deprecation timeline is set for v1.0.0 atoms; they remain verifiable. The deprecation of Ed25519 *signing* for new content takes effect with v1.1.0 adoption per catalog; Ed25519 *verification* of pre-existing atoms is permanent.
+
+---
+
+## Acknowledgments
+
+This revision was developed by convergent-systems-co with reference to the durability and governance patterns of W3C (Recommendation Track), IETF (RFC 2026, RFC 6410), and ISO (Directives Part 1). The crypto-agility model and ML-DSA baseline reflect NIST's FIPS 204 standardization. The phase model is original to this spec but draws on common patterns across all three reference bodies.
+
+The spec acknowledges, honestly, that it is currently the work of a single contributor and is bootstrap infrastructure for what it intends to become. The trajectory matters more than the current state; the criteria for advancement are defined; whether the project reaches Phase 2 or Phase 3 is a question that only time and adoption can answer.
+
+---
+
+**End of Atom Spec v1.2.0.**
+
+*This spec atom is published at `schema-atoms/spec/atom-spec@1.2.0` with `content_hash` and signatures recorded in the canonical TOML companion.*
+
+---
+
+## Part XIV — AI Discovery Interface
+
+**Status:** Added in v1.2.0. Backward-compatible; v1.1.0 atoms are unaffected.
+
+Every atom catalog site MUST expose a machine-readable AI index so that AI agents can discover and use the catalog without crawling HTML.
+
+### XIV.1 Required endpoint
+
+Every catalog site MUST serve a valid AI index at:
+
+```
+https://<canonical-domain>/ai/index.json
+```
+
+The `/ai/` path is reserved for AI-specific artifacts. Additional files MAY be added under `/ai/` in future spec versions.
+
+### XIV.2 `/ai/index.json` schema
+
+The endpoint MUST return `Content-Type: application/json` and a JSON body conforming to:
+
+```json
+{
+  "version": "1",
+  "site": "https://<canonical-domain>",
+  "description": "<one-sentence description of the catalog>",
+  "catalog": {
+    "index": "https://<canonical-domain>/dist/index.json",
+    "<class>": ["<slug>", "..."]
+  },
+  "endpoints": {
+    "<class>": "https://<canonical-domain>/dist/<class>/{slug}/{version}/json/<class>.json"
+  },
+  "workflow": ["<step>", "..."],
+  "systemPromptPattern": "<canonical system prompt template for this catalog>"
+}
+```
+
+Field requirements:
+- `version` — REQUIRED. String `"1"`.
+- `site` — REQUIRED. The canonical HTTPS URL of the site.
+- `description` — REQUIRED. One sentence.
+- `catalog.index` — REQUIRED. URL of the catalog's `dist/index.json`.
+- `catalog.<class>` — REQUIRED at least one. Array of slug strings for each atom class served.
+- `endpoints.<class>` — REQUIRED at least one. URL template with `{slug}` and `{version}` placeholders.
+- `workflow` — REQUIRED. Ordered string array of steps an AI agent should follow.
+- `systemPromptPattern` — RECOMMENDED. Canonical system-prompt template agents can include verbatim.
+
+### XIV.3 Discoverability — three surfaces
+
+Every catalog site MUST implement all three of the following:
+
+**1. `<head>` meta link** on every page:
+```html
+<link rel="ai-index" href="/ai/index.json" type="application/json" />
+```
+
+**2. `robots.txt` declaration** at the site root:
+```
+# AI agents
+AI-Index: https://<canonical-domain>/ai/index.json
+```
+
+**3. Footer note** on the homepage and any primary how-to page:
+```
+AI agents: machine-readable catalog and usage instructions at /ai/index.json
+```
+
+### XIV.4 Built atom JSON output
+
+Converters that emit JSON for a catalog SHOULD inject a top-level `_ai` metadata block into every built artifact:
+
+```json
+{
+  "_ai": {
+    "docs": "https://<canonical-domain>/ai/index.json",
+    "catalog": "https://<canonical-domain>/dist/index.json"
+  }
+}
+```
+
+This makes individual atoms self-describing: an agent holding a single `brand.json` can discover the full catalog without prior knowledge of the site structure.
+
+### XIV.5 Reference implementation
+
+brand-atoms.com (`convergent-systems-co/branding-library`) is the canonical reference implementation of this part. See `web/src/pages/ai/index.json.ts` in that repository.
+
+### XIV.6 `/ai/instructions.md` — RECOMMENDED per-catalog guide
+
+**Status:** Added in v1.3.0.
+
+Every catalog site SHOULD expose a human- and AI-readable Markdown guide at:
+
+```
+https://<canonical-domain>/ai/instructions.md
+```
+
+This file explains the catalog to an AI consumer who has already read `/ai/index.json` and wants to understand how to use specific atoms. It is not a discovery file — it is a usage guide. Recommended sections:
+
+1. **What this catalog is** — one paragraph; what the atoms are for
+2. **Atom types** — for each declared type: what it represents, when to use it, example atom ID
+3. **Navigation recipe** — step-by-step: how to list atoms, fetch a specific atom, find compositions
+4. **Invocation contract** — for skill catalogs: inputs, outputs, side effects
+5. **Composition patterns** — for catalogs that expose compositions: how to find and apply them
+6. **Trust and signing** — where to verify signatures; link to key-atoms
+
+The file MAY be referenced from `/ai/index.json` via an `instructions` top-level key placed **before** the `catalog` key, so streaming readers encounter it first:
+
+```json
+{
+  "version": "1",
+  "instructions": "https://<canonical-domain>/ai/instructions.md",
+  "site": "https://<canonical-domain>",
+  "description": "...",
+  "catalog": { ... }
+}
+```
+
+---
+
+## Part XV — Umbrella Registry AI Discovery
+
+**Status:** Added in v1.3.0.
+
+The atoms ecosystem has a single umbrella registry at `atoms.convergent-systems.co`. This Part defines the AI-specific endpoints that serve as the master entry point for agents exploring the full ecosystem.
+
+### XV.1 Design principle
+
+An AI agent SHOULD be able to discover the full ecosystem — all 25+ catalogs, their domains, their atom types, and their individual AI endpoints — by fetching **one URL**. That URL is the umbrella's `/ai/index.json`. The first key in the response is `instructions`, pointing to the prose guide. Everything else follows.
+
+### XV.2 Required endpoints
+
+The umbrella registry MUST expose:
+
+| Path | Description |
+|---|---|
+| `/ai/index.json` | Master AI directory of all catalogs |
+| `/ai/instructions.md` | Ecosystem-level guide for AI consumers |
+| `/directory.json` | Full machine-readable registry (see §XV.3) |
+
+### XV.3 `/ai/index.json` — umbrella schema
+
+The umbrella's `/ai/index.json` is **not** the same format as the per-catalog `/ai/index.json` defined in Part XIV. It is a **directory**, not a catalog. It MUST conform to:
+
+```json
+{
+  "instructions": "https://atoms.convergent-systems.co/ai/instructions.md",
+  "version": "1",
+  "site": "https://atoms.convergent-systems.co",
+  "description": "<one-sentence description of the ecosystem>",
+  "summary": {
+    "total_catalogs": 25,
+    "live": 20,
+    "bootstrap": 5
+  },
+  "catalogs": [
+    {
+      "name": "brand-atoms",
+      "domain": "brand-atoms.com",
+      "ai_endpoint": "https://brand-atoms.com/ai/index.json",
+      "description": "<catalog purpose>",
+      "atom_types": ["palette", "font", "glyph"],
+      "classes": 3,
+      "atoms": 150,
+      "status": "live"
+    }
+  ]
+}
+```
+
+Field requirements:
+
+| Field | Required | Notes |
+|---|---|---|
+| `instructions` | REQUIRED | MUST be the **first key** in the JSON object. Streaming readers see it immediately and can fetch the guide before parsing the full catalog list. |
+| `version` | REQUIRED | String `"1"`. |
+| `site` | REQUIRED | Canonical HTTPS URL of the umbrella site. |
+| `description` | REQUIRED | One sentence. |
+| `summary.total_catalogs` | REQUIRED | Count of all catalogs in the ecosystem. |
+| `summary.live` | REQUIRED | Count with a live deploy. |
+| `summary.bootstrap` | REQUIRED | Count declared but not yet deployed. |
+| `catalogs[]` | REQUIRED | Sorted alphabetically by `name`. |
+| `catalogs[].name` | REQUIRED | Catalog slug matching `ATOMS.yml name`. |
+| `catalogs[].domain` | REQUIRED | Canonical domain from `ATOMS.yml canonical_domain`. |
+| `catalogs[].ai_endpoint` | REQUIRED | URL of the catalog's own `/ai/index.json`. |
+| `catalogs[].description` | REQUIRED | From `ATOMS.yml description` or `purpose`. |
+| `catalogs[].atom_types` | REQUIRED | Array from `ATOMS.yml atom_types`. |
+| `catalogs[].classes` | REQUIRED | `atom_types.length`. |
+| `catalogs[].atoms` | RECOMMENDED | Total atom count; from live endpoint or local build count. |
+| `catalogs[].status` | REQUIRED | `"live"` or `"bootstrap"`. |
+
+### XV.4 `/ai/instructions.md` — umbrella guide
+
+The umbrella's `/ai/instructions.md` MUST be a Markdown document that covers:
+
+1. **What atoms are** — the primitive, its fields, its invariants
+2. **Navigation recipe** — how to go from umbrella to catalog to atom (step-by-step with example URLs)
+3. **Catalog map** — for each catalog: what it contains and when to use it
+4. **Composition** — how compositions assemble atoms
+5. **Trust** — where to verify signatures
+6. **Self-referential note** — the umbrella site itself is built using pipeline-atoms and workflow-atoms; links to `/pipelines/`
+
+### XV.5 `directory.json` schema
+
+The umbrella MUST serve a full machine-readable registry at `/directory.json`. This is the authoritative source from which `/ai/index.json` is derived. It MUST include all fields in `/ai/index.json` plus the following additional fields per catalog entry:
+
+| Field | Description |
+|---|---|
+| `version` | Catalog version from `ATOMS.yml version` |
+| `pages_url` | Cloudflare Pages URL (`https://<name>.pages.dev`) |
+| `github_url` | GitHub URL (`https://github.com/convergent-systems-co/<name>`) |
+| `federation` | From `ATOMS.yml federation` |
+| `composition_type` | From `ATOMS.yml composition_type` |
+| `composition_dir` | From `ATOMS.yml composition_dir` |
+| `rule_types` | From `ATOMS.yml rule_types` |
+| `runtime_consumers` | From `ATOMS.yml runtime_consumers` |
+| `license` | From `ATOMS.yml licensing.code` |
+| `local_atoms` | Count from submodule atom files at build time |
+| `live` | Object `{catalog_url, atoms, compositions, rules, built_at}` when the catalog's `/exports/catalog.json` is reachable; `null` otherwise |
+
+The `status` field is `"live"` when `live` is non-null, `"bootstrap"` otherwise.
+
+### XV.6 ATOMS.yml field encoding clarification
+
+**Status:** Added in v1.3.0.
+
+All fields in `ATOMS.yml` use **snake_case** exclusively. No camelCase aliases exist. Implementations reading `ATOMS.yml` MUST use the exact field names as declared:
+
+| Field | Correct | Incorrect (DO NOT USE) |
+|---|---|---|
+| Atom types | `atom_types` | `atomTypes` |
+| Canonical domain | `canonical_domain` | `domain`, `canonicalDomain` |
+| Composition type | `composition_type` | `compositionType` |
+| Composition dir | `composition_dir` | `compositionDir` |
+| Rule types | `rule_types` | `ruleTypes` |
+| Runtime consumers | `runtime_consumers` | `runtimeConsumers` |
+| License (under `licensing`) | `licensing.code` | `license`, `licensing_code` |
+
+Implementations that read ATOMS.yml with camelCase key names will receive `undefined` for all fields. The ATOMS.yml schema validator in schema-atoms enforces snake_case.
+
+---
+
+## Changelog (v1.1.0 → v1.3.0)
+
+- **v1.3.0** — Added Part XV (Umbrella Registry AI Discovery): `atoms.convergent-systems.co/ai/index.json` and `/ai/instructions.md` schemas; `directory.json` full field specification; `instructions` as the mandatory first key in both umbrella and per-catalog `ai/index.json` when a guide exists. Extended Part XIV with §XIV.6 (`/ai/instructions.md` as a RECOMMENDED per-catalog guide). Added §XV.6 ATOMS.yml snake_case encoding clarification. Additive; all v1.2.0 atoms remain valid.
+- **v1.2.0** — Added Part XIV (AI Discovery Interface): required `/ai/index.json` endpoint, three-surface discoverability (head link, robots.txt, footer), optional `_ai` metadata block in built JSON artifacts. Additive; all v1.1.0 atoms remain valid.

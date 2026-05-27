@@ -1,3 +1,4 @@
+# atom: pipeline-atoms/github/ci
 name: CI
 
 on:

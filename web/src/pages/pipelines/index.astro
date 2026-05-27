@@ -1,0 +1,180 @@
+---
+import Base from "../../layouts/Base.astro";
+import { readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+
+const HERE = dirname(fileURLToPath(import.meta.url));
+const PIPELINES_PATH = join(HERE, "../../../public/pipelines.json");
+const pipelinesRaw = await readFile(PIPELINES_PATH, "utf-8");
+const pipelines = JSON.parse(pipelinesRaw);
+
+const pipelineAtoms: any[] = pipelines.pipeline_atoms ?? [];
+const workflowCompositions: any[] = pipelines.workflow_compositions ?? [];
+const ecosystemIds: string[] = pipelines.ecosystem_compositions ?? [];
+
+// Partition: compositions this ecosystem uses vs all others
+const ecosystemCompositions = workflowCompositions.filter((c: any) =>
+  ecosystemIds.some((id) => (c.id ?? "").endsWith(id))
+);
+const otherCompositions = workflowCompositions.filter(
+  (c: any) => !ecosystemIds.some((id) => (c.id ?? "").endsWith(id))
+);
+
+// Group pipeline atoms by type
+const byType: Record<string, any[]> = {};
+for (const atom of pipelineAtoms) {
+  const t = atom.type ?? "unknown";
+  (byType[t] ??= []).push(atom);
+}
+---
+<Base
+  title="Pipelines"
+  description="The CI/CD pipeline atoms and workflow compositions that build, deploy, and govern the atoms ecosystem."
+>
+  <h1>Pipelines</h1>
+  <p style="font-size: 1.125rem; color: var(--muted); max-width: 50rem;">
+    This site is built, deployed, and governed by atoms. The pipeline atoms and
+    workflow compositions below are the same primitives cataloged at
+    <a href="https://pipeline-atoms.com">pipeline-atoms.com</a> and
+    <a href="https://workflow-atoms.com">workflow-atoms.com</a> — this is the
+    ecosystem eating its own cooking.
+  </p>
+
+  <section style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin: 2rem 0; padding: 1.5rem; background: var(--card); border: 1px solid var(--border); border-radius: 0.5rem;">
+    <div>
+      <div style="font-size: 2rem; font-weight: 600; line-height: 1;">{pipelines.summary.pipeline_atoms}</div>
+      <div style="color: var(--muted); font-size: 0.875rem;">pipeline atoms</div>
+    </div>
+    <div>
+      <div style="font-size: 2rem; font-weight: 600; line-height: 1;">{pipelines.summary.workflow_compositions}</div>
+      <div style="color: var(--muted); font-size: 0.875rem;">workflow compositions</div>
+    </div>
+    <div>
+      <div style="font-size: 2rem; font-weight: 600; line-height: 1;">{ecosystemCompositions.length}</div>
+      <div style="color: var(--muted); font-size: 0.875rem;">power this ecosystem</div>
+    </div>
+  </section>
+
+  <section style="margin-top: 2.5rem;">
+    <h2>How this ecosystem is built</h2>
+    <p style="color: var(--muted); margin-bottom: 1.5rem;">
+      Every <code>*-atoms.com</code> catalog — including this site — runs these
+      workflow compositions end-to-end on every PR and merge.
+    </p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(26rem, 1fr)); gap: 1rem;">
+      {ecosystemCompositions.map((comp: any) => (
+        <div style="background: var(--card); border: 1px solid var(--border); border-radius: 0.5rem; padding: 1.25rem;">
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <span style="font-size: 0.75rem; background: #e8f0e8; color: var(--live); padding: 0.125rem 0.5rem; border-radius: 0.25rem; font-weight: 600;">composition</span>
+            <code style="font-size: 0.8rem; color: var(--muted);">{comp.version}</code>
+          </div>
+          <div style="font-weight: 600; margin-bottom: 0.375rem;">{comp.name}</div>
+          {comp.description && <p style="color: var(--muted); font-size: 0.875rem; margin: 0 0 0.75rem;">{comp.description}</p>}
+          {comp.steps && comp.steps.length > 0 && (
+            <div style="display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center;">
+              {comp.steps.map((step: any, i: number) => (
+                <>
+                  <code style="font-size: 0.75rem; background: #f0f0f0; padding: 0.125rem 0.375rem; border-radius: 0.25rem;">
+                    {step.id}
+                  </code>
+                  {i < comp.steps.length - 1 && <span style="color: var(--muted); font-size: 0.75rem;">→</span>}
+                </>
+              ))}
+            </div>
+          )}
+          {comp.tags && comp.tags.length > 0 && (
+            <div style="margin-top: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.25rem;">
+              {comp.tags.map((tag: string) => (
+                <span style="font-size: 0.75rem; background: #f4ece4; padding: 0.125rem 0.375rem; border-radius: 0.25rem;">{tag}</span>
+              ))}
+            </div>
+          )}
+          <div style="margin-top: 0.75rem; font-size: 0.8rem;">
+            <code style="color: var(--muted);">{comp.id}</code>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section style="margin-top: 3rem;">
+    <h2>Pipeline atoms</h2>
+    <p style="color: var(--muted); margin-bottom: 1.5rem;">
+      Individual, typed, reusable CI/CD steps — the building blocks that
+      compose into workflows.
+    </p>
+    {Object.entries(byType).sort().map(([type, atoms]) => (
+      <div style="margin-bottom: 2rem;">
+        <h3 style="font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 0.75rem;">
+          {type} <span style="font-weight: 400;">({atoms.length})</span>
+        </h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr)); gap: 0.75rem;">
+          {atoms.map((atom: any) => (
+            <div style="background: var(--card); border: 1px solid var(--border); border-radius: 0.5rem; padding: 1rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.375rem;">
+                <code style="font-size: 0.75rem; background: #e8eef8; color: var(--accent); padding: 0.125rem 0.375rem; border-radius: 0.25rem;">{atom.type}</code>
+                {atom.lifecycle && <code style="font-size: 0.7rem; color: var(--muted);">{atom.lifecycle}</code>}
+              </div>
+              <div style="font-weight: 600; margin-bottom: 0.25rem;">{atom.name}</div>
+              {atom.description && <p style="color: var(--muted); font-size: 0.8rem; margin: 0 0 0.5rem;">{atom.description}</p>}
+              {atom.trigger && (
+                <div style="font-size: 0.75rem; color: var(--muted);">trigger: <code>{atom.trigger}</code></div>
+              )}
+              {atom.jobs && atom.jobs.length > 0 && (
+                <div style="font-size: 0.75rem; color: var(--muted);">jobs: {atom.jobs.join(", ")}</div>
+              )}
+              {atom.tags && atom.tags.length > 0 && (
+                <div style="margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.25rem;">
+                  {atom.tags.map((tag: string) => (
+                    <span style="font-size: 0.7rem; background: #f4ece4; padding: 0.1rem 0.3rem; border-radius: 0.2rem;">{tag}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+  </section>
+
+  {otherCompositions.length > 0 && (
+    <section style="margin-top: 3rem;">
+      <h2>All workflow compositions</h2>
+      <p style="color: var(--muted); margin-bottom: 1.5rem;">
+        Additional compositions for the broader ecosystem.
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(24rem, 1fr)); gap: 0.75rem;">
+        {otherCompositions.map((comp: any) => (
+          <div style="background: var(--card); border: 1px solid var(--border); border-radius: 0.5rem; padding: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.375rem;">
+              <span style="font-size: 0.75rem; background: #f0f0f0; padding: 0.125rem 0.375rem; border-radius: 0.25rem; color: var(--muted);">composition</span>
+            </div>
+            <div style="font-weight: 600; margin-bottom: 0.25rem;">{comp.name}</div>
+            {comp.description && <p style="color: var(--muted); font-size: 0.8rem; margin: 0 0 0.5rem;">{comp.description}</p>}
+            {comp.steps && comp.steps.length > 0 && (
+              <div style="display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center;">
+                {comp.steps.map((step: any, i: number) => (
+                  <>
+                    <code style="font-size: 0.7rem; background: #f0f0f0; padding: 0.1rem 0.3rem; border-radius: 0.2rem;">{step.id}</code>
+                    {i < comp.steps.length - 1 && <span style="color: var(--muted); font-size: 0.7rem;">→</span>}
+                  </>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section style="margin-top: 3rem;">
+    <h2>For AI agents</h2>
+    <p>
+      Fetch <a href="/pipelines.json"><code>/pipelines.json</code></a> for the machine-readable
+      pipeline and workflow catalog. Catalog sources:
+      <a href="https://pipeline-atoms.com/ai/index.json">pipeline-atoms.com/ai/index.json</a> ·
+      <a href="https://workflow-atoms.com/ai/index.json">workflow-atoms.com/ai/index.json</a>.
+    </p>
+  </section>
+</Base>

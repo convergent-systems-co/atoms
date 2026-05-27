@@ -1,3 +1,4 @@
+# atom: pipeline-atoms/github/deploy
 name: Deploy to Cloudflare Pages
 
 # Deploys only on push to main (i.e., after a PR has been merged).

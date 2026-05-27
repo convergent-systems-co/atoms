@@ -51,6 +51,14 @@ loaded dynamically from /catalogs/index.toml at startup.`,
 	root.AddCommand(newKeysCmd())
 	root.AddCommand(newVerifyCmd())
 
+	// Atom lifecycle management (fetch, list, fork, publish, gc, verify-cache).
+	root.AddCommand(newFetchCmd())
+	root.AddCommand(newListCmd())
+	root.AddCommand(newForkCmd())
+	root.AddCommand(newPublishCmd())
+	root.AddCommand(newGCCmd())
+	root.AddCommand(newInstallVerifyCmd())
+
 	// Dynamic per-catalog subcommands. Tolerate registry-unreachable so
 	// `atoms --help` works offline; the per-catalog commands just won't
 	// appear in the help output until the registry is reachable.

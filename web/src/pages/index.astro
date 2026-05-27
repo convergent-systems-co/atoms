@@ -100,10 +100,31 @@ const totalCompositions = live.reduce((s: number, c: any) => s + (c.live?.compos
 
   <section style="margin-top: 3rem;">
     <h2>For AI agents</h2>
-    <p>
-      Fetch <a href="/directory.json"><code>/directory.json</code></a> for the full
-      machine-readable directory. The same data drives this page. See <a href="/how-to-use/">how-to-use</a>
-      for the JSON shape.
+    <p style="color: var(--muted); margin-bottom: 1rem;">
+      Two endpoints power AI discovery of this ecosystem. Start with <code>/ai/index.json</code> —
+      it immediately points you to <code>/ai/instructions.md</code> which explains how to navigate
+      all 25+ catalogs and what each atom type is for.
+    </p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem;">
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 0.5rem; padding: 1rem;">
+        <div style="font-weight: 600; margin-bottom: 0.25rem;"><a href="/ai/index.json"><code>/ai/index.json</code></a></div>
+        <p style="color: var(--muted); font-size: 0.875rem; margin: 0;">
+          Master AI directory — all catalogs with domain, AI endpoint URL, atom types, and description.
+          First key is <code>instructions</code> pointing to instructions.md.
+        </p>
+      </div>
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 0.5rem; padding: 1rem;">
+        <div style="font-weight: 600; margin-bottom: 0.25rem;"><a href="/ai/instructions.md"><code>/ai/instructions.md</code></a></div>
+        <p style="color: var(--muted); font-size: 0.875rem; margin: 0;">
+          Ecosystem guide for AIs — what atoms are, how to navigate from umbrella to catalog,
+          atom structure, compositions, signing, and a per-domain catalog map.
+        </p>
+      </div>
+    </div>
+    <p style="font-size: 0.875rem; color: var(--muted);">
+      Each catalog also exposes its own <code>/ai/index.json</code> (linked as "AI" on every card above).
+      The full machine-readable directory is at <a href="/directory.json"><code>/directory.json</code></a>.
+      See <a href="/how-to-use/">how-to-use</a> for the complete JSON shape.
     </p>
   </section>
 </Base>

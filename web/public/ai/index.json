@@ -1,0 +1,44 @@
+{
+  "instructions": "https://atoms.convergent-systems.co/ai/instructions.md",
+  "version": "1",
+  "site": "https://atoms.convergent-systems.co",
+  "description": "Master AI discovery index for the Convergent Systems atoms ecosystem — typed, versioned, composable libraries of AI primitives. Read instructions first, then explore the catalog list.",
+  "summary": {
+    "total_catalogs": 2,
+    "live": 2,
+    "bootstrap": 0
+  },
+  "catalogs": [
+    {
+      "name": "pipeline-atoms",
+      "domain": "pipeline-atoms.com",
+      "ai_endpoint": "https://pipeline-atoms.com/ai/index.json",
+      "description": "Pipeline primitives for CI/CD — reusable workflow steps, trigger conditions,\ngates, deployment recipes. Composable, versioned, runtime-agnostic via a\ncanonical pipeline schema published in schema-atoms.",
+      "atom_types": [
+        "stage",
+        "step",
+        "gate",
+        "github"
+      ],
+      "classes": 4,
+      "atoms": 15,
+      "status": "live"
+    },
+    {
+      "name": "workflow-atoms",
+      "domain": "workflow-atoms.com",
+      "ai_endpoint": "https://workflow-atoms.com/ai/index.json",
+      "description": "Workflow primitives unified across n8n, Zapier, GitHub Actions, Temporal, Airflow — step types, triggers, states, and gates composed into typed workflows with no per-tool DSL.",
+      "atom_types": [
+        "step-type",
+        "trigger-type",
+        "state-type",
+        "gate-type",
+        "github"
+      ],
+      "classes": 5,
+      "atoms": 42,
+      "status": "live"
+    }
+  ]
+}

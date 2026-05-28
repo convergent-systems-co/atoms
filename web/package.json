@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "prebuild": "node scripts/build-directory.mjs && node scripts/copy-published-atoms.mjs",
+    "prebuild": "node scripts/build-directory.mjs && node scripts/copy-published-atoms.mjs && node scripts/build-pipelines.mjs && node scripts/build-ai-index.mjs",
     "build": "astro build",
     "preview": "astro preview",
     "deploy": "wrangler pages deploy dist --project-name atoms-umbrella"

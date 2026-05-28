@@ -1,3 +1,4 @@
+# atom: pipeline-atoms/github/tf-plan
 name: OpenTofu plan
 
 on:

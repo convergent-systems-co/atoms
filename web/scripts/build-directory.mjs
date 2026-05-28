@@ -1,7 +1,7 @@
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { readFile, writeFile, mkdir, readdir, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, resolve, basename } from "node:path";
 import { parse as parseYaml } from "yaml";
 
 const WEB_DIR = dirname(fileURLToPath(import.meta.url)) + "/..";
@@ -25,59 +25,97 @@ async function discoverCatalogDirs() {
   return paths.filter((p) => existsSync(join(REPO_DIR, p, "ATOMS.yml")));
 }
 
-const FETCH_TIMEOUT_MS = 5000;
-
-async function fetchLive(catalogName) {
-  // pages.dev subdomain matches catalog name.
-  const url = `https://${catalogName}.pages.dev/exports/catalog.json`;
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+// Count atom files in the submodule's atoms/ directory.
+// Works only when the submodule is checked out (always true in CI with submodules: recursive).
+async function countLocalAtoms(submodulePath) {
+  const atomsDir = join(REPO_DIR, submodulePath, "atoms");
+  if (!existsSync(atomsDir)) return 0;
+  let count = 0;
   try {
-    const res = await fetch(url, { signal: controller.signal });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return {
-      catalog_url: url,
-      atoms: Array.isArray(data.atoms) ? data.atoms.length : 0,
-      compositions: Array.isArray(data.compositions) ? data.compositions.length : 0,
-      rules: Array.isArray(data.rules) ? data.rules.length : 0,
-      built_at: data.built_at ?? null,
-    };
-  } catch {
-    return null;
-  } finally {
-    clearTimeout(timer);
-  }
+    const entries = await readdir(atomsDir, { recursive: true });
+    for (const entry of entries) {
+      if (entry.endsWith(".json") || entry.endsWith(".toml")) {
+        const full = join(atomsDir, entry);
+        if ((await stat(full)).isFile()) count++;
+      }
+    }
+  } catch { /* submodule not initialized */ }
+  return count;
 }
 
-async function readCatalog(name) {
-  const path = join(REPO_DIR, name, "ATOMS.yml");
-  if (!existsSync(path)) {
-    return { name, status: "missing", error: "ATOMS.yml not found" };
+const FETCH_TIMEOUT_MS = 5000;
+
+async function fetchLive(catalogName, domain) {
+  // Try canonical domain first, fall back to pages.dev subdomain.
+  const urls = [
+    domain ? `https://${domain}/exports/catalog.json` : null,
+    `https://${catalogName}.pages.dev/exports/catalog.json`,
+  ].filter(Boolean);
+
+  for (const url of urls) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    try {
+      const res = await fetch(url, { signal: controller.signal });
+      if (!res.ok) continue;
+      const data = await res.json();
+      return {
+        catalog_url: url,
+        atoms: Array.isArray(data.atoms) ? data.atoms.length : 0,
+        compositions: Array.isArray(data.compositions) ? data.compositions.length : 0,
+        rules: Array.isArray(data.rules) ? data.rules.length : 0,
+        built_at: data.built_at ?? null,
+      };
+    } catch {
+      // try next URL
+    } finally {
+      clearTimeout(timer);
+    }
   }
-  const text = await readFile(path, "utf-8");
+  return null;
+}
+
+async function readCatalog(submodulePath) {
+  const yamPath = join(REPO_DIR, submodulePath, "ATOMS.yml");
+  if (!existsSync(yamPath)) {
+    return { name: basename(submodulePath), status: "missing", error: "ATOMS.yml not found" };
+  }
+  const text = await readFile(yamPath, "utf-8");
   let yaml;
   try {
     yaml = parseYaml(text);
   } catch (e) {
-    return { name, status: "invalid", error: String(e) };
+    return { name: basename(submodulePath), status: "invalid", error: String(e) };
   }
-  const live = await fetchLive(name);
+
+  // yaml fields use snake_case — match ATOMS.yml exactly
+  const catalogName = yaml.name ?? basename(submodulePath);
+  const domain = yaml.canonical_domain ?? yaml.domain ?? null;
+  const atomTypes = Array.isArray(yaml.atom_types) ? yaml.atom_types : [];
+
+  const [live, localAtomCount] = await Promise.all([
+    fetchLive(catalogName, domain),
+    countLocalAtoms(submodulePath),
+  ]);
+
   return {
-    name: yaml.name ?? name,
+    name: catalogName,
     version: yaml.version ?? null,
     status: live ? "live" : "bootstrap",
-    domain: yaml.domain ?? null,
-    pages_url: `https://${name}.pages.dev`,
-    github_url: `https://github.com/convergent-systems-co/${name}`,
-    federation: yaml.ecosystem?.federation ?? null,
+    domain,
+    pages_url: `https://${catalogName}.pages.dev`,
+    github_url: `https://github.com/convergent-systems-co/${catalogName}`,
+    ai_endpoint: domain ? `https://${domain}/ai/index.json` : null,
+    federation: yaml.federation ?? yaml.ecosystem?.federation ?? null,
+    description: typeof yaml.description === "string" ? yaml.description.trim() : null,
     purpose: typeof yaml.purpose === "string" ? yaml.purpose.trim() : null,
-    atom_types: Array.isArray(yaml.atomTypes) ? yaml.atomTypes : [],
-    composition_type: yaml.compositionType ?? null,
-    composition_dir: yaml.compositionDir ?? null,
-    rule_types: Array.isArray(yaml.ruleTypes) ? yaml.ruleTypes : [],
-    runtime_consumers: Array.isArray(yaml.runtimeConsumers) ? yaml.runtimeConsumers : [],
-    license: yaml.license ?? null,
+    atom_types: atomTypes,
+    composition_type: yaml.composition_type ?? null,
+    composition_dir: yaml.composition_dir ?? null,
+    rule_types: Array.isArray(yaml.rule_types) ? yaml.rule_types : [],
+    runtime_consumers: Array.isArray(yaml.runtime_consumers) ? yaml.runtime_consumers : [],
+    license: yaml.licensing?.code ?? yaml.license ?? null,
+    local_atoms: localAtomCount,
     live,
   };
 }

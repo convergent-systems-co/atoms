@@ -1,41 +1,53 @@
 ---
 const { catalog } = Astro.props;
 const isLive = catalog.status === "live";
-const statusColor = isLive ? "var(--live)" : "var(--bootstrap)";
-const live = catalog.live;
+const siteUrl = catalog.domain ? `https://${catalog.domain}` : null;
+
+// Prefer live atom count; fall back to local submodule count from build time.
+const atomCount = isLive
+  ? (catalog.live?.atoms ?? catalog.local_atoms ?? 0)
+  : (catalog.local_atoms ?? 0);
+const classCount = Array.isArray(catalog.atom_types) ? catalog.atom_types.length : 0;
 ---
 <article style="border: 1px solid var(--border); border-radius: 0.5rem; padding: 1rem; background: var(--card); display: flex; flex-direction: column; gap: 0.5rem;">
   <header style="display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;">
     <h3 style="margin: 0;">
-      <a href={`/catalogs/${catalog.name}/`}>{catalog.name}</a>
+      {siteUrl
+        ? <a href={siteUrl}>{catalog.name}</a>
+        : catalog.name
+      }
     </h3>
-    <span style={`font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: ${statusColor};`}>
-      {catalog.status}{catalog.version && ` · v${catalog.version}`}
+    <span style="font-size: 0.7rem; color: var(--muted); white-space: nowrap;">
+      Classes: <strong>{classCount}</strong> · Atoms: <strong>{atomCount > 0 ? atomCount : "—"}</strong>
     </span>
   </header>
 
-  {catalog.purpose && (
-    <p style="margin: 0; color: var(--muted); font-size: 0.875rem; line-height: 1.45;">{catalog.purpose}</p>
+  {(catalog.description || catalog.purpose) && (
+    <p style="margin: 0; color: var(--muted); font-size: 0.875rem; line-height: 1.45;">
+      {catalog.description ?? catalog.purpose}
+    </p>
   )}
 
   {catalog.atom_types && catalog.atom_types.length > 0 && (
-    <div style="font-size: 0.75rem; color: var(--muted);">
-      Atom types: {catalog.atom_types.map((t: string) => <code style="margin-right: 0.25rem;">{t}</code>)}
+    <div style="font-size: 0.75rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 0.25rem;">
+      {catalog.atom_types.map((t: string) => (
+        <code style="background: #f0f0f0; padding: 0.1rem 0.3rem; border-radius: 0.2rem;">{t}</code>
+      ))}
     </div>
   )}
 
-  {live && (
+  {isLive && catalog.live && (
     <div style="font-size: 0.875rem; display: flex; gap: 1rem; padding-top: 0.5rem; border-top: 1px dashed var(--border);">
-      <span><strong>{live.atoms}</strong> atoms</span>
-      <span><strong>{live.compositions}</strong> compositions</span>
-      <span><strong>{live.rules}</strong> rules</span>
+      <span><strong>{catalog.live.atoms}</strong> atoms</span>
+      <span><strong>{catalog.live.compositions}</strong> compositions</span>
+      {catalog.live.rules > 0 && <span><strong>{catalog.live.rules}</strong> rules</span>}
     </div>
   )}
 
   <div style="display: flex; gap: 1rem; font-size: 0.75rem; padding-top: 0.5rem;">
-    <a href={`/catalogs/${catalog.name}/`}>profile</a>
-    <a href={`/catalogs/${catalog.name}.toml`}>signed .toml</a>
-    {isLive && <a href={`${catalog.pages_url}/exports/catalog.json`}>catalog.json</a>}
+    <a href={`/catalogs/${catalog.name}/`}>Profile</a>
+    {catalog.ai_endpoint && <a href={catalog.ai_endpoint}>AI</a>}
+    <a href={`/catalogs/${catalog.name}.toml`}>Signatures</a>
     <a href={catalog.github_url}>GitHub</a>
   </div>
 </article>

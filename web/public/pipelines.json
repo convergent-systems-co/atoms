@@ -1,0 +1,1508 @@
+{
+  "built_at": "2026-05-27T20:52:47.832Z",
+  "ecosystem_compositions": [
+    "atoms-catalog-cicd",
+    "terraform-lifecycle",
+    "repo-governance",
+    "security-baseline"
+  ],
+  "pipeline_atoms": [
+    {
+      "schema": "https://pipeline-atoms.com/schemas/atom-v1.json",
+      "type": "step",
+      "id": "ci/npm-ci-step",
+      "version": "1.0.0",
+      "name": "npm ci",
+      "description": "Install Node.js dependencies from the lockfile using 'npm ci'. Fails fast if package-lock.json is absent or out of sync with package.json. Produces a reproducible, clean node_modules from the pinned lockfile — never hoists or deduplicates beyond what the lockfile specifies.",
+      "runtime": {
+        "engine": "github-actions",
+        "command": "npm ci",
+        "working_directory": ".",
+        "timeout_seconds": 180
+      },
+      "authored_by": "convergent-systems-key",
+      "tags": [
+        "ci",
+        "node",
+        "npm",
+        "install",
+        "dependencies"
+      ],
+      "lifecycle": "stable"
+    },
+    {
+      "schema": "https://pipeline-atoms.com/schemas/atom-v1.json",
+      "type": "stage",
+      "id": "ci/validate-stage",
+      "version": "1.0.0",
+      "name": "CI Validate Stage",
+      "description": "Validation stage that runs the atoms catalog validator (validate_atoms.py) against all atom JSON files in the repo. Confirms schema conformance, required field presence, and SemVer format for every atom before any build or deploy step proceeds.",
+      "runtime": {
+        "engine": "github-actions",
+        "command": "python scripts/validate_atoms.py",
+        "working_directory": ".",
+        "environment": {
+          "ATOMS_DIR": "atoms"
+        },
+        "timeout_seconds": 120
+      },
+      "steps": [
+        {
+          "ref": "ci/npm-ci-step",
+          "version": "1.0.0"
+        },
+        {
+          "ref": "ci/run-validate-atoms-step",
+          "version": "1.0.0"
+        }
+      ],
+      "authored_by": "convergent-systems-key",
+      "tags": [
+        "ci",
+        "validation",
+        "schema",
+        "catalog"
+      ],
+      "lifecycle": "stable"
+    },
+    {
+      "schema": "https://pipeline-atoms.com/schemas/atom-v1.json",
+      "type": "gate",
+      "id": "deploy/all-checks-green-gate",
+      "version": "1.0.0",
+      "name": "All Checks Green",
+      "description": "Deployment gate that blocks forward progress until all required CI checks have passed. Evaluates the GitHub Actions 'needs' context to confirm every upstream job concluded with 'success'. A single upstream failure causes this gate to fail, preventing any deploy step from running. Implements Code.md §11.10: 'Merge before CI green defeats Code.md §3.'",
+      "runtime": {
+        "engine": "github-actions",
+        "command": "echo 'All upstream checks green — proceeding to deploy.'",
+        "timeout_seconds": 10
+      },
+      "condition": "${{ !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') }}",
+      "on_failure": "fail",
+      "authored_by": "convergent-systems-key",
+      "tags": [
+        "ci",
+        "deploy",
+        "gate",
+        "quality-gate",
+        "all-checks"
+      ],
+      "lifecycle": "stable"
+    },
+    {
+      "schema": "https://pipeline-atoms.com/schemas/atom-v1.json",
+      "type": "github",
+      "id": "pipeline-atoms/github/add-pages-domain",
+      "version": "1.0.0",
+      "name": "Add Custom Domain to Cloudflare Pages",
+      "description": "Registers a custom domain (e.g. pipeline-atoms.com) with an existing Cloudflare Pages project via the Cloudflare API. Fires on workflow_dispatch with inputs for project name and domain. Used by every *-atoms catalog repo during initial site provisioning.",
+      "runtime": {
+        "engine": "github-actions"
+      },
+      "trigger": "workflow_dispatch",
+      "jobs": [
+        "add-domain"
+      ],
+      "uses_secrets": [
+        "CLOUDFLARE_API_TOKEN",
+        "CLOUDFLARE_ACCOUNT_ID"
+      ],
+      "authored_by": "convergent-systems-key",
+      "tags": [
+        "github-actions",
+        "cloudflare-pages",
+        "custom-domain"
+      ],
+      "lifecycle": "stable"
+    },
+    {
+      "schema": "https://pipeline-atoms.com/schemas/atom-v1.json",
+      "type": "github",
+      "id": "pipeline-atoms/github/bootstrap",
+      "version": "1.0.0",
+      "name": "One-Shot Repo Bootstrap",
+      "description": "Fires only when github.run_number == 1 (the very first push to a new repo). Installs canonical labels from repo-standards and runs bootstrap setup tasks. Self-skips on all subsequent pushes via the run_number condition.",
+      "runtime": {
+        "engine": "github-actions"
+      },
+      "trigger": "push",
+      "trigger_filter": "branches: [main]",
+      "condition": "github.run_number == 1",
+      "jobs": [
+        "install-labels",
+        "bootstrap"
+      ],
+      "uses_secrets": [],
+      "authored_by": "convergent-systems-key",
+      "tags": [
+        "github-actions",
+        "bootstrap",
+        "one-shot"
+      ],
+      "lifecycle": "stable"
+    },
+    {
+      "schema": "https://pipeline-atoms.com/schemas/atom-v1.json",
+      "type": "github",
+      "id": "pipeline-atoms/github/ci",
+      "version": "1.0.0",
+      "name": "CI Pipeline",
+      "description": "Continuous integration pipeline for *-atoms catalog sites: runs TypeScript type-check, Astro build, and Lighthouse performance audit. Fires on every push and pull_request to catch regressions before merge.",
+      "runtime": {
+        "engine": "github-actions"
+      },
+      "trigger": "push, pull_request",
+      "jobs": [
+        "check",
+        "build",
+        "lighthouse"
+      ],
+      "uses_secrets": [],
+      "authored_by": "convergent-systems-key",
+      "tags": [
+        "github-actions",
+        "ci",
+        "astro",
+        "lighthouse"
+      ],
+      "lifecycle": "stable"
+    },
+    {
+      "schema": "https://pipeline-atoms.com/schemas/atom-v1.json",
+      "type": "github",
+      "id": "pipeline-atoms/github/deploy",
+      "version": "1.0.0",
+      "name": "Deploy to Cloudflare Pages",
+      "description": "Deploys a *-atoms catalog site to Cloudflare Pages on every push to the main branch. Requires CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID org-level secrets.",
+      "runtime": {
+        "engine": "github-actions"
+      },
+      "trigger": "push",
+      "trigger_filter": "branches: [main]",
+      "jobs": [
+        "deploy"
+      ],
+      "uses_secrets": [
+        "CLOUDFLARE_API_TOKEN",
+        "CLOUDFLARE_ACCOUNT_ID"
+      ],
+      "authored_by": "convergent-systems-key",
+      "tags": [
+        "github-actions",
+        "deploy",
+        "cloudflare-pages"
+      ],
+      "lifecycle": "stable"
+    },
+    {
+      "schema": "https://pipeline-atoms.com/schemas/atom-v1.json",
+      "type": "github",
+      "id": "pipeline-atoms/github/label-cleanup",
+      "version": "1.0.0",
+      "name": "Label Cleanup",
+      "description": "Migrates non-standard labels to their canonical aliases defined in repo-standards. Detects diverged labels, renames them, and removes true duplicates. Runs every Monday at 08:00 UTC and on workflow_dispatch.",
+      "runtime": {
+        "engine": "github-actions"
+      },
+      "trigger": "schedule, workflow_dispatch",
+      "trigger_filter": "schedule: Monday 08:00 UTC",
+      "jobs": [
+        "cleanup"
+      ],
+      "uses_secrets": [],
+      "authored_by": "convergent-systems-key",
+      "tags": [
+        "github-actions",
+        "labels",
+        "cleanup"
+      ],
+      "lifecycle": "stable"
+    },
+    {
+      "schema": "https://pipeline-atoms.com/schemas/atom-v1.json",
+      "type": "github",
+      "id": "pipeline-atoms/github/label-sync",
+      "version": "1.0.0",
+      "name": "Label Sync",
+      "description": "Installs the canonical agile label set (agile/epic, agile/feature, agile/story, agile/task, status/*, type/*) from convergent-systems-co/repo-standards. Runs on workflow_dispatch and on a weekly schedule to keep repos aligned with the governance standard.",
+      "runtime": {
+        "engine": "github-actions"
+      },
+      "trigger": "workflow_dispatch, schedule",
+      "trigger_filter": "schedule: weekly",
+      "jobs": [
+        "sync"
+      ],
+      "uses_secrets": [],
+      "authored_by": "convergent-systems-key",
+      "tags": [
+        "github-actions",
+        "labels",
+        "governance"
+      ],
+      "lifecycle": "stable"
+    },
+    {
+      "schema": "https://pipeline-atoms.com/schemas/atom-v1.json",
+      "type": "github",
+      "id": "pipeline-atoms/github/release",
+      "version": "1.0.0",
+      "name": "Tagged Release",
+      "description": "Runs on semver tag push (v*): builds the site, deploys to Cloudflare Pages, and creates a GitHub Release with auto-generated release notes. Implements the tag→deploy→release step of Code.md §11.10.",
+      "runtime": {
+        "engine": "github-actions"
+      },
+      "trigger": "tag",
+      "trigger_filter": "tags: [v*]",
+      "jobs": [
+        "release"
+      ],
+      "uses_secrets": [
+        "CLOUDFLARE_API_TOKEN",
+        "CLOUDFLARE_ACCOUNT_ID"
+      ],
+      "authored_by": "convergent-systems-key",
+      "tags": [
+        "github-actions",
+        "release",
+        "semver"
+      ],
+      "lifecycle": "stable"
+    },
+    {
+      "schema": "https://pipeline-atoms.com/schemas/atom-v1.json",
+      "type": "github",
+      "id": "pipeline-atoms/github/secret-scan",
+      "version": "1.0.0",
+      "name": "TruffleHog Secret Scan",
+      "description": "Runs TruffleHog secret detection on every push and pull_request to prevent credentials, API keys, and tokens from entering the codebase. Fails the workflow on any verified finding.",
+      "runtime": {
+        "engine": "github-actions"
+      },
+      "trigger": "push, pull_request",
+      "jobs": [
+        "trufflehog"
+      ],
+      "uses_secrets": [],
+      "authored_by": "convergent-systems-key",
+      "tags": [
+        "github-actions",
+        "security",
+        "secrets",
+        "trufflehog"
+      ],
+      "lifecycle": "stable"
+    },
+    {
+      "schema": "https://pipeline-atoms.com/schemas/atom-v1.json",
+      "type": "github",
+      "id": "pipeline-atoms/github/terraform-apply",
+      "version": "1.0.0",
+      "name": "Terraform Apply",
+      "description": "Applies Terraform/OpenTofu changes via workflow_dispatch with an explicit confirmation gate (inputs: env=[dev|stg|prod], confirm must equal 'apply'). Prevents accidental applies; the confirm check is enforced in the job condition before any state mutation.",
+      "runtime": {
+        "engine": "github-actions"
+      },
+      "trigger": "workflow_dispatch",
+      "trigger_filter": "inputs: env (dev|stg|prod), confirm (must be 'apply')",
+      "jobs": [
+        "apply"
+      ],
+      "uses_secrets": [
+        "CLOUDFLARE_DNS_TOKEN",
+        "CLOUDFLARE_ACCOUNT_ID",
+        "R2_ACCESS_KEY_ID",
+        "R2_SECRET_ACCESS_KEY"
+      ],
+      "authored_by": "convergent-systems-key",
+      "tags": [
+        "github-actions",
+        "terraform",
+        "infra",
+        "apply"
+      ],
+      "lifecycle": "stable"
+    },
+    {
+      "schema": "https://pipeline-atoms.com/schemas/atom-v1.json",
+      "type": "github",
+      "id": "pipeline-atoms/github/terraform-apply-dns",
+      "version": "1.0.0",
+      "name": "Create DNS CNAME",
+      "description": "Creates a Cloudflare DNS CNAME record for a *-atoms.com domain via the Cloudflare API. Used during the DNS/Terraform sprint to wire custom domains to Cloudflare Pages projects. Fires on workflow_dispatch with inputs for zone, name, and target.",
+      "runtime": {
+        "engine": "github-actions"
+      },
+      "trigger": "workflow_dispatch",
+      "jobs": [
+        "create-cname"
+      ],
+      "uses_secrets": [
+        "CLOUDFLARE_DNS_TOKEN"
+      ],
+      "authored_by": "convergent-systems-key",
+      "tags": [
+        "github-actions",
+        "dns",
+        "cloudflare",
+        "cname"
+      ],
+      "lifecycle": "stable"
+    },
+    {
+      "schema": "https://pipeline-atoms.com/schemas/atom-v1.json",
+      "type": "github",
+      "id": "pipeline-atoms/github/tf-plan",
+      "version": "1.0.0",
+      "name": "Terraform Plan",
+      "description": "Runs OpenTofu/Terraform plan in a matrix across dev, stg, and prod environments on pull_requests that touch infra/terraform/**. Posts plan output as a PR comment. Does not apply — plan only.",
+      "runtime": {
+        "engine": "github-actions"
+      },
+      "trigger": "pull_request",
+      "trigger_filter": "paths: [infra/terraform/**]",
+      "jobs": [
+        "plan"
+      ],
+      "uses_secrets": [
+        "CLOUDFLARE_API_TOKEN",
+        "R2_ACCESS_KEY_ID",
+        "R2_SECRET_ACCESS_KEY"
+      ],
+      "authored_by": "convergent-systems-key",
+      "tags": [
+        "github-actions",
+        "terraform",
+        "infra",
+        "plan"
+      ],
+      "lifecycle": "stable"
+    },
+    {
+      "schema": "https://pipeline-atoms.com/schemas/atom-v1.json",
+      "type": "github",
+      "id": "pipeline-atoms/github/triage",
+      "version": "1.0.0",
+      "name": "Issue Triage",
+      "description": "Automatically triages new and edited issues by applying the agile label hierarchy (epic/feature/story/task) and status labels. Delegates to the convergent-systems-co/repo-standards shared triage workflow via workflow_call. Fires on issues (opened, edited, reopened), issue_comment, and workflow_dispatch.",
+      "runtime": {
+        "engine": "github-actions"
+      },
+      "trigger": "issues, issue_comment, workflow_dispatch",
+      "trigger_filter": "issues: [opened, edited, reopened]",
+      "jobs": [
+        "triage"
+      ],
+      "uses_secrets": [],
+      "authored_by": "convergent-systems-key",
+      "tags": [
+        "github-actions",
+        "triage",
+        "issues"
+      ],
+      "lifecycle": "stable"
+    }
+  ],
+  "workflow_compositions": [
+    {
+      "schema": "https://workflow-atoms.com/schemas/composition-v1.json",
+      "id": "workflow-atoms/workflows/atoms-catalog-cicd",
+      "version": "1.0.0",
+      "name": "Atoms Catalog CI/CD",
+      "description": "Standard CI/CD pipeline for every *-atoms.com catalog site: type-check and build on PR, deploy to Cloudflare Pages on merge to main, create tagged release for semver tags.",
+      "trigger": {
+        "atom_id": "workflow-atoms/trigger-type/push",
+        "config": {
+          "inputs": [
+            "branch",
+            "tag"
+          ]
+        }
+      },
+      "steps": [
+        {
+          "id": "secret-scan",
+          "atom_id": "pipeline-atoms/github/secret-scan"
+        },
+        {
+          "id": "ci",
+          "atom_id": "pipeline-atoms/github/ci",
+          "depends_on": [
+            "secret-scan"
+          ]
+        },
+        {
+          "id": "deploy",
+          "atom_id": "pipeline-atoms/github/deploy",
+          "depends_on": [
+            "ci"
+          ],
+          "inputs": {
+            "condition": "push to main"
+          }
+        },
+        {
+          "id": "release",
+          "atom_id": "pipeline-atoms/github/release",
+          "depends_on": [
+            "deploy"
+          ],
+          "inputs": {
+            "condition": "semver tag push"
+          }
+        }
+      ],
+      "tags": [
+        "ci-cd",
+        "atoms-fleet",
+        "cloudflare-pages",
+        "astro"
+      ]
+    },
+    {
+      "schema": "https://workflow-atoms.com/schemas/composition-v1.json",
+      "id": "workflow-atoms/workflows/catalog-publish",
+      "version": "1.0.0",
+      "name": "Catalog Publish",
+      "description": "Publish the atoms catalog: validate all atoms, build and sign the export artifact, push a release tag, and deploy the catalog website.",
+      "trigger": {
+        "atom_id": "workflow-atoms/trigger-type/push",
+        "config": {
+          "branches": [
+            "main"
+          ]
+        }
+      },
+      "steps": [
+        {
+          "id": "checkout",
+          "atom_id": "workflow-atoms/step-type/git-checkout"
+        },
+        {
+          "id": "validate",
+          "atom_id": "workflow-atoms/step-type/validate-schema",
+          "depends_on": [
+            "checkout"
+          ],
+          "on_failure": "fail"
+        },
+        {
+          "id": "schema-valid-gate",
+          "atom_id": "workflow-atoms/gate-type/schema-valid-gate",
+          "depends_on": [
+            "validate"
+          ],
+          "on_failure": "fail"
+        },
+        {
+          "id": "build-exports",
+          "atom_id": "workflow-atoms/step-type/regenerate-exports",
+          "depends_on": [
+            "schema-valid-gate"
+          ]
+        },
+        {
+          "id": "sign",
+          "atom_id": "workflow-atoms/step-type/sign-artifact",
+          "depends_on": [
+            "build-exports"
+          ]
+        },
+        {
+          "id": "push-tag",
+          "atom_id": "workflow-atoms/step-type/git-create-tag",
+          "depends_on": [
+            "sign"
+          ]
+        },
+        {
+          "id": "deploy-site",
+          "atom_id": "workflow-atoms/step-type/deploy-catalog-site",
+          "depends_on": [
+            "push-tag"
+          ]
+        }
+      ],
+      "tags": [
+        "catalog",
+        "publish",
+        "release",
+        "deploy"
+      ]
+    },
+    {
+      "schema": "https://workflow-atoms.com/schemas/composition-v1.json",
+      "id": "workflow-atoms/workflows/ci-validate-build",
+      "version": "1.0.0",
+      "name": "CI Validate and Build",
+      "description": "Standard CI pipeline: check out the repository, install dependencies, run linting/validation, compile the build artifact, and upload it for downstream jobs.",
+      "trigger": {
+        "atom_id": "workflow-atoms/trigger-type/push",
+        "config": {
+          "branches": [
+            "main",
+            "feat/*"
+          ]
+        }
+      },
+      "steps": [
+        {
+          "id": "checkout",
+          "atom_id": "workflow-atoms/step-type/git-checkout",
+          "inputs": {
+            "fetch_depth": 0
+          }
+        },
+        {
+          "id": "install",
+          "atom_id": "workflow-atoms/step-type/install-dependencies",
+          "depends_on": [
+            "checkout"
+          ]
+        },
+        {
+          "id": "validate",
+          "atom_id": "workflow-atoms/step-type/run-lint-validate",
+          "depends_on": [
+            "install"
+          ],
+          "on_failure": "fail"
+        },
+        {
+          "id": "build",
+          "atom_id": "workflow-atoms/step-type/build-artifact",
+          "depends_on": [
+            "validate"
+          ]
+        },
+        {
+          "id": "upload",
+          "atom_id": "workflow-atoms/step-type/upload-artifact",
+          "depends_on": [
+            "build"
+          ],
+          "inputs": {
+            "artifact_name": "dist",
+            "retention_days": 7
+          }
+        }
+      ],
+      "tags": [
+        "ci",
+        "build",
+        "validate"
+      ]
+    },
+    {
+      "schema": "https://workflow-atoms.com/schemas/composition-v1.json",
+      "id": "workflow-atoms/workflows/dependabot-review",
+      "version": "1.0.0",
+      "name": "Dependabot Review and Merge",
+      "description": "Automatically review and merge Dependabot pull requests: filter out major version bumps for manual review, run the test suite, and merge if tests pass.",
+      "trigger": {
+        "atom_id": "workflow-atoms/trigger-type/push",
+        "config": {
+          "branches": [
+            "dependabot/*"
+          ]
+        }
+      },
+      "steps": [
+        {
+          "id": "checkout",
+          "atom_id": "workflow-atoms/step-type/git-checkout"
+        },
+        {
+          "id": "filter-major",
+          "atom_id": "workflow-atoms/step-type/filter-major-bumps",
+          "depends_on": [
+            "checkout"
+          ],
+          "on_failure": "fail"
+        },
+        {
+          "id": "not-major-gate",
+          "atom_id": "workflow-atoms/gate-type/not-major-bump-gate",
+          "depends_on": [
+            "filter-major"
+          ],
+          "on_failure": "fail"
+        },
+        {
+          "id": "install",
+          "atom_id": "workflow-atoms/step-type/install-dependencies",
+          "depends_on": [
+            "not-major-gate"
+          ]
+        },
+        {
+          "id": "test",
+          "atom_id": "workflow-atoms/step-type/run-tests",
+          "depends_on": [
+            "install"
+          ]
+        },
+        {
+          "id": "tests-pass-gate",
+          "atom_id": "workflow-atoms/gate-type/tests-pass-gate",
+          "depends_on": [
+            "test"
+          ],
+          "on_failure": "fail"
+        },
+        {
+          "id": "merge",
+          "atom_id": "workflow-atoms/step-type/github-pr-merge",
+          "depends_on": [
+            "tests-pass-gate"
+          ],
+          "inputs": {
+            "merge_method": "merge",
+            "delete_branch": true
+          }
+        }
+      ],
+      "tags": [
+        "dependabot",
+        "automation",
+        "merge"
+      ]
+    },
+    {
+      "schema": "https://workflow-atoms.com/schemas/composition-v1.json",
+      "id": "workflow-atoms/workflows/deploy-to-cloudflare-pages",
+      "version": "1.0.0",
+      "name": "Deploy to Cloudflare Pages",
+      "description": "Build a Node/Astro site and deploy it to Cloudflare Pages via Wrangler. Requires CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID in the environment.",
+      "trigger": {
+        "atom_id": "workflow-atoms/trigger-type/push",
+        "config": {
+          "branches": [
+            "main"
+          ]
+        }
+      },
+      "steps": [
+        {
+          "id": "checkout",
+          "atom_id": "workflow-atoms/step-type/git-checkout"
+        },
+        {
+          "id": "install",
+          "atom_id": "workflow-atoms/step-type/install-dependencies",
+          "depends_on": [
+            "checkout"
+          ]
+        },
+        {
+          "id": "build",
+          "atom_id": "workflow-atoms/step-type/build-artifact",
+          "depends_on": [
+            "install"
+          ],
+          "inputs": {
+            "output_path": "dist"
+          }
+        },
+        {
+          "id": "deploy",
+          "atom_id": "workflow-atoms/step-type/cloudflare-pages-deploy",
+          "depends_on": [
+            "build"
+          ],
+          "inputs": {
+            "directory": "dist"
+          }
+        }
+      ],
+      "tags": [
+        "deploy",
+        "cloudflare",
+        "pages",
+        "astro"
+      ]
+    },
+    {
+      "schema": "https://workflow-atoms.com/schemas/composition-v1.json",
+      "id": "workflow-atoms/workflows/incident-response",
+      "version": "1.0.0",
+      "name": "Incident Response",
+      "description": "Structured incident response workflow: detect and alert on-call, collect a diagnostic snapshot, apply a mitigation action, and produce a post-mortem document.",
+      "trigger": {
+        "atom_id": "workflow-atoms/trigger-type/manual"
+      },
+      "steps": [
+        {
+          "id": "page-oncall",
+          "atom_id": "workflow-atoms/step-type/page-on-call",
+          "inputs": {
+            "severity": "critical"
+          }
+        },
+        {
+          "id": "diagnose",
+          "atom_id": "workflow-atoms/step-type/diagnose-incident",
+          "depends_on": [
+            "page-oncall"
+          ],
+          "inputs": {
+            "time_window_minutes": 60
+          }
+        },
+        {
+          "id": "mitigate",
+          "atom_id": "workflow-atoms/step-type/apply-mitigation",
+          "depends_on": [
+            "diagnose"
+          ],
+          "on_failure": "retry"
+        },
+        {
+          "id": "post-mortem",
+          "atom_id": "workflow-atoms/step-type/write-post-mortem",
+          "depends_on": [
+            "mitigate"
+          ]
+        }
+      ],
+      "tags": [
+        "incident",
+        "ops",
+        "reliability"
+      ]
+    },
+    {
+      "schema": "https://workflow-atoms.com/schemas/composition-v1.json",
+      "id": "workflow-atoms/workflows/olympus-8-phase-agentic-loop",
+      "version": "1.0.0",
+      "name": "Olympus 8-Phase Agentic Loop",
+      "description": "The core Olympus agentic execution loop. Executes up to 20 iterations of: policy-gate → invoke-LLM → parse-tool-calls → execute-tools → append-results → check-termination. Used by the Zeus toolloop and all Pantheon module orchestration.",
+      "trigger": {
+        "atom_id": "workflow-atoms/trigger-type/manual",
+        "config": {
+          "inputs": [
+            "persona_ref",
+            "policy_floor_ref",
+            "context_ref",
+            "prompt"
+          ]
+        }
+      },
+      "steps": [
+        {
+          "id": "policy-gate",
+          "atom_id": "workflow-atoms/gate-type/policy-broker-gate",
+          "inputs": {
+            "tool_calls": "$ctx.pending_tool_calls",
+            "policy_floor_ref": "$trigger.policy_floor_ref",
+            "persona_ref": "$trigger.persona_ref"
+          },
+          "on_failure": "fail"
+        },
+        {
+          "id": "invoke-llm",
+          "atom_id": "workflow-atoms/step-type/invoke-llm",
+          "depends_on": [
+            "policy-gate"
+          ],
+          "inputs": {
+            "context": "$trigger.context_ref",
+            "prompt": "$trigger.prompt",
+            "persona_ref": "$trigger.persona_ref"
+          }
+        },
+        {
+          "id": "parse-tool-calls",
+          "atom_id": "workflow-atoms/step-type/parse-tool-calls",
+          "depends_on": [
+            "invoke-llm"
+          ],
+          "inputs": {
+            "llm_response": "$steps.invoke-llm.response"
+          }
+        },
+        {
+          "id": "execute-tools",
+          "atom_id": "workflow-atoms/step-type/execute-tool-calls",
+          "depends_on": [
+            "parse-tool-calls"
+          ],
+          "inputs": {
+            "tool_calls": "$steps.parse-tool-calls.tool_calls"
+          }
+        },
+        {
+          "id": "append-results",
+          "atom_id": "workflow-atoms/step-type/append-tool-results",
+          "depends_on": [
+            "execute-tools"
+          ],
+          "inputs": {
+            "context": "$trigger.context_ref",
+            "tool_calls": "$steps.parse-tool-calls.tool_calls",
+            "tool_results": "$steps.execute-tools.tool_results"
+          }
+        },
+        {
+          "id": "termination-gate",
+          "atom_id": "workflow-atoms/gate-type/no-tool-calls-gate",
+          "depends_on": [
+            "append-results"
+          ],
+          "inputs": {
+            "has_tool_calls": "$steps.parse-tool-calls.has_tool_calls",
+            "max_iterations": 20
+          }
+        }
+      ],
+      "tags": [
+        "olympus",
+        "agentic",
+        "loop",
+        "zeus",
+        "pantheon",
+        "core"
+      ]
+    },
+    {
+      "schema": "https://workflow-atoms.com/schemas/composition-v1.json",
+      "id": "workflow-atoms/workflows/olympus-agentic-loop",
+      "version": "1.0.0",
+      "name": "Olympus Agentic Toolloop",
+      "description": "The core Olympus agent loop: receive prompt → invoke LLM → parse tool calls → execute → repeat until no tool calls or max iterations reached. Gates a policy broker check before each tool dispatch.",
+      "trigger": {
+        "atom_id": "workflow-atoms/trigger-type/manual",
+        "config": {
+          "inputs": [
+            "user_prompt",
+            "persona_ref",
+            "policy_floor_ref"
+          ]
+        }
+      },
+      "steps": [
+        {
+          "id": "policy-gate",
+          "atom_id": "workflow-atoms/gate-type/policy-broker-gate",
+          "inputs": {
+            "tool_calls": "$ctx.pending_tool_calls",
+            "policy_floor_ref": "$trigger.policy_floor_ref",
+            "persona_ref": "$trigger.persona_ref"
+          },
+          "on_failure": "fail"
+        },
+        {
+          "id": "invoke-llm",
+          "atom_id": "workflow-atoms/step-type/invoke-llm",
+          "depends_on": [
+            "policy-gate"
+          ],
+          "inputs": {
+            "context": "$ctx.message_context",
+            "tool_schemas": "$ctx.tool_schemas",
+            "persona_ref": "$trigger.persona_ref"
+          }
+        },
+        {
+          "id": "parse-tool-calls",
+          "atom_id": "workflow-atoms/step-type/parse-tool-calls",
+          "depends_on": [
+            "invoke-llm"
+          ],
+          "inputs": {
+            "llm_response": "$steps.invoke-llm.response",
+            "tool_schemas": "$ctx.tool_schemas"
+          }
+        },
+        {
+          "id": "execute-tools",
+          "atom_id": "workflow-atoms/step-type/execute-tool-calls",
+          "depends_on": [
+            "parse-tool-calls"
+          ],
+          "inputs": {
+            "tool_calls": "$steps.parse-tool-calls.tool_calls"
+          }
+        },
+        {
+          "id": "append-results",
+          "atom_id": "workflow-atoms/step-type/append-tool-results",
+          "depends_on": [
+            "execute-tools"
+          ],
+          "inputs": {
+            "context": "$ctx.message_context",
+            "tool_calls": "$steps.parse-tool-calls.tool_calls",
+            "tool_results": "$steps.execute-tools.tool_results"
+          }
+        },
+        {
+          "id": "termination-gate",
+          "atom_id": "workflow-atoms/gate-type/no-tool-calls-gate",
+          "depends_on": [
+            "append-results"
+          ],
+          "inputs": {
+            "has_tool_calls": "$steps.parse-tool-calls.has_tool_calls",
+            "max_iterations": 20
+          }
+        }
+      ],
+      "tags": [
+        "olympus",
+        "agentic",
+        "toolloop",
+        "zeus",
+        "llm"
+      ]
+    },
+    {
+      "schema": "https://workflow-atoms.com/schemas/composition-v1.json",
+      "id": "workflow-atoms/workflows/onboarding",
+      "version": "1.0.0",
+      "name": "Developer Onboarding",
+      "description": "New developer onboarding workflow: clone all project repositories, install dependencies, run the test suite to verify the environment, and provision development secrets.",
+      "trigger": {
+        "atom_id": "workflow-atoms/trigger-type/manual"
+      },
+      "steps": [
+        {
+          "id": "clone-repos",
+          "atom_id": "workflow-atoms/step-type/clone-repository"
+        },
+        {
+          "id": "install-deps",
+          "atom_id": "workflow-atoms/step-type/install-dependencies",
+          "depends_on": [
+            "clone-repos"
+          ]
+        },
+        {
+          "id": "run-tests",
+          "atom_id": "workflow-atoms/step-type/run-tests",
+          "depends_on": [
+            "install-deps"
+          ]
+        },
+        {
+          "id": "tests-pass-gate",
+          "atom_id": "workflow-atoms/gate-type/tests-pass-gate",
+          "depends_on": [
+            "run-tests"
+          ],
+          "on_failure": "fail"
+        },
+        {
+          "id": "setup-secrets",
+          "atom_id": "workflow-atoms/step-type/setup-secrets",
+          "depends_on": [
+            "tests-pass-gate"
+          ]
+        }
+      ],
+      "tags": [
+        "onboarding",
+        "developer",
+        "setup"
+      ]
+    },
+    {
+      "schema": "https://workflow-atoms.com/schemas/composition-v1.json",
+      "id": "workflow-atoms/workflows/pr-and-merge",
+      "version": "1.0.0",
+      "name": "PR and Merge",
+      "description": "Standard delivery cycle: push the feature branch, open a pull request, wait for CI to go green, then merge. Implements the full worktree+branch → push → PR → CI → merge lifecycle.",
+      "trigger": {
+        "atom_id": "workflow-atoms/trigger-type/manual"
+      },
+      "steps": [
+        {
+          "id": "push-branch",
+          "atom_id": "workflow-atoms/step-type/git-push",
+          "inputs": {
+            "remote": "origin"
+          }
+        },
+        {
+          "id": "create-pr",
+          "atom_id": "workflow-atoms/step-type/github-pr-create",
+          "depends_on": [
+            "push-branch"
+          ],
+          "inputs": {
+            "base_branch": "main"
+          }
+        },
+        {
+          "id": "wait-for-ci",
+          "atom_id": "workflow-atoms/gate-type/ci-green",
+          "depends_on": [
+            "create-pr"
+          ],
+          "inputs": {
+            "timeout_minutes": 30
+          },
+          "on_failure": "fail"
+        },
+        {
+          "id": "merge-pr",
+          "atom_id": "workflow-atoms/step-type/github-pr-merge",
+          "depends_on": [
+            "wait-for-ci"
+          ],
+          "inputs": {
+            "merge_method": "merge",
+            "delete_branch": true
+          }
+        }
+      ],
+      "tags": [
+        "git",
+        "github",
+        "pr",
+        "delivery"
+      ]
+    },
+    {
+      "schema": "https://workflow-atoms.com/schemas/composition-v1.json",
+      "id": "workflow-atoms/workflows/release-tag",
+      "version": "1.0.0",
+      "name": "Release Tag",
+      "description": "Tag a release: verify the main branch is clean and up to date, create an annotated git tag, then trigger the downstream release workflow.",
+      "trigger": {
+        "atom_id": "workflow-atoms/trigger-type/manual"
+      },
+      "steps": [
+        {
+          "id": "validate-clean-main",
+          "atom_id": "workflow-atoms/gate-type/clean-main-gate",
+          "inputs": {
+            "branch": "main"
+          },
+          "on_failure": "fail"
+        },
+        {
+          "id": "create-tag",
+          "atom_id": "workflow-atoms/step-type/git-create-tag",
+          "depends_on": [
+            "validate-clean-main"
+          ]
+        },
+        {
+          "id": "trigger-release",
+          "atom_id": "workflow-atoms/step-type/trigger-workflow",
+          "depends_on": [
+            "create-tag"
+          ],
+          "inputs": {
+            "workflow_id": "release.yml"
+          }
+        }
+      ],
+      "tags": [
+        "release",
+        "git",
+        "tag"
+      ]
+    },
+    {
+      "schema": "https://workflow-atoms.com/schemas/composition-v1.json",
+      "id": "workflow-atoms/workflows/repo-governance",
+      "version": "1.0.0",
+      "name": "Repository Governance",
+      "description": "Automated governance for every *-atoms repo: one-shot bootstrap on first push, weekly label sync from repo-standards, automatic issue triage via copilot+rest agent.",
+      "trigger": {
+        "atom_id": "workflow-atoms/trigger-type/schedule",
+        "config": {}
+      },
+      "steps": [
+        {
+          "id": "bootstrap",
+          "atom_id": "pipeline-atoms/github/bootstrap"
+        },
+        {
+          "id": "label-sync",
+          "atom_id": "pipeline-atoms/github/label-sync",
+          "depends_on": [
+            "bootstrap"
+          ]
+        },
+        {
+          "id": "label-cleanup",
+          "atom_id": "pipeline-atoms/github/label-cleanup",
+          "depends_on": [
+            "label-sync"
+          ]
+        },
+        {
+          "id": "triage",
+          "atom_id": "pipeline-atoms/github/triage",
+          "depends_on": [
+            "label-cleanup"
+          ]
+        }
+      ],
+      "tags": [
+        "governance",
+        "labels",
+        "triage",
+        "automation",
+        "atoms-fleet"
+      ]
+    },
+    {
+      "schema": "https://workflow-atoms.com/schemas/composition-v1.json",
+      "id": "workflow-atoms/workflows/schema-migration",
+      "version": "1.0.0",
+      "name": "Atom Schema Migration",
+      "description": "Migrate atoms to a new schema version: audit existing atoms, validate them against the new schema, fix non-conforming atoms, and regenerate the catalog export.",
+      "trigger": {
+        "atom_id": "workflow-atoms/trigger-type/manual"
+      },
+      "steps": [
+        {
+          "id": "audit",
+          "atom_id": "workflow-atoms/step-type/audit-atoms"
+        },
+        {
+          "id": "validate",
+          "atom_id": "workflow-atoms/step-type/validate-schema",
+          "depends_on": [
+            "audit"
+          ]
+        },
+        {
+          "id": "fix-nonconforming",
+          "atom_id": "workflow-atoms/step-type/fix-nonconforming",
+          "depends_on": [
+            "validate"
+          ],
+          "on_failure": "fail"
+        },
+        {
+          "id": "schema-valid-gate",
+          "atom_id": "workflow-atoms/gate-type/schema-valid-gate",
+          "depends_on": [
+            "fix-nonconforming"
+          ],
+          "on_failure": "fail"
+        },
+        {
+          "id": "regenerate",
+          "atom_id": "workflow-atoms/step-type/regenerate-exports",
+          "depends_on": [
+            "schema-valid-gate"
+          ]
+        }
+      ],
+      "tags": [
+        "schema",
+        "migration",
+        "atoms",
+        "catalog"
+      ]
+    },
+    {
+      "schema": "https://workflow-atoms.com/schemas/composition-v1.json",
+      "id": "workflow-atoms/workflows/security-baseline",
+      "version": "1.0.0",
+      "name": "Security Scanning Baseline",
+      "description": "Minimum security checks for every *-atoms catalog site: secret detection with TruffleHog on every push and PR.",
+      "trigger": {
+        "atom_id": "workflow-atoms/trigger-type/push",
+        "config": {}
+      },
+      "steps": [
+        {
+          "id": "secret-scan",
+          "atom_id": "pipeline-atoms/github/secret-scan"
+        }
+      ],
+      "tags": [
+        "security",
+        "secrets",
+        "trufflehog",
+        "baseline",
+        "atoms-fleet"
+      ]
+    },
+    {
+      "schema": "https://workflow-atoms.com/schemas/composition-v1.json",
+      "id": "workflow-atoms/workflows/security-scan",
+      "version": "1.0.0",
+      "name": "Security Scan",
+      "description": "Run a secret scan (trufflehog) and a dependency vulnerability audit. Gates block the pipeline if secrets are found or high-severity vulnerabilities are present.",
+      "trigger": {
+        "atom_id": "workflow-atoms/trigger-type/push",
+        "config": {
+          "branches": [
+            "main",
+            "feat/*"
+          ]
+        }
+      },
+      "steps": [
+        {
+          "id": "checkout",
+          "atom_id": "workflow-atoms/step-type/git-checkout"
+        },
+        {
+          "id": "secret-scan",
+          "atom_id": "workflow-atoms/step-type/run-secret-scan",
+          "depends_on": [
+            "checkout"
+          ],
+          "inputs": {
+            "scanner": "trufflehog"
+          }
+        },
+        {
+          "id": "no-secrets-gate",
+          "atom_id": "workflow-atoms/gate-type/no-secrets-found-gate",
+          "depends_on": [
+            "secret-scan"
+          ],
+          "on_failure": "fail"
+        },
+        {
+          "id": "dep-audit",
+          "atom_id": "workflow-atoms/step-type/run-dependency-audit",
+          "depends_on": [
+            "checkout"
+          ],
+          "inputs": {
+            "severity_threshold": "high"
+          }
+        },
+        {
+          "id": "no-high-severity-gate",
+          "atom_id": "workflow-atoms/gate-type/no-high-severity-gate",
+          "depends_on": [
+            "dep-audit"
+          ],
+          "on_failure": "fail"
+        }
+      ],
+      "tags": [
+        "security",
+        "scan",
+        "audit",
+        "ci"
+      ]
+    },
+    {
+      "schema": "https://workflow-atoms.com/schemas/composition-v1.json",
+      "id": "workflow-atoms/workflows/sre-incident-response",
+      "version": "1.0.0",
+      "name": "SRE Incident Response",
+      "description": "Full incident response lifecycle: declare → assess → mitigate → resolve → post-mortem. Uses incident-commander persona, SRE identity, and prod-read-only policy by default.",
+      "trigger": {
+        "atom_id": "workflow-atoms/trigger-type/manual",
+        "config": {
+          "inputs": [
+            "severity",
+            "service",
+            "incident_id"
+          ]
+        }
+      },
+      "steps": [
+        {
+          "id": "declare-incident",
+          "atom_id": "workflow-atoms/step-type/declare-incident",
+          "inputs": {
+            "severity": "$trigger.severity",
+            "service": "$trigger.service",
+            "incident_id": "$trigger.incident_id"
+          }
+        },
+        {
+          "id": "page-oncall",
+          "atom_id": "workflow-atoms/step-type/page-on-call",
+          "depends_on": [
+            "declare-incident"
+          ],
+          "inputs": {
+            "severity": "$trigger.severity",
+            "incident_id": "$trigger.incident_id"
+          }
+        },
+        {
+          "id": "assess-blast-radius",
+          "atom_id": "workflow-atoms/step-type/diagnose-incident",
+          "depends_on": [
+            "page-oncall"
+          ],
+          "inputs": {
+            "service": "$trigger.service",
+            "time_window_minutes": 60
+          }
+        },
+        {
+          "id": "mitigate",
+          "atom_id": "workflow-atoms/step-type/apply-mitigation",
+          "depends_on": [
+            "assess-blast-radius"
+          ],
+          "on_failure": "retry"
+        },
+        {
+          "id": "verify-resolution",
+          "atom_id": "workflow-atoms/step-type/run-tests",
+          "depends_on": [
+            "mitigate"
+          ],
+          "inputs": {
+            "service": "$trigger.service"
+          }
+        },
+        {
+          "id": "post-mortem",
+          "atom_id": "workflow-atoms/step-type/write-post-mortem",
+          "depends_on": [
+            "verify-resolution"
+          ],
+          "inputs": {
+            "incident_id": "$trigger.incident_id",
+            "service": "$trigger.service"
+          }
+        }
+      ],
+      "tags": [
+        "sre",
+        "incident",
+        "production",
+        "olympus"
+      ]
+    },
+    {
+      "schema": "https://workflow-atoms.com/schemas/composition-v1.json",
+      "id": "workflow-atoms/workflows/sre-runbook-generation",
+      "version": "1.0.0",
+      "name": "SRE Runbook Generation",
+      "description": "Generate a structured runbook for a given service or failure mode. Uses runbook-author persona with documentation-writer voice.",
+      "trigger": {
+        "atom_id": "workflow-atoms/trigger-type/manual",
+        "config": {
+          "inputs": [
+            "service",
+            "failure_mode",
+            "alert_name"
+          ]
+        }
+      },
+      "steps": [
+        {
+          "id": "gather-service-context",
+          "atom_id": "workflow-atoms/step-type/clone-repository",
+          "inputs": {
+            "service": "$trigger.service"
+          }
+        },
+        {
+          "id": "identify-failure-modes",
+          "atom_id": "workflow-atoms/step-type/diagnose-incident",
+          "depends_on": [
+            "gather-service-context"
+          ],
+          "inputs": {
+            "service": "$trigger.service",
+            "alert_name": "$trigger.alert_name",
+            "failure_mode": "$trigger.failure_mode"
+          }
+        },
+        {
+          "id": "draft-runbook",
+          "atom_id": "workflow-atoms/step-type/write-post-mortem",
+          "depends_on": [
+            "identify-failure-modes"
+          ],
+          "inputs": {
+            "service": "$trigger.service",
+            "failure_mode": "$trigger.failure_mode",
+            "alert_name": "$trigger.alert_name"
+          }
+        },
+        {
+          "id": "validate-runbook",
+          "atom_id": "workflow-atoms/gate-type/ci-green",
+          "depends_on": [
+            "draft-runbook"
+          ],
+          "on_failure": "fail"
+        },
+        {
+          "id": "publish-runbook",
+          "atom_id": "workflow-atoms/step-type/publish-artifact",
+          "depends_on": [
+            "validate-runbook"
+          ],
+          "inputs": {
+            "destination": "doc-atoms"
+          }
+        }
+      ],
+      "tags": [
+        "sre",
+        "runbook",
+        "documentation",
+        "olympus"
+      ]
+    },
+    {
+      "schema": "https://workflow-atoms.com/schemas/composition-v1.json",
+      "id": "workflow-atoms/workflows/terraform-lifecycle",
+      "version": "1.0.0",
+      "name": "Terraform Infrastructure Lifecycle",
+      "description": "Full Terraform lifecycle for *-atoms catalog infrastructure: plan on PR → apply on approval → optional destroy. Uses R2 state backend, Cloudflare DNS token, and OpenTofu CLI.",
+      "trigger": {
+        "atom_id": "workflow-atoms/trigger-type/manual",
+        "config": {
+          "inputs": [
+            "environment",
+            "action"
+          ]
+        }
+      },
+      "steps": [
+        {
+          "id": "tf-plan",
+          "atom_id": "pipeline-atoms/github/tf-plan",
+          "on_failure": "fail"
+        },
+        {
+          "id": "review-gate",
+          "atom_id": "workflow-atoms/gate-type/ci-green",
+          "depends_on": [
+            "tf-plan"
+          ]
+        },
+        {
+          "id": "tf-apply",
+          "atom_id": "pipeline-atoms/github/terraform-apply",
+          "depends_on": [
+            "review-gate"
+          ]
+        },
+        {
+          "id": "verify",
+          "atom_id": "workflow-atoms/step-type/verify-infrastructure",
+          "depends_on": [
+            "tf-apply"
+          ]
+        }
+      ],
+      "tags": [
+        "terraform",
+        "infra",
+        "lifecycle",
+        "cloudflare",
+        "atoms-fleet"
+      ]
+    }
+  ],
+  "summary": {
+    "pipeline_atoms": 15,
+    "workflow_compositions": 18
+  }
+}

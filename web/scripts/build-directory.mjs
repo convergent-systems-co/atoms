@@ -45,6 +45,25 @@ async function countLocalAtoms(submodulePath) {
 
 const FETCH_TIMEOUT_MS = 5000;
 
+// Check if the site apex (root URL) is reachable — proves the CF Pages project is deployed.
+async function checkApexLive(catalogName, domain) {
+  const urls = [
+    domain ? `https://${domain}/` : null,
+    `https://${catalogName}.pages.dev/`,
+  ].filter(Boolean);
+  for (const url of urls) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    try {
+      const res = await fetch(url, { signal: controller.signal, method: "HEAD" });
+      if (res.ok) return true;
+    } catch { /* offline */ } finally {
+      clearTimeout(timer);
+    }
+  }
+  return false;
+}
+
 async function fetchLive(catalogName, domain) {
   // Try canonical domain first, fall back to pages.dev subdomain.
   const urls = [
@@ -58,6 +77,10 @@ async function fetchLive(catalogName, domain) {
     try {
       const res = await fetch(url, { signal: controller.signal });
       if (!res.ok) continue;
+      // Some CF Pages sites return HTML with 200 (SPA fallback) when the file is missing.
+      // Only parse if the response is actually JSON.
+      const ct = res.headers.get("content-type") ?? "";
+      if (!ct.includes("application/json") && !ct.includes("text/plain")) continue;
       const data = await res.json();
       return {
         catalog_url: url,
@@ -93,15 +116,21 @@ async function readCatalog(submodulePath) {
   const domain = yaml.canonical_domain ?? yaml.domain ?? null;
   const atomTypes = Array.isArray(yaml.atom_types) ? yaml.atom_types : [];
 
-  const [live, localAtomCount] = await Promise.all([
+  const [live, localAtomCount, apexLive] = await Promise.all([
     fetchLive(catalogName, domain),
     countLocalAtoms(submodulePath),
+    checkApexLive(catalogName, domain),
   ]);
+
+  // A catalog is "live" if:
+  //   - exports/catalog.json returned valid JSON (live != null), OR
+  //   - The site apex is reachable AND it has atoms on disk (brand/theme use non-standard catalog paths)
+  const isLive = live != null || (apexLive && localAtomCount > 0);
 
   return {
     name: catalogName,
     version: yaml.version ?? null,
-    status: live ? "live" : "bootstrap",
+    status: isLive ? "live" : "bootstrap",
     domain,
     pages_url: `https://${catalogName}.pages.dev`,
     github_url: `https://github.com/convergent-systems-co/${catalogName}`,

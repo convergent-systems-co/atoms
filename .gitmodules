@@ -73,3 +73,6 @@
 [submodule "src/doc-atoms"]
 	path = src/doc-atoms
 	url = https://github.com/convergent-systems-co/doc-atoms.git
+[submodule "src/ai-atoms"]
+	path = src/ai-atoms
+	url = https://github.com/convergent-systems-co/ai-atoms.git

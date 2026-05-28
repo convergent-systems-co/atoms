@@ -25,21 +25,25 @@ async function discoverCatalogDirs() {
   return paths.filter((p) => existsSync(join(REPO_DIR, p, "ATOMS.yml")));
 }
 
-// Count atom files in the submodule's atoms/ directory.
-// Works only when the submodule is checked out (always true in CI with submodules: recursive).
-async function countLocalAtoms(submodulePath) {
-  const atomsDir = join(REPO_DIR, submodulePath, "atoms");
-  if (!existsSync(atomsDir)) return 0;
+// Count atom/composition files in the submodule.
+// Checks atoms/ (standard) and any extra directories passed in (e.g. brands/, palettes/).
+// Works when the submodule is checked out (always true in CI with submodules: recursive).
+async function countLocalAtoms(submodulePath, extraDirs = []) {
+  const dirsToCheck = ["atoms", ...extraDirs];
   let count = 0;
-  try {
-    const entries = await readdir(atomsDir, { recursive: true });
-    for (const entry of entries) {
-      if (entry.endsWith(".json") || entry.endsWith(".toml")) {
-        const full = join(atomsDir, entry);
-        if ((await stat(full)).isFile()) count++;
+  for (const dirName of dirsToCheck) {
+    const dir = join(REPO_DIR, submodulePath, dirName);
+    if (!existsSync(dir)) continue;
+    try {
+      const entries = await readdir(dir, { recursive: true });
+      for (const entry of entries) {
+        if (entry.endsWith(".json") || entry.endsWith(".toml")) {
+          const full = join(dir, entry);
+          if ((await stat(full)).isFile()) count++;
+        }
       }
-    }
-  } catch { /* submodule not initialized */ }
+    } catch { /* submodule not initialized */ }
+  }
   return count;
 }
 
@@ -116,16 +120,22 @@ async function readCatalog(submodulePath) {
   const domain = yaml.canonical_domain ?? yaml.domain ?? null;
   const atomTypes = Array.isArray(yaml.atom_types) ? yaml.atom_types : [];
 
+  // Some catalogs (brand-atoms) store files in composition_dir (brands/, palettes/, fonts/)
+  // rather than atoms/. Count from both.
+  const compositionDirName = yaml.composition_dir ?? null;
+  const extraDirs = compositionDirName ? [compositionDirName] : [];
+
   const [live, localAtomCount, apexLive] = await Promise.all([
     fetchLive(catalogName, domain),
-    countLocalAtoms(submodulePath),
+    countLocalAtoms(submodulePath, extraDirs),
     checkApexLive(catalogName, domain),
   ]);
 
   // A catalog is "live" if:
   //   - exports/catalog.json returned valid JSON (live != null), OR
-  //   - The site apex is reachable AND it has atoms on disk (brand/theme use non-standard catalog paths)
-  const isLive = live != null || (apexLive && localAtomCount > 0);
+  //   - The site apex is reachable (CF Pages is deployed, regardless of catalog path convention)
+  // "bootstrap" is reserved for sites with no deployment at all.
+  const isLive = live != null || apexLive;
 
   return {
     name: catalogName,

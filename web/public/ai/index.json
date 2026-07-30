@@ -4,11 +4,24 @@
   "site": "https://atoms.convergent-systems.co",
   "description": "Master AI discovery index for the Convergent Systems atoms ecosystem — typed, versioned, composable libraries of AI primitives. Read instructions first, then explore the catalog list.",
   "summary": {
-    "total_catalogs": 19,
-    "live": 17,
-    "bootstrap": 2
+    "total_catalogs": 20,
+    "live": 20,
+    "bootstrap": 0
   },
   "catalogs": [
+    {
+      "name": "ai-atoms",
+      "domain": "ai-atoms.com",
+      "ai_endpoint": "https://ai-atoms.com/ai/index.json",
+      "description": "AI runtime primitives — hooks and skills for AI agents, Claude Code, and agentic pipelines.\nSkills are bounded, invocable units of AI capability with declared inputs, outputs, and\nsystem-prompt fragments. Hooks are event-driven runtime behaviors wired into AI tool\ninfrastructure (Claude Code PreToolUse/PostToolUse, Copilot CLI, etc.).",
+      "atom_types": [
+        "skill",
+        "hook"
+      ],
+      "classes": 2,
+      "atoms": 298,
+      "status": "live"
+    },
     {
       "name": "amendment-atoms",
       "domain": "amendment-atoms.com",
@@ -36,7 +49,7 @@
       ],
       "classes": 3,
       "atoms": 0,
-      "status": "bootstrap"
+      "status": "live"
     },
     {
       "name": "channel-atoms",
@@ -51,7 +64,7 @@
         "auth-method"
       ],
       "classes": 5,
-      "atoms": 31,
+      "atoms": 39,
       "status": "live"
     },
     {
@@ -82,7 +95,7 @@
         "value-declaration"
       ],
       "classes": 5,
-      "atoms": 3,
+      "atoms": 4,
       "status": "live"
     },
     {
@@ -98,7 +111,7 @@
         "attention-budget"
       ],
       "classes": 5,
-      "atoms": 9,
+      "atoms": 13,
       "status": "live"
     },
     {
@@ -145,7 +158,7 @@
         "key-cert-type"
       ],
       "classes": 4,
-      "atoms": 8,
+      "atoms": 13,
       "status": "live"
     },
     {
@@ -249,7 +262,7 @@
       "description": "User/agent profile compositions — durable \"working-identity\" declarations for the Olympus broker. Each profile composes role-packs, policy stack, governance stack, default persona/theme/budget, available identities/channels, knowledge sources, and default workflows into a coherent posture. Catalog is composition-only; primitive atoms live in other catalogs.",
       "atom_types": [],
       "classes": 0,
-      "atoms": 0,
+      "atoms": 3,
       "status": "live"
     },
     {
@@ -286,7 +299,7 @@
         "hook"
       ],
       "classes": 26,
-      "atoms": 30,
+      "atoms": 126,
       "status": "live"
     },
     {
@@ -318,8 +331,8 @@
         "syntax-scheme"
       ],
       "classes": 5,
-      "atoms": 2,
-      "status": "bootstrap"
+      "atoms": 15,
+      "status": "live"
     }
   ]
 }

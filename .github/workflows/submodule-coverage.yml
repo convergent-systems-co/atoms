@@ -1,0 +1,66 @@
+name: Submodule coverage
+
+on:
+  push:
+    branches: [main]
+    paths: ['.gitmodules']
+  pull_request:
+    paths: ['.gitmodules']
+  schedule:
+    # Daily at 07:00 UTC — catches repos created outside the PR flow
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Collect GitHub *-atoms repos
+        id: github
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh repo list convergent-systems-co \
+            --limit 200 \
+            --json name \
+            --jq '.[].name | select(endswith("-atoms"))' \
+            | sort > /tmp/github-atoms-raw.txt
+          grep -v '^#' .github/retired-atoms.txt | grep -v '^$' | sort > /tmp/retired-atoms.txt
+          comm -23 /tmp/github-atoms-raw.txt /tmp/retired-atoms.txt > /tmp/github-atoms.txt
+          echo "Found $(wc -l < /tmp/github-atoms-raw.txt) repos on GitHub, $(wc -l < /tmp/retired-atoms.txt) excluded as retired"
+          cat /tmp/github-atoms.txt
+
+      - name: Collect .gitmodules entries
+        run: |
+          grep 'url = ' .gitmodules \
+            | sed 's|.*github\.com/[^/]*/||; s|\.git||' \
+            | sort > /tmp/gitmodules-atoms.txt
+          echo "Found $(wc -l < /tmp/gitmodules-atoms.txt) entries in .gitmodules"
+          cat /tmp/gitmodules-atoms.txt
+
+      - name: Diff — fail on any missing registration
+        run: |
+          missing=$(comm -23 /tmp/github-atoms.txt /tmp/gitmodules-atoms.txt)
+          if [ -n "$missing" ]; then
+            echo "❌ The following *-atoms repos exist on GitHub but are NOT registered as submodules:"
+            echo "$missing"
+            echo ""
+            echo "Add each one to .gitmodules and atoms/src/ before the next CI run."
+            exit 1
+          fi
+          echo "✅ All *-atoms repos on GitHub are registered as submodules."
+
+      - name: Diff — warn on phantom submodules
+        run: |
+          phantom=$(comm -13 /tmp/github-atoms.txt /tmp/gitmodules-atoms.txt)
+          if [ -n "$phantom" ]; then
+            echo "⚠️  The following .gitmodules entries have no matching GitHub repo:"
+            echo "$phantom"
+          else
+            echo "✅ No phantom submodule entries."
+          fi

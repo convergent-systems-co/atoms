@@ -1,0 +1,10 @@
+# *-atoms GitHub repos intentionally retired as submodules of this umbrella.
+# Each was tagged archive/pre-ai-atoms-merge at its final HEAD before removal.
+# Excluded from the submodule-coverage check below — do not re-add unless
+# un-retiring the catalog.
+action-atoms
+agent-atoms
+persona-atoms
+prompt-atoms
+skill-atoms
+workflow-atoms

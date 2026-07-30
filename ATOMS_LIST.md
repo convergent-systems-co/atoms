@@ -1,5 +1,3 @@
-action-atoms.com
-agent-atoms.com
 amendment-atoms.com
 brand-atoms.com
 channel-atoms.com
@@ -12,14 +10,10 @@ identity-atoms.com
 key-atoms.com
 knowledge-atoms.com
 model-atoms.com
-persona-atoms.com
 pipeline-atoms.com
 plugin-atoms.com
 policy-atoms.com
 profile-atoms.com
-prompt-atoms.com
 schema-atoms.com
 service-atoms.com
-skill-atoms.com
 theme-atoms.com
-workflow-atoms.com

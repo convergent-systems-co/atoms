@@ -52,3 +52,20 @@ dist/
 
 # Git worktrees
 .worktrees/
+
+# --- relocation-ignore (build/IDE artifacts) ---
+bin/
+obj/
+node_modules/
+dist/
+.next/
+target/
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.idea/
+.vs/
+.coverage
+TestResults/
+.terraform/

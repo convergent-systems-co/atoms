@@ -2,7 +2,7 @@
 
 **Site:** atoms.convergent-systems.co  
 **Federation:** convergent-systems.co  
-**Purpose:** Central directory for 25+ typed, versioned, composable atom catalogs used by AI agents, CI/CD pipelines, and runtime systems.
+**Purpose:** Central directory for typed, versioned, composable atom catalogs used by AI agents, CI/CD pipelines, and runtime systems. See `/directory.json` for the current catalog count.
 
 ---
 
@@ -20,9 +20,9 @@ Atoms are not code — they are data. They describe things (a color palette, a C
 
 ## How the ecosystem is organized
 
-The ecosystem has 25+ **catalogs**. Each catalog:
+The ecosystem has several **catalogs** (see `/directory.json` for the current list). Each catalog:
 
-1. Lives at its own domain (e.g., `brand-atoms.com`, `persona-atoms.com`)
+1. Lives at its own domain (e.g., `brand-atoms.com`, `channel-atoms.com`)
 2. Has its own `ATOMS.yml` declaring its atom types, version, and federation
 3. Exposes `/ai/index.json` for AI discovery of that catalog's contents
 4. Exposes `/exports/catalog.json` with the full atom list
@@ -34,19 +34,19 @@ The **umbrella** (`atoms.convergent-systems.co`) is the master directory. It doe
 ```
 1. Read /ai/index.json at atoms.convergent-systems.co
    → You are here now (this file is the instructions)
-   → catalogs[] lists all 25+ catalogs with name, domain, ai_endpoint, atom_types
+   → catalogs[] lists every current catalog with name, domain, ai_endpoint, atom_types
 
 2. Pick the catalogs relevant to your task:
    - Need brand/visual identity?   → brand-atoms.com
-   - Need AI personas?             → persona-atoms.com
    - Need policies?                → policy-atoms.com
    - Need CI/CD pipelines?         → pipeline-atoms.com
-   - Need workflow compositions?   → workflow-atoms.com
    - Need event schemas?           → event-atoms.com
    - Need identity/auth?           → identity-atoms.com
    - Need context definitions?     → context-atoms.com
    - Need channel specs?           → channel-atoms.com
-   - Need agent definitions?       → agent-atoms.com
+
+   (AI agent/persona/prompt/skill/workflow primitives are being consolidated
+   into `ai-atoms` as atom types; check `/directory.json` once that lands.)
 
 3. For each selected catalog, fetch:
    GET https://<catalog-domain>/ai/index.json
@@ -81,12 +81,7 @@ Additional fields are type-specific — see `schema-atoms.com` for the grammar a
 
 ## Composition
 
-Many catalogs expose **compositions** — named groups of atoms assembled to accomplish a task. For example:
-
-- `workflow-atoms.com` has `atoms-catalog-cicd` (secret-scan → ci → deploy → release)
-- `workflow-atoms.com` has `terraform-lifecycle` (tf-plan → gate → tf-apply → verify)
-
-Compositions are in the catalog's `composition_dir` (e.g., `/workflows/`, `/brands/`, `/prompts/`).
+Many catalogs expose **compositions** — named groups of atoms assembled to accomplish a task. Compositions are in the catalog's `composition_dir` (e.g., `/pipelines/`, `/brands/`) — see the catalog's `atoms/exports/catalog.json` for its full composition list.
 
 ## Signing and trust
 

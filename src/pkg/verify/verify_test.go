@@ -83,13 +83,13 @@ func TestVerifyRejectsTamperedAtom(t *testing.T) {
 	root := repoRoot(t)
 	pubKey := rootPublicKey(t)
 
-	raw, err := os.ReadFile(filepath.Join(root, "catalogs/prompt-atoms.toml"))
+	raw, err := os.ReadFile(filepath.Join(root, "catalogs/channel-atoms.toml"))
 	if err != nil {
-		t.Fatalf("read prompt-atoms.toml: %v", err)
+		t.Fatalf("read channel-atoms.toml: %v", err)
 	}
-	// Replace "prompt-atoms" with "prompt-fakes" in the body. Same length,
+	// Replace "channel-atoms" with "channel-fakes" in the body. Same length,
 	// stays-parseable TOML, but changes the canonical hash.
-	tampered := strings.Replace(string(raw), "prompt-atoms.com", "prompt-fakes.com", 1)
+	tampered := strings.Replace(string(raw), "channel-atoms.com", "channel-fakes.com", 1)
 	if tampered == string(raw) {
 		t.Fatal("no replacement happened — test is broken")
 	}

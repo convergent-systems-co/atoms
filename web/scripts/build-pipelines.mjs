@@ -1,8 +1,11 @@
-// Generates web/public/pipelines.json from pipeline-atoms and workflow-atoms submodules.
+// Generates web/public/pipelines.json from the pipeline-atoms submodule.
 // Reads:
 //   src/pipeline-atoms/atoms/**/*.json  → pipeline atoms
-//   src/workflow-atoms/workflows/*.json → workflow compositions
 // Output is consumed by web/src/pages/pipelines/index.astro at build time.
+//
+// workflow-atoms was retired as a submodule (merging into ai-atoms as an atom
+// type); until that migration lands, workflow_compositions has no source and
+// stays empty.
 
 import { readFile, writeFile, mkdir, readdir, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
@@ -33,12 +36,8 @@ async function readJsonFiles(dir) {
 
 async function main() {
   const pipelineDir = join(REPO_DIR, "src", "pipeline-atoms", "atoms");
-  const workflowDir = join(REPO_DIR, "src", "workflow-atoms", "workflows");
-
-  const [pipelineAtoms, workflowCompositions] = await Promise.all([
-    readJsonFiles(pipelineDir),
-    readJsonFiles(workflowDir),
-  ]);
+  const pipelineAtoms = await readJsonFiles(pipelineDir);
+  const workflowCompositions = [];
 
   // The compositions that power the atoms ecosystem itself
   const ecosystemCompositions = ["atoms-catalog-cicd", "terraform-lifecycle", "repo-governance", "security-baseline"];

@@ -25,8 +25,8 @@ canonical hash (SHA-256 of canonical TOML with [signatures] removed),
 and checks the signature against the umbrella root key at /keys/root.toml.
 
 Examples:
-  atoms verify https://atoms.convergent-systems.co/catalogs/prompt-atoms.toml
-  atoms verify ./catalogs/prompt-atoms.toml`,
+  atoms verify https://atoms.convergent-systems.co/catalogs/channel-atoms.toml
+  atoms verify ./catalogs/channel-atoms.toml`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			raw, err := readAtom(cmd.Context(), args[0])

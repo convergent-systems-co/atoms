@@ -29,8 +29,10 @@ jobs:
             --limit 200 \
             --json name \
             --jq '.[].name | select(endswith("-atoms"))' \
-            | sort > /tmp/github-atoms.txt
-          echo "Found $(wc -l < /tmp/github-atoms.txt) repos on GitHub"
+            | sort > /tmp/github-atoms-raw.txt
+          grep -v '^#' .github/retired-atoms.txt | grep -v '^$' | sort > /tmp/retired-atoms.txt
+          comm -23 /tmp/github-atoms-raw.txt /tmp/retired-atoms.txt > /tmp/github-atoms.txt
+          echo "Found $(wc -l < /tmp/github-atoms-raw.txt) repos on GitHub, $(wc -l < /tmp/retired-atoms.txt) excluded as retired"
           cat /tmp/github-atoms.txt
 
       - name: Collect .gitmodules entries

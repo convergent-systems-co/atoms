@@ -20,25 +20,24 @@ import Base from "../layouts/Base.astro";
   },
   "catalogs": [
     {
-      "name": "prompt-atoms",
+      "name": "channel-atoms",
       "version": "0.1.0",
       "status": "live",
-      "domain": "prompt-atoms.com",
-      "pages_url": "https://prompt-atoms.pages.dev",
-      "github_url": "https://github.com/convergent-systems-co/prompt-atoms",
-      "federation": "xdao.co",
-      "purpose": "Prompt engineering as a canonical, machine-readable, ...",
-      "atom_types": ["persona", "constraint", "format-instruction", "tool-use-template", "refusal-pattern", "output-schema"],
-      "composition_type": "prompts",
-      "composition_dir": "prompts",
-      "rule_types": ["model-compatibility", "token-length-constraint", "format-compatibility"],
+      "domain": "channel-atoms.com",
+      "pages_url": "https://channel-atoms.pages.dev",
+      "github_url": "https://github.com/convergent-systems-co/channel-atoms",
+      "federation": "convergent-systems.co",
+      "purpose": "Communication channels canonicalized — Slack, email, SMS, webhook, ...",
+      "atom_types": ["protocol", "endpoint", "delivery-semantic", "transport", "auth-method"],
+      "composition_type": "channels",
+      "composition_dir": "channels",
       "runtime_consumers": ["aish", "olympus"],
       "license": "Apache-2.0",
       "live": {
-        "catalog_url": "https://prompt-atoms.pages.dev/exports/catalog.json",
-        "atoms": 50,
+        "catalog_url": "https://channel-atoms.pages.dev/exports/catalog.json",
+        "atoms": 40,
         "compositions": 2,
-        "rules": 2,
+        "rules": 0,
         "built_at": "2026-05-21T..."
       }
     },
@@ -64,7 +63,7 @@ import Base from "../layouts/Base.astro";
 
   <h2>Consuming a specific catalog</h2>
   <p>Each live catalog publishes its full content at <code>{`<pages_url>/exports/catalog.json`}</code>. Example:</p>
-  <pre><code>curl https://prompt-atoms.pages.dev/exports/catalog.json | jq '.atoms[0]'</code></pre>
+  <pre><code>curl https://channel-atoms.pages.dev/exports/catalog.json | jq '.atoms[0]'</code></pre>
 
   <h2>Caching</h2>
   <p>The directory is cached for 60s at the edge (<code>Cache-Control: public, max-age=60</code>). CORS is open (<code>Access-Control-Allow-Origin: *</code>) so any client can fetch.</p>

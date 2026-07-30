@@ -4,11 +4,197 @@
   "site": "https://atoms.convergent-systems.co",
   "description": "Master AI discovery index for the Convergent Systems atoms ecosystem — typed, versioned, composable libraries of AI primitives. Read instructions first, then explore the catalog list.",
   "summary": {
-    "total_catalogs": 2,
-    "live": 2,
-    "bootstrap": 0
+    "total_catalogs": 19,
+    "live": 17,
+    "bootstrap": 2
   },
   "catalogs": [
+    {
+      "name": "amendment-atoms",
+      "domain": "amendment-atoms.com",
+      "ai_endpoint": "https://amendment-atoms.com/ai/index.json",
+      "description": "Amendments to specifications and constitutional documents — typed proposal,\nratification, revocation, and effective-date primitives. The change-control\nvocabulary downstream catalogs (constitution-atoms, policy-atoms, schema-atoms)\ncompose against to evolve their published documents under a sanctioned,\nsigned, auditable lineage.",
+      "atom_types": [
+        "proposal",
+        "ratification",
+        "revocation",
+        "effective-date"
+      ],
+      "classes": 4,
+      "atoms": 3,
+      "status": "live"
+    },
+    {
+      "name": "brand-atoms",
+      "domain": "brand-atoms.com",
+      "ai_endpoint": "https://brand-atoms.com/ai/index.json",
+      "description": "Brand guidelines, from PDFs into typed YAML — machine-consumable, composable atoms covering palettes, fonts, and glyph sets.",
+      "atom_types": [
+        "palette",
+        "font",
+        "glyph"
+      ],
+      "classes": 3,
+      "atoms": 0,
+      "status": "bootstrap"
+    },
+    {
+      "name": "channel-atoms",
+      "domain": "channel-atoms.com",
+      "ai_endpoint": "https://channel-atoms.com/ai/index.json",
+      "description": "Communication channels canonicalized — Slack, email, SMS, webhook, IRC, Matrix, Discord, RSS, iMessage. Typed protocols, endpoints, delivery semantics, transports, and auth methods so any agent or runtime can declare a channel once and reach it everywhere.",
+      "atom_types": [
+        "protocol",
+        "endpoint",
+        "delivery-semantic",
+        "transport",
+        "auth-method"
+      ],
+      "classes": 5,
+      "atoms": 31,
+      "status": "live"
+    },
+    {
+      "name": "compliance-atoms",
+      "domain": "compliance-atoms.com",
+      "ai_endpoint": "https://compliance-atoms.com/ai/index.json",
+      "description": "SOC2, HIPAA, ISO27001, PCI, GDPR mapped once with shared control families, evidence types, audit requirements, and cross-framework equivalence — ending the industry-wide redundancy of duplicate control mappings.",
+      "atom_types": [
+        "control-family",
+        "control",
+        "evidence-type",
+        "audit-requirement"
+      ],
+      "classes": 4,
+      "atoms": 17,
+      "status": "live"
+    },
+    {
+      "name": "constitution-atoms",
+      "domain": "constitution-atoms.com",
+      "ai_endpoint": "https://constitution-atoms.com/ai/index.json",
+      "description": "Organizational constitutions canonicalized — bylaws, charters, mission\nstatements, principle hierarchies, value declarations — composed into typed\ngovernance corpora that downstream policy-atoms and compliance-atoms\nreference.",
+      "atom_types": [
+        "charter",
+        "bylaw",
+        "principle",
+        "mission-statement",
+        "value-declaration"
+      ],
+      "classes": 5,
+      "atoms": 3,
+      "status": "live"
+    },
+    {
+      "name": "context-atoms",
+      "domain": "context-atoms.com",
+      "ai_endpoint": "https://context-atoms.com/ai/index.json",
+      "description": "Context primitives for AI runtimes — situational frames, environment descriptors,\nconversation scopes, working-memory shapes, attention budgets. Composes with\nagent-atoms and prompt-atoms so an agent's situational context is expressed as\ntyped, versioned, signed atoms rather than free-text prose dumped into a system\nprompt.",
+      "atom_types": [
+        "situational-frame",
+        "environment-descriptor",
+        "conversation-scope",
+        "working-memory-shape",
+        "attention-budget"
+      ],
+      "classes": 5,
+      "atoms": 9,
+      "status": "live"
+    },
+    {
+      "name": "doc-atoms",
+      "domain": "doc-atoms.com",
+      "ai_endpoint": "https://doc-atoms.com/ai/index.json",
+      "description": "Explanatory documentation as atoms — tutorials, explanations, runbooks,\nhow-tos, and reference guides. doc-atoms is the narrative/teaching catalog\nin the ecosystem; it is distinct from schema-atoms, which holds normative\nspecs and JSON Schemas. Specs are versioned and amended; documentation\nexplains, narrates, or teaches and is not normative (atoms-spec/v1.1.0\nPart II — \"Distinction from doc-atoms\").",
+      "atom_types": [
+        "tutorial",
+        "explanation",
+        "runbook",
+        "how-to",
+        "reference-guide"
+      ],
+      "classes": 5,
+      "atoms": 13,
+      "status": "live"
+    },
+    {
+      "name": "event-atoms",
+      "domain": "event-atoms.com",
+      "ai_endpoint": "https://event-atoms.com/ai/index.json",
+      "description": "Event primitives — types, schemas, channels, subscription patterns, delivery semantics — paired with Service Atoms to cover the request/response and async halves of distributed systems.",
+      "atom_types": [
+        "event-type",
+        "schema",
+        "channel",
+        "subscription-pattern",
+        "delivery-semantics"
+      ],
+      "classes": 5,
+      "atoms": 3,
+      "status": "live"
+    },
+    {
+      "name": "identity-atoms",
+      "domain": "identity-atoms.com",
+      "ai_endpoint": "https://identity-atoms.com/ai/index.json",
+      "description": "Identity primitives unified across vendors — auth methods, claim types, trust frameworks, key and certificate types — defined once and composable into identity profiles, federated setups, and persona templates.",
+      "atom_types": [
+        "auth-method",
+        "claim-type",
+        "trust-framework",
+        "key-cert-type"
+      ],
+      "classes": 4,
+      "atoms": 8,
+      "status": "live"
+    },
+    {
+      "name": "key-atoms",
+      "domain": "key-atoms.com",
+      "ai_endpoint": "https://key-atoms.com/ai/index.json",
+      "description": "Cryptographic keys, key roles, key successions, and revocations as atoms.\nPublic-key records only — private key material NEVER lives in this repo\nand is held exclusively in the principal's offline secret store. Every\n*-atoms catalog in the convergent-systems.co federation depends on\nkey-atoms for signature verification under atoms-spec/v1.1.0.",
+      "atom_types": [
+        "key",
+        "revocation",
+        "succession"
+      ],
+      "classes": 3,
+      "atoms": 0,
+      "status": "live"
+    },
+    {
+      "name": "knowledge-atoms",
+      "domain": "knowledge-atoms.com",
+      "ai_endpoint": "https://knowledge-atoms.com/ai/index.json",
+      "description": "Knowledge graph primitives as a foundation for RAG, semantic memory, and AI knowledge bases — entity types, relationship types, provenance, fact types, confidence primitives.",
+      "atom_types": [
+        "entity-type",
+        "relationship-type",
+        "provenance-atom",
+        "fact-type",
+        "confidence-primitive"
+      ],
+      "classes": 5,
+      "atoms": 6,
+      "status": "live"
+    },
+    {
+      "name": "model-atoms",
+      "domain": "model-atoms.com",
+      "ai_endpoint": "https://model-atoms.com/ai/index.json",
+      "description": "AI model definitions canonicalized — Claude, GPT, Llama, Gemini, Mistral variants with capabilities, context windows, pricing tiers, deprecation policy, tool-use shape, vision support, modality. One typed source-of-truth for what a model is, what it can do, and when it goes away.",
+      "atom_types": [
+        "model-card",
+        "capability",
+        "pricing-tier",
+        "deprecation-policy",
+        "tool-use-shape",
+        "modality"
+      ],
+      "classes": 6,
+      "atoms": 84,
+      "status": "live"
+    },
     {
       "name": "pipeline-atoms",
       "domain": "pipeline-atoms.com",
@@ -25,20 +211,115 @@
       "status": "live"
     },
     {
-      "name": "workflow-atoms",
-      "domain": "workflow-atoms.com",
-      "ai_endpoint": "https://workflow-atoms.com/ai/index.json",
-      "description": "Workflow primitives unified across n8n, Zapier, GitHub Actions, Temporal, Airflow — step types, triggers, states, and gates composed into typed workflows with no per-tool DSL.",
+      "name": "plugin-atoms",
+      "domain": "plugin-atoms.com",
+      "ai_endpoint": "https://plugin-atoms.com/ai/index.json",
+      "description": "Plugin interface standards — not implementations — making plugins ecosystem-portable across Convergent Systems runtimes. USB-C for software plugins.",
       "atom_types": [
-        "step-type",
-        "trigger-type",
-        "state-type",
-        "gate-type",
-        "github"
+        "interface-contract",
+        "capability-declaration",
+        "permission-scope",
+        "lifecycle-hook",
+        "trust-primitive"
       ],
       "classes": 5,
-      "atoms": 42,
+      "atoms": 5,
       "status": "live"
+    },
+    {
+      "name": "policy-atoms",
+      "domain": "policy-atoms.com",
+      "ai_endpoint": "https://policy-atoms.com/ai/index.json",
+      "description": "Governance rules as typed, versioned, catalog-driven artifacts — subjects, resources, actions, effects, and conditions — so every organization stops reinventing the same policies.",
+      "atom_types": [
+        "subject",
+        "resource",
+        "action",
+        "effect",
+        "condition"
+      ],
+      "classes": 5,
+      "atoms": 0,
+      "status": "live"
+    },
+    {
+      "name": "profile-atoms",
+      "domain": "profile-atoms.com",
+      "ai_endpoint": "https://profile-atoms.com/ai/index.json",
+      "description": "User/agent profile compositions — durable \"working-identity\" declarations for the Olympus broker. Each profile composes role-packs, policy stack, governance stack, default persona/theme/budget, available identities/channels, knowledge sources, and default workflows into a coherent posture. Catalog is composition-only; primitive atoms live in other catalogs.",
+      "atom_types": [],
+      "classes": 0,
+      "atoms": 0,
+      "status": "live"
+    },
+    {
+      "name": "schema-atoms",
+      "domain": "schema-atoms.com",
+      "ai_endpoint": "https://schema-atoms.com/ai/index.json",
+      "description": null,
+      "atom_types": [
+        "design-spec",
+        "openapi-spec",
+        "asyncapi-spec",
+        "graphql-schema",
+        "grpc-spec",
+        "json-rpc-spec",
+        "json-schema",
+        "protobuf-schema",
+        "avro-schema",
+        "xml-schema",
+        "toml-schema",
+        "rfc",
+        "w3c-spec",
+        "iso-spec",
+        "fips",
+        "internal-protocol",
+        "bnf-grammar",
+        "ebnf-grammar",
+        "language-reference",
+        "query-language-spec",
+        "regex-spec",
+        "ontology",
+        "controlled-vocabulary",
+        "code-list",
+        "skill",
+        "hook"
+      ],
+      "classes": 26,
+      "atoms": 30,
+      "status": "live"
+    },
+    {
+      "name": "service-atoms",
+      "domain": "service-atoms.com",
+      "ai_endpoint": "https://service-atoms.com/ai/index.json",
+      "description": "Replaces DNS for services inside the ecosystem while remaining decentralized at the implementation layer — identity, protocol, schema, policy, and endpoint primitives composed into typed services.",
+      "atom_types": [
+        "identity",
+        "protocol",
+        "schema",
+        "policy",
+        "endpoint-pattern"
+      ],
+      "classes": 5,
+      "atoms": 20,
+      "status": "live"
+    },
+    {
+      "name": "theme-atoms",
+      "domain": "theme-atoms.com",
+      "ai_endpoint": "https://theme-atoms.com/ai/index.json",
+      "description": "Theme primitives for terminal, shell, editor, and TUI experiences — prompt segments, separators, glyph sets, role bindings, syntax schemes. Composable surface designs that extend brands with surface-specific behavior.",
+      "atom_types": [
+        "prompt-segment",
+        "separator-style",
+        "glyph-set",
+        "role-binding",
+        "syntax-scheme"
+      ],
+      "classes": 5,
+      "atoms": 2,
+      "status": "bootstrap"
     }
   ]
 }

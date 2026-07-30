@@ -3,18 +3,18 @@ canonical_name = "atoms.convergent-systems.co/spec/atom-spec"
 version = "1.0.0"
 atom_type = "atoms.convergent-systems.co/spec"
 authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
-created_at = "2026-05-26T14:30:58.668Z"
+created_at = "2026-07-30T22:51:21.656Z"
 
 [signatures]
-"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "qj8yp9B5eLkamNfT8ENMCuuAcJY1GLZx551sjEMQxNw2c94uz5xiYrShowkPHoOdh3SJyrfaudAifUehIV+zCA=="
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "T0qHN42fatJjnBIJkQArY42FOsHdHaCxBp5mDuhcwzuUiElb2WtbcB8lnlN7xULRl3H7rkEQGZD+zsX7kEGpAA=="
 
 [body]
 markdown = """
-# The Atom Spec — v1.2.0
+# The Atom Spec — v1.3.0
 
-**Status:** v1.2.0 — Additive revision of v1.1.0. Adds Part XIV (AI Discovery Interface). All v1.1.0 atoms remain valid.
+**Status:** v1.3.0 — Additive revision of v1.2.0. Adds Part XV (Umbrella Registry AI Discovery), extends Part XIV with `/ai/instructions.md`, documents `directory.json` schema, and clarifies ATOMS.yml field encoding. All v1.2.0 atoms remain valid.
 
-**Predecessor:** v1.0.0 (bootstrap, hand-authored). All v1.0.0 atoms remain verifiable; v1.1.0 is backward-compatible at the verification layer.
+**Predecessor:** v1.2.0. All v1.2.0 atoms remain verifiable; v1.3.0 is backward-compatible at the verification layer.
 
 **Author of this revision:** convergent-systems-co (sole contributor at time of writing — see Part XII, Phase Model).
 
@@ -23,6 +23,15 @@ markdown = """
 ## Summary of changes from v1.0.0
 
 This revision adds the following capabilities to the spec. Each is documented in the Part referenced below.
+
+**New in v1.3.0:**
+
+20. **Umbrella Registry AI Discovery** — `atoms.convergent-systems.co/ai/index.json` and `/ai/instructions.md` defined as the master AI entry points for the full ecosystem (Part XV, new)
+21. **`/ai/instructions.md`** — RECOMMENDED artifact on every catalog site; explains the catalog's atom types, navigation, and invocation contract to AI consumers (Part XIV §XIV.6, new)
+22. **`directory.json` schema** — formally documents the umbrella registry's machine-readable catalog list including `ai_endpoint` and `local_atoms` fields (Part XV §XV.3)
+23. **ATOMS.yml field encoding clarification** — all fields use snake_case; camelCase aliases do not exist (Part VIII §VIII.clarification, new)
+
+**Previously added (v1.1.0 / v1.2.0):**
 
 1. **Federation correction** — `xdao.co` → `convergent-systems.co` (Part VII)
 2. **Dual-license model** — Apache-2.0 for code, CC-BY-4.0 for data (Part VII)
@@ -705,10 +714,164 @@ This makes individual atoms self-describing: an agent holding a single `brand.js
 
 brand-atoms.com (`convergent-systems-co/branding-library`) is the canonical reference implementation of this part. See `web/src/pages/ai/index.json.ts` in that repository.
 
+### XIV.6 `/ai/instructions.md` — RECOMMENDED per-catalog guide
+
+**Status:** Added in v1.3.0.
+
+Every catalog site SHOULD expose a human- and AI-readable Markdown guide at:
+
+```
+https://<canonical-domain>/ai/instructions.md
+```
+
+This file explains the catalog to an AI consumer who has already read `/ai/index.json` and wants to understand how to use specific atoms. It is not a discovery file — it is a usage guide. Recommended sections:
+
+1. **What this catalog is** — one paragraph; what the atoms are for
+2. **Atom types** — for each declared type: what it represents, when to use it, example atom ID
+3. **Navigation recipe** — step-by-step: how to list atoms, fetch a specific atom, find compositions
+4. **Invocation contract** — for skill catalogs: inputs, outputs, side effects
+5. **Composition patterns** — for catalogs that expose compositions: how to find and apply them
+6. **Trust and signing** — where to verify signatures; link to key-atoms
+
+The file MAY be referenced from `/ai/index.json` via an `instructions` top-level key placed **before** the `catalog` key, so streaming readers encounter it first:
+
+```json
+{
+  "version": "1",
+  "instructions": "https://<canonical-domain>/ai/instructions.md",
+  "site": "https://<canonical-domain>",
+  "description": "...",
+  "catalog": { ... }
+}
+```
+
 ---
 
-## Changelog (v1.1.0 → v1.2.0)
+## Part XV — Umbrella Registry AI Discovery
 
+**Status:** Added in v1.3.0.
+
+The atoms ecosystem has a single umbrella registry at `atoms.convergent-systems.co`. This Part defines the AI-specific endpoints that serve as the master entry point for agents exploring the full ecosystem.
+
+### XV.1 Design principle
+
+An AI agent SHOULD be able to discover the full ecosystem — all 25+ catalogs, their domains, their atom types, and their individual AI endpoints — by fetching **one URL**. That URL is the umbrella's `/ai/index.json`. The first key in the response is `instructions`, pointing to the prose guide. Everything else follows.
+
+### XV.2 Required endpoints
+
+The umbrella registry MUST expose:
+
+| Path | Description |
+|---|---|
+| `/ai/index.json` | Master AI directory of all catalogs |
+| `/ai/instructions.md` | Ecosystem-level guide for AI consumers |
+| `/directory.json` | Full machine-readable registry (see §XV.3) |
+
+### XV.3 `/ai/index.json` — umbrella schema
+
+The umbrella's `/ai/index.json` is **not** the same format as the per-catalog `/ai/index.json` defined in Part XIV. It is a **directory**, not a catalog. It MUST conform to:
+
+```json
+{
+  "instructions": "https://atoms.convergent-systems.co/ai/instructions.md",
+  "version": "1",
+  "site": "https://atoms.convergent-systems.co",
+  "description": "<one-sentence description of the ecosystem>",
+  "summary": {
+    "total_catalogs": 25,
+    "live": 20,
+    "bootstrap": 5
+  },
+  "catalogs": [
+    {
+      "name": "brand-atoms",
+      "domain": "brand-atoms.com",
+      "ai_endpoint": "https://brand-atoms.com/ai/index.json",
+      "description": "<catalog purpose>",
+      "atom_types": ["palette", "font", "glyph"],
+      "classes": 3,
+      "atoms": 150,
+      "status": "live"
+    }
+  ]
+}
+```
+
+Field requirements:
+
+| Field | Required | Notes |
+|---|---|---|
+| `instructions` | REQUIRED | MUST be the **first key** in the JSON object. Streaming readers see it immediately and can fetch the guide before parsing the full catalog list. |
+| `version` | REQUIRED | String `"1"`. |
+| `site` | REQUIRED | Canonical HTTPS URL of the umbrella site. |
+| `description` | REQUIRED | One sentence. |
+| `summary.total_catalogs` | REQUIRED | Count of all catalogs in the ecosystem. |
+| `summary.live` | REQUIRED | Count with a live deploy. |
+| `summary.bootstrap` | REQUIRED | Count declared but not yet deployed. |
+| `catalogs[]` | REQUIRED | Sorted alphabetically by `name`. |
+| `catalogs[].name` | REQUIRED | Catalog slug matching `ATOMS.yml name`. |
+| `catalogs[].domain` | REQUIRED | Canonical domain from `ATOMS.yml canonical_domain`. |
+| `catalogs[].ai_endpoint` | REQUIRED | URL of the catalog's own `/ai/index.json`. |
+| `catalogs[].description` | REQUIRED | From `ATOMS.yml description` or `purpose`. |
+| `catalogs[].atom_types` | REQUIRED | Array from `ATOMS.yml atom_types`. |
+| `catalogs[].classes` | REQUIRED | `atom_types.length`. |
+| `catalogs[].atoms` | RECOMMENDED | Total atom count; from live endpoint or local build count. |
+| `catalogs[].status` | REQUIRED | `"live"` or `"bootstrap"`. |
+
+### XV.4 `/ai/instructions.md` — umbrella guide
+
+The umbrella's `/ai/instructions.md` MUST be a Markdown document that covers:
+
+1. **What atoms are** — the primitive, its fields, its invariants
+2. **Navigation recipe** — how to go from umbrella to catalog to atom (step-by-step with example URLs)
+3. **Catalog map** — for each catalog: what it contains and when to use it
+4. **Composition** — how compositions assemble atoms
+5. **Trust** — where to verify signatures
+6. **Self-referential note** — the umbrella site itself is built using pipeline-atoms and workflow-atoms; links to `/pipelines/`
+
+### XV.5 `directory.json` schema
+
+The umbrella MUST serve a full machine-readable registry at `/directory.json`. This is the authoritative source from which `/ai/index.json` is derived. It MUST include all fields in `/ai/index.json` plus the following additional fields per catalog entry:
+
+| Field | Description |
+|---|---|
+| `version` | Catalog version from `ATOMS.yml version` |
+| `pages_url` | Cloudflare Pages URL (`https://<name>.pages.dev`) |
+| `github_url` | GitHub URL (`https://github.com/convergent-systems-co/<name>`) |
+| `federation` | From `ATOMS.yml federation` |
+| `composition_type` | From `ATOMS.yml composition_type` |
+| `composition_dir` | From `ATOMS.yml composition_dir` |
+| `rule_types` | From `ATOMS.yml rule_types` |
+| `runtime_consumers` | From `ATOMS.yml runtime_consumers` |
+| `license` | From `ATOMS.yml licensing.code` |
+| `local_atoms` | Count from submodule atom files at build time |
+| `live` | Object `{catalog_url, atoms, compositions, rules, built_at}` when the catalog's `/exports/catalog.json` is reachable; `null` otherwise |
+
+The `status` field is `"live"` when `live` is non-null, `"bootstrap"` otherwise.
+
+### XV.6 ATOMS.yml field encoding clarification
+
+**Status:** Added in v1.3.0.
+
+All fields in `ATOMS.yml` use **snake_case** exclusively. No camelCase aliases exist. Implementations reading `ATOMS.yml` MUST use the exact field names as declared:
+
+| Field | Correct | Incorrect (DO NOT USE) |
+|---|---|---|
+| Atom types | `atom_types` | `atomTypes` |
+| Canonical domain | `canonical_domain` | `domain`, `canonicalDomain` |
+| Composition type | `composition_type` | `compositionType` |
+| Composition dir | `composition_dir` | `compositionDir` |
+| Rule types | `rule_types` | `ruleTypes` |
+| Runtime consumers | `runtime_consumers` | `runtimeConsumers` |
+| License (under `licensing`) | `licensing.code` | `license`, `licensing_code` |
+
+Implementations that read ATOMS.yml with camelCase key names will receive `undefined` for all fields. The ATOMS.yml schema validator in schema-atoms enforces snake_case.
+
+---
+
+## Changelog (v1.1.0 → v1.3.0)
+
+- **v1.3.0** — Added Part XV (Umbrella Registry AI Discovery): `atoms.convergent-systems.co/ai/index.json` and `/ai/instructions.md` schemas; `directory.json` full field specification; `instructions` as the mandatory first key in both umbrella and per-catalog `ai/index.json` when a guide exists. Extended Part XIV with §XIV.6 (`/ai/instructions.md` as a RECOMMENDED per-catalog guide). Added §XV.6 ATOMS.yml snake_case encoding clarification. Additive; all v1.2.0 atoms remain valid.
 - **v1.2.0** — Added Part XIV (AI Discovery Interface): required `/ai/index.json` endpoint, three-surface discoverability (head link, robots.txt, footer), optional `_ai` metadata block in built JSON artifacts. Additive; all v1.1.0 atoms remain valid.
 """
 markdown_url = "/spec/atom-spec.md"

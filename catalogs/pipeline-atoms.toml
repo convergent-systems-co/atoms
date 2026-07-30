@@ -3,10 +3,10 @@ canonical_name = "atoms.convergent-systems.co/catalogs/pipeline-atoms"
 version = "0.1.0"
 atom_type = "atoms.convergent-systems.co/catalogs"
 authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
-created_at = "2026-05-26T14:30:58.668Z"
+created_at = "2026-07-30T22:51:21.656Z"
 
 [signatures]
-"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "Y+5I4tNcKQitoqhwHoFS8oRzIlY6nj951ezzVTTdmcw9+0yb5dgN4/h44YaQ7j7mHF0zPUHlETtcyPWg/nh9DQ=="
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "2F4R+EMEsSvj8lNEK3v36HpkBWMGJmObRjl2pSBeHGnKFIOm4NFvLPe8Mkg9sQOwCVQtcuYEhObSpVZqoR8kBA=="
 
 [body]
 atom_types = []

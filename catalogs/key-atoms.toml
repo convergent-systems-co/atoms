@@ -3,10 +3,10 @@ canonical_name = "atoms.convergent-systems.co/catalogs/key-atoms"
 version = "0.1.0"
 atom_type = "atoms.convergent-systems.co/catalogs"
 authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
-created_at = "2026-05-26T14:30:58.668Z"
+created_at = "2026-07-30T22:51:21.656Z"
 
 [signatures]
-"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "0l0ZuFDEQb/c+Ss4pnmPS8LlvnznUQeaNFZ++SUs+oqU/MBmuBzvMGGphhXxScgTCtcbWpn+9sZu+wLzCeh9CQ=="
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "jtmOa3UBD7WKBinqI6Jk0Aue7fbqqRzMwgrZkUpWEB9E/Q1iUnU8UgdqSQa9R8c2JAFtTJZlgwjRVamElKCuDA=="
 
 [body]
 atom_types = []

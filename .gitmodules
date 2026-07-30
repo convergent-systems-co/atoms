@@ -4,9 +4,6 @@
 [submodule "service-atoms"]
 	path = src/service-atoms
 	url = https://github.com/convergent-systems-co/service-atoms.git
-[submodule "prompt-atoms"]
-	path = src/prompt-atoms
-	url = https://github.com/convergent-systems-co/prompt-atoms.git
 [submodule "policy-atoms"]
 	path = src/policy-atoms
 	url = https://github.com/convergent-systems-co/policy-atoms.git
@@ -16,12 +13,6 @@
 [submodule "compliance-atoms"]
 	path = src/compliance-atoms
 	url = https://github.com/convergent-systems-co/compliance-atoms.git
-[submodule "workflow-atoms"]
-	path = src/workflow-atoms
-	url = https://github.com/convergent-systems-co/workflow-atoms.git
-[submodule "agent-atoms"]
-	path = src/agent-atoms
-	url = https://github.com/convergent-systems-co/agent-atoms.git
 [submodule "knowledge-atoms"]
 	path = src/knowledge-atoms
 	url = https://github.com/convergent-systems-co/knowledge-atoms.git
@@ -34,9 +25,6 @@
 [submodule "theme-atoms"]
 	path = src/theme-atoms
 	url = https://github.com/convergent-systems-co/theme-atoms.git
-[submodule "persona-atoms"]
-	path = src/persona-atoms
-	url = https://github.com/convergent-systems-co/persona-atoms.git
 [submodule "channel-atoms"]
 	path = src/channel-atoms
 	url = https://github.com/convergent-systems-co/channel-atoms.git
@@ -46,9 +34,6 @@
 [submodule "profile-atoms"]
 	path = src/profile-atoms
 	url = https://github.com/convergent-systems-co/profile-atoms.git
-[submodule "src/skill-atoms"]
-	path = src/skill-atoms
-	url = https://github.com/convergent-systems-co/skill-atoms.git
 [submodule "src/schema-atoms"]
 	path = src/schema-atoms
 	url = https://github.com/convergent-systems-co/schema-atoms.git
@@ -58,9 +43,6 @@
 [submodule "src/context-atoms"]
 	path = src/context-atoms
 	url = https://github.com/convergent-systems-co/context-atoms.git
-[submodule "src/action-atoms"]
-	path = src/action-atoms
-	url = https://github.com/convergent-systems-co/action-atoms.git
 [submodule "src/amendment-atoms"]
 	path = src/amendment-atoms
 	url = https://github.com/convergent-systems-co/amendment-atoms.git

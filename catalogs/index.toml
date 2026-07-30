@@ -3,26 +3,14 @@ canonical_name = "atoms.convergent-systems.co/catalogs/index"
 version = "1.0.0"
 atom_type = "atoms.convergent-systems.co/class-index"
 authored_by = "ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y="
-created_at = "2026-05-26T14:30:58.668Z"
+created_at = "2026-07-30T22:51:21.656Z"
 
 [signatures]
-"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "TeC7g2+PRbG9RPNUou1mgD00ev6md4JTy02wu7GuCcgtS9qRBydA57zjG9l21tHo3J91tDYFhO5cjIP+PyTyDw=="
+"ed25519:P6+CekZ4v8Y+h4AUvxnVoGc9scE4kwOn3Ee46/3P65Y=" = "2XdLgXf028rVt5oWfOv+wT2mo9KEoMLD++0lj1GCG7IRJnyWVGKqN7mSZPQ02e/CJpVm6fA4SzWZeIMjsDPWAw=="
 
 [body]
 class = "catalogs"
-total = 25
-
-[[body.catalogs]]
-canonical_domain = "action-atoms.com"
-name = "action-atoms"
-url = "/catalogs/action-atoms.toml"
-version = "0.1.0"
-
-[[body.catalogs]]
-canonical_domain = "agent-atoms.com"
-name = "agent-atoms"
-url = "/catalogs/agent-atoms.toml"
-version = "0.1.0"
+total = 19
 
 [[body.catalogs]]
 canonical_domain = "amendment-atoms.com"
@@ -97,12 +85,6 @@ url = "/catalogs/model-atoms.toml"
 version = "0.1.0"
 
 [[body.catalogs]]
-canonical_domain = "persona-atoms.com"
-name = "persona-atoms"
-url = "/catalogs/persona-atoms.toml"
-version = "0.1.0"
-
-[[body.catalogs]]
 canonical_domain = "pipeline-atoms.com"
 name = "pipeline-atoms"
 url = "/catalogs/pipeline-atoms.toml"
@@ -127,12 +109,6 @@ url = "/catalogs/profile-atoms.toml"
 version = "0.1.0"
 
 [[body.catalogs]]
-canonical_domain = "prompt-atoms.com"
-name = "prompt-atoms"
-url = "/catalogs/prompt-atoms.toml"
-version = "0.1.0"
-
-[[body.catalogs]]
 canonical_domain = "schema-atoms.com"
 name = "schema-atoms"
 url = "/catalogs/schema-atoms.toml"
@@ -145,19 +121,7 @@ url = "/catalogs/service-atoms.toml"
 version = "0.1.0"
 
 [[body.catalogs]]
-canonical_domain = "skill-atoms.com"
-name = "skill-atoms"
-url = "/catalogs/skill-atoms.toml"
-version = "0.1.0"
-
-[[body.catalogs]]
 canonical_domain = "theme-atoms.com"
 name = "theme-atoms"
 url = "/catalogs/theme-atoms.toml"
-version = "0.1.0"
-
-[[body.catalogs]]
-canonical_domain = "workflow-atoms.com"
-name = "workflow-atoms"
-url = "/catalogs/workflow-atoms.toml"
 version = "0.1.0"

@@ -184,10 +184,10 @@ Eight schemas under `schemas/v1/`, each using `oneOf` with
   canonical URL; the rest change shape. There is no in-place upgrade path.
 - **Seven domains must serve 301s from `infra/` in the same release** or every
   existing reference breaks.
-- **`ai-atoms` is currently undiscoverable.** `catalogs/ai-atoms.toml` does not
-  exist and `catalogs/index.toml` has zero occurrences of it. That must be
-  authored and the index re-signed (`make sign`, requires a 1Password session)
-  before any of this is reachable.
+- **`model-atoms` and `context-atoms` must leave the registry.** Both are
+  currently listed in `catalogs/index.toml`; this ADR folds one in and drops the
+  other. Removal requires re-signing (`make sign`, needs a 1Password session).
+  `ai-atoms` itself is already registered (`catalogs/ai-atoms.toml`).
 - **`spec_version` is unresolved.** `ai-atoms/ATOMS.yml` pins
   `atoms-spec/v1.1.0`; `spec/` publishes v1.0.0, v1.2.0, v1.3.0. v1.1.0 does not
   exist there.

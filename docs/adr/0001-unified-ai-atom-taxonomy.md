@@ -6,10 +6,16 @@
 
 ## Context
 
-`ai-atoms` becomes the single catalog for all AI-runtime primitives. Seven
+`ai-atoms` becomes the single catalog for all AI-runtime primitives. **Eight**
 catalogs fold in: `persona-atoms`, `agent-atoms`, `prompt-atoms`, `model-atoms`,
-`skill-atoms`, `context-atoms`, `knowledge-atoms`. `aiConstitution` stays
-separate — it is Apache-2.0 executable code that *consumes* the catalog.
+`skill-atoms`, `workflow-atoms`, `context-atoms`, `knowledge-atoms`.
+`aiConstitution` stays separate — it is Apache-2.0 executable code that
+*consumes* the catalog.
+
+> **Corrected 2026-08-16.** `workflow-atoms` was omitted from the original
+> scope. Its `step-type` (31) and `gate-type` (9) atoms are workflow primitives
+> and belong under this ADR's `workflow` type; its 4 agentic workflows are
+> compositions. Only the 14 CI/CD workflows stay out.
 
 This is a **clean-sheet taxonomy**. The existing types are treated as input
 material, not as constraints. Where today's vocabulary does not survive
@@ -17,20 +23,36 @@ first-principles design, it is retired rather than preserved as a sub-type.
 
 ### Measured starting state
 
-Actual `.json` instance counts under `atoms/`, taken 2026-08-16 from the pinned
-submodule commits — not the type lists declared in `ATOMS.yml`.
+Actual `.json` instance counts under `atoms/`.
+
+> **Corrected 2026-08-16.** The original table was measured from the *pinned
+> submodule commits*, which lagged the catalogs' actual HEADs. Re-measured
+> against the source repositories' HEADs during migration
+> (convergent-systems-co/ai-atoms#46). Four rows were wrong, one type was
+> missing entirely, and the scope omitted a catalog. Superseded values below;
+> the taxonomy decision is unchanged.
 
 | Catalog | Atoms | Types (instances) |
 |---|---:|---|
-| `ai-atoms` | 298 | skill 284, hook 14 |
+| `ai-atoms` | 302 | skill 284, hook 18 |
 | `model-atoms` | 84 | model-card 77, capability 7 |
-| `prompt-atoms` | 60 | persona 20, constraint 15, format-instruction 10, output-schema 5, refusal-pattern 5, tool-use-template 5 |
-| `persona-atoms` | 53 | knowledge-boundary 17, role-definition 17, behavioural-constraint 11, tone-parameter 4, voice-profile 4 |
+| `persona-atoms` | **78** | role-definition 28, knowledge-boundary 23, behavioural-constraint 13, **work-contract 6**, tone-parameter 4, voice-profile 4 |
+| `prompt-atoms` | **61** | persona 21, constraint 15, format-instruction 10, output-schema 5, refusal-pattern 5, tool-use-template 5 |
 | `agent-atoms` | 48 | tool-definition 20, persona 10, capability-declaration 8, isolation-constraint 5, role-boundary 5 |
+| `workflow-atoms` | **40** | step-type 31, gate-type 9 |
 | `skill-atoms` | 22 | skill 22 |
 | `knowledge-atoms` | 3 | entity-type 1, fact-type 1, provenance-atom 1 |
 | `context-atoms` | 0 | — |
-| **Total** | **568** | **34 declared types** |
+| **Total** | **638** | **37 declared types** |
+
+Corrections against the original figures: `persona-atoms` 53 → **78** (and it has
+a **`work-contract`** type the first pass missed entirely); `prompt-atoms`
+60 → **61**; `ai-atoms` 298 → **302**; `workflow-atoms` added as an eighth
+source catalog, contributing 40 atoms. Total 568 → **638**.
+
+Beyond the `atoms/` trees, the source catalogs also ship **52 composition
+files** — 40 personas, 4 agents, 4 workflows, 3 prompts, 1 skill — which the
+original measurement did not count at all.
 
 Roughly a third of the declared vocabulary is empty: four `model-atoms` types,
 all five `context-atoms` types, and two `knowledge-atoms` types have zero
@@ -50,9 +72,16 @@ are *fields of a persona*, not things that exist independently. Nothing consumes
 a tone parameter on its own. The 2026-05-23 draft spec made exactly this
 argument and was never executed; `persona-atoms` still ships them.
 
-**It has no composition layer.** 568 primitives and no type that assembles them
-into a working agent. The thing users actually want to install — "a tech lead
-that plans, writes ADRs, and gates merges" — is unrepresentable.
+**Composition is untyped.** 638 primitives, and while 52 composition files do
+exist across the catalogs, no *atom type* represents them — so a composition
+cannot be versioned, referenced by canonical URL, or resolved as a dependency.
+The thing users actually want to install — "a tech lead that plans, writes ADRs,
+and gates merges" — exists as a file in `persona-atoms/personas/` but is
+unaddressable from the taxonomy.
+
+> **Corrected 2026-08-16.** The original text claimed there was "no composition
+> layer." There is one, per-catalog and untyped; the defect is that it sits
+> outside the type system, not that it is absent.
 
 **It confuses layers.** `agent-atoms/tool-definition` carries `tool_spec` and
 declares an executable affordance. `prompt-atoms/tool-use-template` carries
@@ -101,22 +130,45 @@ runtime-enforced refusals and ships with zero instances.
 
 ### 3. Every atom has a destination
 
+> **Corrected 2026-08-16** to the destinations actually used by the migration
+> (convergent-systems-co/ai-atoms#46).
+
 | Destination | Sources | Atoms |
 |---|---|---:|
-| `skill` | `ai-atoms/skill` 284, `skill-atoms/skill` 22 | 306 |
-| `model` | `model-atoms/*` | 84 |
-| `prompt` | `prompt-atoms/*` (all six types, renamed) | 60 |
-| `policy` | 5 types across `agent-atoms` + `persona-atoms` | 46 |
-| `agent/persona` | `persona-atoms/role-definition` 17, `agent-atoms/persona` 10 | 27 |
-| `tool` | `agent-atoms/tool-definition` | 20 |
-| `hook` | `ai-atoms/hook` | 14 |
-| *folded into `agent/persona` as fields* | `voice-profile` 4, `tone-parameter` 4 | 8 |
+| `skill` | `ai-atoms/skill` 284 + `skill-atoms` net-new 11 | **295** |
+| `model` | `model-atoms/*` *(pending)* | 84 |
+| `prompt` | `prompt-atoms/*`, subtypes preserved | **61** |
+| `policy` | `capability` 8, `isolation` 5, `boundary` 41 | **54** |
+| `workflow` | `step` 31, `gate` 9 | **40** |
+| `agent/persona` | `persona-atoms/role-definition` | **28** |
+| `tool/command` | `agent-atoms/tool-definition` | 20 |
+| `hook` | `ai-atoms/hook` | **18** |
+| `agent/_facets` | `work-contract` 6, `voice-profile` 4, `tone-parameter` 4 | **14** |
+| `agent/actor` | `agent-atoms/persona` | **10** |
+| *deferred — different contract* | `skill-atoms/skills/ai-hook` | 3 |
 | *out of scope* | `knowledge-atoms` | 3 |
 | *dropped* | `context-atoms` | 0 |
-| **Total** | | **568** |
+| **compositions** | personas 40, agents 4, workflows 4, prompts 3, skills 1 | **52** |
 
-No atom is orphaned. `agent/actor`, `agent/reviewer`, and all of `workflow`
-begin empty and are authored fresh.
+Four corrections to the original mapping:
+
+- **`skill` is 295, not 306.** Eleven of `skill-atoms`' 22 atoms were *already*
+  in `ai-atoms`. The original figure double-counted the overlap.
+- **`agent-atoms/persona` lands in `agent/actor`, not `agent/persona`.** Both
+  sources contain `code-reviewer.json` and `devops-engineer.json`; a flat merge
+  silently clobbered one with the other. They split cleanly on this ADR's own
+  criterion — `persona_profile` (behaviour) → `actor`, `job_to_be_done` (role
+  spec) → `persona`.
+- **`policy` is 54, not 46**, following the corrected `persona-atoms` counts.
+- **`work-contract` (6) joins the facets**, which the original omitted.
+
+The claim that "`agent/actor`, `agent/reviewer`, and all of `workflow` begin
+empty and are authored fresh" was **wrong**. `agent/actor` inherits 10 atoms,
+`workflow` inherits 40, and 52 compositions already existed — including the
+complete delivery-pipeline persona set (`planner-tech-lead`, `executor-coder`,
+`executor-tdd-test-writer`, `reviewer-adversarial-test-writer`,
+`coordinator-devops-engineer`, and others). Only `agent/reviewer` is genuinely
+empty.
 
 ### 4. Persona is not a type — it is an unbound agent
 
@@ -180,10 +232,11 @@ Eight schemas under `schemas/v1/`, each using `oneOf` with
 
 ## Consequences
 
-- **This is a rewrite, not a migration.** All 568 atoms are re-typed. 270 change
+- **This is a rewrite, not a migration.** All 638 atoms are re-typed. 336 change
   canonical URL; the rest change shape. There is no in-place upgrade path.
-- **Seven domains must serve 301s from `infra/` in the same release** or every
-  existing reference breaks.
+- **Seven domains must serve 301s from `infra/` in the same release** — 
+  `persona`, `agent`, `prompt`, `model`, `skill`, `workflow`, `context` — or
+  every existing reference breaks. `knowledge-atoms.com` stays live.
 - **`model-atoms` and `context-atoms` must leave the registry.** Both are
   currently listed in `catalogs/index.toml`; this ADR folds one in and drops the
   other. Removal requires re-signing (`make sign`, needs a 1Password session).

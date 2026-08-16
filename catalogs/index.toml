@@ -10,7 +10,7 @@ created_at = "2026-07-30T23:48:48.385Z"
 
 [body]
 class = "catalogs"
-total = 18
+total = 17
 
 [[body.catalogs]]
 canonical_domain = "ai-atoms.com"
@@ -88,12 +88,6 @@ version = "0.1.0"
 canonical_domain = "plugin-atoms.com"
 name = "plugin-atoms"
 url = "/catalogs/plugin-atoms.toml"
-version = "0.1.0"
-
-[[body.catalogs]]
-canonical_domain = "policy-atoms.com"
-name = "policy-atoms"
-url = "/catalogs/policy-atoms.toml"
 version = "0.1.0"
 
 [[body.catalogs]]
